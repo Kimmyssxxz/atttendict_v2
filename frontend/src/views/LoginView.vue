@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h2>Staff Login</h2>
+      <h2>Login</h2>
       <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
           <label for="username">Username</label>
@@ -33,25 +33,25 @@
 
 <script>
 export default {
-  name: 'StaffLoginView',
+  name: 'LoginView',
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
     };
   },
   methods: {
     async handleLogin() {
       try {
-        const response = await fetch('http://localhost:3001/auth/staff/login', {
+        const response = await fetch('http://localhost:3001/auth/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             username: this.username,
-            password: this.password
-          })
+            password: this.password,
+          }),
         });
 
         if (!response.ok) {
@@ -59,14 +59,27 @@ export default {
         }
 
         const data = await response.json();
-        console.log('Staff login successful:', data);
-        // e.g. this.$router.push('/some/staff/dashboard');
+        const user = data.user;
+
+        if (!user || !user.role) {
+          throw new Error('Invalid login response');
+        }
+
+        if (user.role === 'student') {
+          localStorage.setItem('internUser', JSON.stringify(user));
+          this.$router.push({ name: 'InternDashboard' });
+        } else if (user.role === 'staff') {
+          localStorage.setItem('staffUser', JSON.stringify(user));
+          this.$router.push({ name: 'StaffDashboard' });
+        } else {
+          throw new Error('This login page is only for intern and staff accounts.');
+        }
       } catch (error) {
-        console.error('Staff login error:', error);
-        alert('Staff login failed. Please check your credentials.');
+        console.error('Login error:', error);
+        alert('Login failed. Please check your credentials.');
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

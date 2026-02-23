@@ -71,8 +71,8 @@
             class="form-control"
           >
             <option disabled value="">Select role</option>
+            <option value="student">Student / Intern</option>
             <option value="staff">Staff</option>
-            <option value="admin">Admin</option>
           </select>
         </div>
 
@@ -85,6 +85,18 @@
             required
             class="form-control"
             placeholder="Enter position"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="assignedOffice">Assigned Office / Company</label>
+          <input
+            id="assignedOffice"
+            v-model="form.assignedOffice"
+            type="text"
+            required
+            class="form-control"
+            placeholder="Enter assigned office or company"
           />
         </div>
 
@@ -134,6 +146,7 @@ export default {
         lastName: '',
         role: '',
         position: '',
+        assignedOffice: '',
         password: '',
         confirmPassword: ''
       }
@@ -155,6 +168,7 @@ export default {
           lastName: this.form.lastName,
           role: this.form.role,
           position: this.form.position,
+          assignedOffice: this.form.assignedOffice,
           password: this.form.password
         });
 
