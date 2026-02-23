@@ -9,6 +9,7 @@
           <router-link to="/intern/attendance">My Attendance</router-link>
           <router-link to="/intern/notifications">Notifications</router-link>
           <router-link to="/intern/profile">Profile</router-link>
+          <router-link to="/intern/settings">Settings</router-link>
         </nav>
 
         <div class="notif-wrapper" @click="toggleNotifications">
@@ -73,6 +74,15 @@
             />
           </div>
           <div class="form-group">
+            <label for="editRequiredHours">OJT Required Hours</label>
+            <input
+              id="editRequiredHours"
+              type="number"
+              min="0"
+              v-model.number="intern.ojtRequiredHours"
+            />
+          </div>
+          <div class="form-group">
             <label for="editPhone">Phone Number</label>
             <input
               id="editPhone"
@@ -93,29 +103,6 @@
           </button>
           <p v-if="infoMessage" class="note">{{ infoMessage }}</p>
           <p v-if="infoError" class="note error-note">{{ infoError }}</p>
-        </form>
-      </section>
-
-      <section class="card password-card">
-        <h2>Change Password</h2>
-        <form class="password-form" @submit.prevent="handleChangePassword">
-          <div class="form-group">
-            <label for="current">Current Password</label>
-            <input id="current" type="password" v-model="passwordForm.currentPassword" />
-          </div>
-          <div class="form-group">
-            <label for="new">New Password</label>
-            <input id="new" type="password" v-model="passwordForm.newPassword" />
-          </div>
-          <div class="form-group">
-            <label for="confirm">Confirm New Password</label>
-            <input id="confirm" type="password" v-model="passwordForm.confirmNewPassword" />
-          </div>
-          <button type="submit" class="btn btn-save" :disabled="pwdSaving || !intern.id">
-            {{ pwdSaving ? 'Saving...' : 'Save' }}
-          </button>
-          <p v-if="pwdMessage" class="note">{{ pwdMessage }}</p>
-          <p v-if="pwdError" class="note error-note">{{ pwdError }}</p>
         </form>
       </section>
     </main>
@@ -144,6 +131,7 @@ export default {
         email: '',
         role: '',
         photoUrl: '',
+        ojtRequiredHours: null,
       },
       notifications: [],
       unreadCount: 0,
@@ -155,14 +143,6 @@ export default {
       infoSaving: false,
       infoMessage: null,
       infoError: null,
-      pwdSaving: false,
-      pwdMessage: null,
-      pwdError: null,
-      passwordForm: {
-        currentPassword: '',
-        newPassword: '',
-        confirmNewPassword: '',
-      },
     };
   },
   computed: {
@@ -297,6 +277,7 @@ export default {
         const prevSchool = this.intern.schoolOrUniversity || '';
         const prevPhone = this.intern.phoneNumber || '';
         const prevEmail = this.intern.email || '';
+        const prevRequiredHours = Number(this.intern.ojtRequiredHours) || 0;
         const response = await fetch(`http://localhost:3001/users/${this.intern.id}/info`, {
           method: 'PUT',
           headers: {
@@ -306,6 +287,7 @@ export default {
             schoolOrUniversity: this.intern.schoolOrUniversity || '',
             phoneNumber: this.intern.phoneNumber || '',
             email: this.intern.email || '',
+            ojtRequiredHours: Number(this.intern.ojtRequiredHours) || null,
           }),
         });
 
@@ -334,6 +316,7 @@ export default {
         const newSchool = this.intern.schoolOrUniversity || '';
         const newPhone = this.intern.phoneNumber || '';
         const newEmail = this.intern.email || '';
+        const newRequiredHours = Number(this.intern.ojtRequiredHours) || 0;
         if (newSchool !== prevSchool) {
           this.addLocalNotification('Your school information was updated.');
         }
@@ -342,6 +325,9 @@ export default {
         }
         if (newEmail !== prevEmail) {
           this.addLocalNotification('Your email information was updated.');
+        }
+        if (newRequiredHours !== prevRequiredHours) {
+          this.addLocalNotification('Your OJT required hours were updated.');
         }
       } catch (err) {
         console.error('Error updating intern info:', err);
@@ -385,65 +371,6 @@ export default {
         if (event && event.target) {
           event.target.value = '';
         }
-      }
-    },
-    async handleChangePassword() {
-      try {
-        this.pwdError = null;
-        this.pwdMessage = null;
-
-        if (!this.intern.id) {
-          this.pwdError = 'Walang intern ID. Subukan mag-login ulit.';
-          return;
-        }
-
-        const { currentPassword, newPassword, confirmNewPassword } = this.passwordForm;
-
-        if (!currentPassword || !newPassword || !confirmNewPassword) {
-          this.pwdError = 'Please fill in all password fields.';
-          return;
-        }
-
-        if (newPassword !== confirmNewPassword) {
-          this.pwdError = 'New password and confirmation do not match.';
-          return;
-        }
-
-        if (newPassword.length < 6) {
-          this.pwdError = 'New password must be at least 6 characters.';
-          return;
-        }
-
-        this.pwdSaving = true;
-
-        const response = await fetch(`http://localhost:3001/users/${this.intern.id}/change-password`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            currentPassword,
-            newPassword,
-          }),
-        });
-
-        const data = await response.json().catch(() => null);
-
-        if (!response.ok) {
-          const message = data && data.message ? data.message : 'Failed to update password.';
-          throw new Error(message);
-        }
-
-        this.pwdMessage = (data && data.message) || 'Password updated successfully.';
-        this.addLocalNotification('Your account password was changed.');
-        this.passwordForm.currentPassword = '';
-        this.passwordForm.newPassword = '';
-        this.passwordForm.confirmNewPassword = '';
-      } catch (err) {
-        console.error('Error changing password:', err);
-        this.pwdError = err && err.message ? err.message : 'Failed to update password.';
-      } finally {
-        this.pwdSaving = false;
       }
     },
   },

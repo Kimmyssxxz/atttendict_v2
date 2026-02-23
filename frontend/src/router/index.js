@@ -2,13 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router';
 import RegisterView from '../views/RegisterView.vue';
 import LoginView from '../views/LoginView.vue';
 import AdminLoginView from '../views/admin/AdminLoginView.vue';
+import AdminDashboardView from '../views/admin/AdminDashboardView.vue';
+import AdminStudentInternsView from '../views/admin/AdminStudentInternsView.vue';
 import DashboardView from '../views/intern/DashboardView.vue';
 import TimeView from '../views/intern/TimeView.vue';
 import AttendanceView from '../views/intern/AttendanceView.vue';
 import ProfileView from '../views/intern/ProfileView.vue';
+import SettingsView from '../views/intern/SettingsView.vue';
 import StaffDashboardView from '../views/staff/StaffDashboardView.vue';
 import NotificationsView from '../views/intern/NotificationsView.vue';
-import StaffLoginView from '../views/staff/StaffLoginView.vue';
 import ClientLogBook from '../views/client/ClientLogBook.vue';
 import ClientEvaluation from '../views/client/ClientEvaluation.vue';
 
@@ -44,9 +46,24 @@ const routes = [
     component: ProfileView
   },
   {
+    path: '/intern/settings',
+    name: 'InternSettings',
+    component: SettingsView
+  },
+  {
     path: '/staff/dashboard',
     name: 'StaffDashboard',
     component: StaffDashboardView,
+  },
+  {
+    path: '/admin/dashboard',
+    name: 'AdminDashboard',
+    component: AdminDashboardView,
+  },
+  {
+    path: '/admin/interns',
+    name: 'AdminStudentInterns',
+    component: AdminStudentInternsView,
   },
   {
     path: '/auth/admin/login',

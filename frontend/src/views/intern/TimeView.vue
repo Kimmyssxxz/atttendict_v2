@@ -9,6 +9,7 @@
           <router-link to="/intern/attendance">My Attendance</router-link>
           <router-link to="/intern/notifications">Notifications</router-link>
           <router-link to="/intern/profile">Profile</router-link>
+          <router-link to="/intern/settings">Settings</router-link>
         </nav>
 
         <div class="notif-wrapper" @click="toggleNotifications">

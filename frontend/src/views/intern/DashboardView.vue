@@ -9,6 +9,7 @@
           <router-link to="/intern/attendance">My Attendance</router-link>
           <router-link to="/intern/notifications">Notifications</router-link>
           <router-link to="/intern/profile">Profile</router-link>
+          <router-link to="/intern/settings">Settings</router-link>
         </nav>
 
         <div class="notif-wrapper" @click="toggleNotifications">
@@ -90,34 +91,6 @@
             </div>
           </div>
         </div>
-      </section>
-
-      <section class="right-column">
-        <div class="card chart-card">
-          <div class="card-title-row">
-            <h3>Monthly Attendance</h3>
-            <span class="chip">{{ monthlyAttendance.monthLabel }}</span>
-          </div>
-          <div class="simple-line-chart">
-            <div class="line-chart-grid">
-              <div
-                v-for="(week, index) in monthlyAttendance.weeks"
-                :key="week.label + index"
-                class="line-point-group"
-              >
-                <div class="line-point-wrapper">
-                  <div
-                    class="line-point"
-                    :style="{ height: week.percent + '%' }"
-                  ></div>
-                </div>
-                <span class="bar-label">{{ week.label }}</span>
-                <span class="bar-value">{{ week.daysPresent }} days</span>
-              </div>
-            </div>
-            <p class="chart-hint">Approximate visualization only. Detailed records are in the Attendance page.</p>
-          </div>
-        </div>
 
         <div class="card analytics-card">
           <h3>Attendance Analytics</h3>
@@ -156,6 +129,85 @@
             </div>
           </div>
         </div>
+      </section>
+
+      <section class="right-column">
+        <div class="card chart-card">
+          <div class="card-title-row">
+            <h3>Monthly Attendance</h3>
+            <span class="chip">{{ monthlyAttendance.monthLabel }}</span>
+          </div>
+          <div class="simple-line-chart">
+            <div class="line-chart-grid">
+              <div
+                v-for="(week, index) in monthlyAttendance.weeks"
+                :key="week.label + index"
+                class="line-point-group"
+              >
+                <div class="line-point-wrapper">
+                  <div
+                    class="line-point"
+                    :style="{ height: week.percent + '%' }"
+                  ></div>
+                </div>
+                <span class="bar-label">{{ week.label }}</span>
+                <span class="bar-value">{{ week.daysPresent }} days</span>
+              </div>
+            </div>
+            <p class="chart-hint">Approximate visualization only. Detailed records are in the Attendance page.</p>
+          </div>
+        </div>
+
+        <div class="card calendar-card">
+          <div class="card-title-row">
+            <h3>Calendar View</h3>
+            <span class="chip">{{ calendarMonthLabel }}</span>
+          </div>
+          <div class="calendar-legend">
+            <span class="legend-item"><span class="legend-dot legend-present"></span>Present</span>
+            <span class="legend-item"><span class="legend-dot legend-absent"></span>Absent</span>
+            <span class="legend-item"><span class="legend-dot legend-holiday"></span>Holiday</span>
+            <span class="legend-item"><span class="legend-dot legend-weekend"></span>Weekend (Sunday)</span>
+          </div>
+          <div class="calendar-grid">
+            <div class="calendar-weekday" v-for="d in ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']" :key="d">
+              {{ d }}
+            </div>
+            <button
+              v-for="(day, idx) in calendarWeeksFlat"
+              :key="day.dateKey + '_' + idx"
+              type="button"
+              class="calendar-day"
+              :class="[
+                day.isCurrentMonth ? 'calendar-day--current-month' : 'calendar-day--other-month',
+                day.status === 'present' ? 'calendar-day--present' : '',
+                day.status === 'absent' ? 'calendar-day--absent' : '',
+                day.status === 'holiday' ? 'calendar-day--holiday' : '',
+                day.isWeekend && day.status === 'none' ? 'calendar-day--weekend' : '',
+                day.isToday ? 'calendar-day--today' : ''
+              ]"
+              @click="handleCalendarDayClick(day)"
+            >
+              <span class="calendar-day-number">{{ day.dayOfMonth }}</span>
+            </button>
+          </div>
+
+          <div v-if="calendarSelectedDetails" class="calendar-details">
+            <h4>{{ calendarSelectedDetails.displayDate }}</h4>
+            <p class="calendar-details-status">Status: {{ calendarSelectedDetails.statusLabel }}</p>
+            <p v-if="calendarSelectedDetails.hasRecord">
+              Time In AM: {{ calendarSelectedDetails.timeInAM || '—' }}<br />
+              Time Out AM: {{ calendarSelectedDetails.timeOutAM || '—' }}<br />
+              Time In PM: {{ calendarSelectedDetails.timeInPM || '—' }}<br />
+              Time Out PM: {{ calendarSelectedDetails.timeOutPM || '—' }}<br />
+              Total Hours: {{ calendarSelectedDetails.totalHours }}
+            </p>
+            <p v-else>
+              No attendance record for this day.
+            </p>
+          </div>
+        </div>
+
       </section>
     </main>
   </div>
@@ -198,7 +250,12 @@ export default {
       notifications: [],
       unreadCount: 0,
       internId: null,
-      showNotifications: false
+      showNotifications: false,
+      calendarWeeks: [],
+      calendarMonthLabel: '',
+      calendarSelectedDate: null,
+      calendarSelectedDetails: null,
+      attendanceByDate: {},
     }
   },
   created() {
@@ -238,6 +295,9 @@ export default {
       const raw = (this.completedHours / this.requiredHours) * 100;
       const clamped = Math.max(0, Math.min(raw, 100));
       return Math.round(clamped);
+    },
+    calendarWeeksFlat() {
+      return this.calendarWeeks.reduce((all, week) => all.concat(week.days), []);
     },
   },
   methods: {
@@ -321,6 +381,11 @@ export default {
         this.mostCommonTimeIn = '--:--';
         this.lowHourDaysCount = 0;
         this.consistencyScore = 0;
+        this.attendanceByDate = {};
+        this.calendarWeeks = [];
+        this.calendarMonthLabel = '';
+        this.calendarSelectedDate = null;
+        this.calendarSelectedDetails = null;
         return;
       }
 
@@ -375,6 +440,15 @@ export default {
       this.updateAverageWorkingHours(byDate);
       this.updateAttendanceRate(byDate);
       this.updateExtraAnalytics(byDate, allTimeInsMinutes);
+
+      const rawMap = {};
+      records.forEach((r) => {
+        if (r && r.date) {
+          rawMap[r.date] = r;
+        }
+      });
+      this.attendanceByDate = rawMap;
+      this.buildCalendar(byDate, rawMap);
     },
     parseTimeToMinutes(timeStr) {
       if (!timeStr || typeof timeStr !== 'string') return null;
@@ -471,6 +545,111 @@ export default {
         monthLabel,
         weeks: normalizedWeeks,
       };
+    },
+    buildCalendar(byDate, rawMap) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const monthIndex = today.getMonth();
+      const firstOfMonth = new Date(year, monthIndex, 1);
+      const startDayOfWeek = firstOfMonth.getDay();
+      const calendarStart = new Date(year, monthIndex, 1 - startDayOfWeek);
+
+      const weeks = [];
+      const nowDateKey = today.toISOString().slice(0, 10);
+
+      for (let week = 0; week < 6; week += 1) {
+        const days = [];
+        for (let i = 0; i < 7; i += 1) {
+          const d = new Date(calendarStart);
+          d.setDate(calendarStart.getDate() + week * 7 + i);
+          const y = d.getFullYear();
+          const m = (d.getMonth() + 1).toString().padStart(2, '0');
+          const dayNum = d.getDate().toString().padStart(2, '0');
+          const key = `${y}-${m}-${dayNum}`;
+          const info = byDate[key] || { minutes: 0 };
+          const rec = rawMap[key];
+
+          let status = 'none';
+          const isFuture = d.getTime() > today.getTime();
+          const isSunday = d.getDay() === 0;
+          if (rec) {
+            const tag = (rec.tagAM || rec.tagPM || '').toLowerCase();
+            if (tag && tag.includes('holiday')) {
+              status = 'holiday';
+            } else if (info.minutes > 0) {
+              status = 'present';
+            } else if (!isFuture && !isSunday) {
+              status = 'absent';
+            }
+          } else if (!isFuture) {
+            if (info.minutes > 0) {
+              status = 'present';
+            } else if (!isSunday) {
+              status = 'absent';
+            }
+          }
+
+          days.push({
+            dateKey: key,
+            dayOfMonth: parseInt(dayNum, 10),
+            isCurrentMonth: d.getMonth() === monthIndex,
+            isToday: key === nowDateKey,
+            isWeekend: isSunday,
+            status,
+          });
+        }
+        weeks.push({ days });
+      }
+
+      this.calendarWeeks = weeks;
+      this.calendarMonthLabel = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      const todayEntry = weeks.flatMap((w) => w.days).find((day) => day.dateKey === nowDateKey);
+      if (todayEntry) {
+        this.handleCalendarDayClick(todayEntry);
+      } else {
+        this.calendarSelectedDate = null;
+        this.calendarSelectedDetails = null;
+      }
+    },
+    handleCalendarDayClick(day) {
+      if (!day) return;
+      this.calendarSelectedDate = day.dateKey;
+      const rec = this.attendanceByDate[day.dateKey] || null;
+
+      let statusLabel = 'No record';
+      if (day.status === 'present') statusLabel = 'Present';
+      else if (day.status === 'absent') statusLabel = 'Absent';
+      else if (day.status === 'holiday') statusLabel = 'Holiday';
+
+      let totalHours = 0;
+      if (rec) {
+        const totalMinutes = (rec.totalMinutesAM || 0) + (rec.totalMinutesPM || 0) || rec.totalMinutes || 0;
+        totalHours = Math.round((Math.max(0, totalMinutes) / 60) * 10) / 10;
+      }
+
+      this.calendarSelectedDetails = {
+        displayDate: this.formatCalendarDisplayDate(day.dateKey),
+        statusLabel,
+        hasRecord: !!rec,
+        timeInAM: rec && rec.timeInAM,
+        timeOutAM: rec && rec.timeOutAM,
+        timeInPM: rec && rec.timeInPM,
+        timeOutPM: rec && rec.timeOutPM,
+        totalHours,
+      };
+    },
+    formatCalendarDisplayDate(dateKey) {
+      if (!dateKey) return '';
+      const parts = dateKey.split('-');
+      if (parts.length !== 3) return dateKey;
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10) - 1;
+      const d = parseInt(parts[2], 10);
+      if (Number.isNaN(y) || Number.isNaN(m) || Number.isNaN(d)) return dateKey;
+      const dt = new Date(y, m, d);
+      if (Number.isNaN(dt.getTime())) return dateKey;
+      return dt.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     },
     updateAverageTimeIn(allTimeInsMinutes) {
       if (!Array.isArray(allTimeInsMinutes) || !allTimeInsMinutes.length) {
@@ -942,6 +1121,134 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.calendar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.legend-present {
+  background: #22c55e;
+}
+
+.legend-late {
+  background: #eab308;
+}
+
+.legend-absent {
+  background: #ef4444;
+}
+
+.legend-holiday {
+  background: #3b82f6;
+}
+
+.legend-weekend {
+  background: #eab308;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.calendar-day {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.2rem;
+  font-size: 0.75rem;
+  text-align: center;
+  cursor: pointer;
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.calendar-day--other-month {
+  opacity: 0.4;
+}
+
+.calendar-day--present {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.calendar-day--late {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.calendar-day--absent {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.calendar-day--holiday {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.calendar-day--weekend {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #facc15;
+}
+
+.calendar-day--today {
+  outline: 2px solid #4b5563;
+  outline-offset: 1px;
+}
+
+.calendar-day-number {
+  font-weight: 600;
+}
+
+.calendar-details {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  font-size: 0.8rem;
+  color: #374151;
+}
+
+.calendar-details h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.9rem;
+}
+
+.calendar-details-status {
+  margin: 0 0 0.25rem;
 }
 
 .card-title-row {

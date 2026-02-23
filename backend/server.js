@@ -58,6 +58,31 @@ function getTodayInfo() {
   return { now, dateString, timeString };
 }
 
+function parseUserAgent(ua) {
+  if (!ua || typeof ua !== 'string') {
+    return {
+      device: 'Unknown device',
+      browser: 'Unknown',
+    };
+  }
+
+  let browser = 'Unknown';
+  if (ua.includes('Edg/')) browser = 'Edge';
+  else if (ua.includes('OPR/') || ua.includes('Opera')) browser = 'Opera';
+  else if (ua.includes('Chrome/')) browser = 'Chrome';
+  else if (ua.includes('Safari/')) browser = 'Safari';
+  else if (ua.includes('Firefox/')) browser = 'Firefox';
+  else if (ua.includes('MSIE') || ua.includes('Trident/')) browser = 'Internet Explorer';
+
+  let device = 'Unknown device';
+  if (/Windows NT/i.test(ua)) device = 'Windows PC';
+  else if (/Macintosh|Mac OS X/i.test(ua)) device = 'Mac';
+  else if (/Android/i.test(ua)) device = 'Android';
+  else if (/iPhone|iPad|iPod/i.test(ua)) device = 'iOS';
+
+  return { device, browser };
+}
+
 // Create a notification document for a specific user and role
 async function createUserNotification(userId, { title, message, type, metadata }) {
   try {
@@ -178,6 +203,141 @@ app.post('/auth/login', async (req, res) => {
     });
   } catch (err) {
     console.error('Unified login error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.post('/users/:id/sessions', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: 'User id is required' });
+    }
+
+    const { userAgent, location } = req.body || {};
+    const { device, browser } = parseUserAgent(userAgent || '');
+
+    const sessionsRef = db.collection('sessions');
+
+    const existingSnap = await sessionsRef
+      .where('userId', '==', id)
+      .where('isCurrent', '==', true)
+      .limit(1)
+      .get();
+
+    const now = new Date();
+
+    let sessionDocRef;
+    if (!existingSnap.empty) {
+      sessionDocRef = existingSnap.docs[0].ref;
+      await sessionDocRef.update({
+        device,
+        browser,
+        location: location || 'Philippines',
+        lastActive: admin.firestore.Timestamp.fromDate(now),
+      });
+    } else {
+      const payload = {
+        userId: id,
+        device,
+        browser,
+        location: location || 'Philippines',
+        isCurrent: true,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastActive: admin.firestore.Timestamp.fromDate(now),
+      };
+      sessionDocRef = await sessionsRef.add(payload);
+    }
+
+    const currentSnap = await sessionDocRef.get();
+    return res.json({
+      message: 'Session recorded',
+      session: { id: currentSnap.id, ...currentSnap.data() },
+    });
+  } catch (err) {
+    console.error('Create/update session error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.get('/users/:id/sessions', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: 'User id is required' });
+    }
+
+    const snap = await db
+      .collection('sessions')
+      .where('userId', '==', id)
+      .get();
+
+    const sessions = snap.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .sort((a, b) => {
+        const ta = a.lastActive && a.lastActive.toMillis ? a.lastActive.toMillis() : 0;
+        const tb = b.lastActive && b.lastActive.toMillis ? b.lastActive.toMillis() : 0;
+        return tb - ta;
+      });
+
+    return res.json({
+      message: 'Sessions fetched',
+      sessions,
+    });
+  } catch (err) {
+    console.error('Fetch sessions error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.delete('/users/:id/sessions/:sessionId', async (req, res) => {
+  try {
+    const { id, sessionId } = req.params;
+    if (!id || !sessionId) {
+      return res.status(400).json({ message: 'User id and sessionId are required' });
+    }
+
+    const sessionRef = db.collection('sessions').doc(sessionId);
+    const snap = await sessionRef.get();
+    if (!snap.exists) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+
+    const data = snap.data();
+    if (data.userId !== id) {
+      return res.status(403).json({ message: 'Session does not belong to this user' });
+    }
+    await sessionRef.delete();
+    return res.json({ message: 'Session revoked' });
+  } catch (err) {
+    console.error('Delete session error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.delete('/users/:id/sessions', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: 'User id is required' });
+    }
+
+    const snap = await db
+      .collection('sessions')
+      .where('userId', '==', id)
+      .get();
+
+    if (snap.empty) {
+      return res.json({ message: 'No sessions to revoke', deleted: 0 });
+    }
+
+    const batch = db.batch();
+    snap.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+
+    return res.json({ message: 'All sessions revoked', deleted: snap.size });
+  } catch (err) {
+    console.error('Delete all sessions error:', err);
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -630,6 +790,8 @@ app.put('/users/:id/info', async (req, res) => {
       schoolOrUniversity,
       phoneNumber,
       email,
+      requiredHours,
+      ojtRequiredHours,
     } = req.body;
 
     const userRef = db.collection('users').doc(id);
@@ -642,6 +804,18 @@ app.put('/users/:id/info', async (req, res) => {
     if (typeof schoolOrUniversity === 'string') updatePayload.schoolOrUniversity = schoolOrUniversity;
     if (typeof phoneNumber === 'string') updatePayload.phoneNumber = phoneNumber;
     if (typeof email === 'string') updatePayload.email = email;
+    if (requiredHours !== undefined) {
+      const parsedRequired = Number(requiredHours);
+      if (Number.isFinite(parsedRequired) && parsedRequired > 0) {
+        updatePayload.requiredHours = parsedRequired;
+      }
+    }
+    if (ojtRequiredHours !== undefined) {
+      const parsedOjt = Number(ojtRequiredHours);
+      if (Number.isFinite(parsedOjt) && parsedOjt > 0) {
+        updatePayload.ojtRequiredHours = parsedOjt;
+      }
+    }
 
     if (Object.keys(updatePayload).length === 0) {
       return res.status(400).json({ message: 'No updatable fields provided' });
