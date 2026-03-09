@@ -1,108 +1,113 @@
 <template>
-  <div class="admin-shell">
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-100">
     <AdminSidebar />
 
-    <div class="admin-layout">
-      <header class="admin-header">
-        <h1>Student Attendance Validation</h1>
+    <div class="flex-1 flex flex-col">
+      <header class="px-8 py-6 bg-blue-600 text-white">
+        <h1 class="m-0 text-2xl font-bold">Student Attendance Validation</h1>
       </header>
 
-      <main class="admin-main">
-        <section class="section">
-          <div class="selection-panel">
-            <div class="selection-panel-inner">
-              <div v-if="!selectedInternId" class="selection-empty">
-                <div class="selection-icon">▣</div>
-                <h3 class="selection-title">Select an intern to review</h3>
-                <p class="selection-subtitle">Click any intern below to view attendance details</p>
+      <main class="flex-1 px-8 py-6">
+        <section class="bg-white rounded-lg p-6 shadow-sm">
+          <div class="border border-gray-200 rounded-xl bg-white p-5 mb-5">
+            <div class="min-h-[180px]">
+              <div v-if="!selectedInternId" class="min-h-[180px] flex flex-col items-center justify-center gap-1.5 text-center">
+                <div class="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center text-xl text-blue-700 mb-1">▣</div>
+                <h3 class="m-0 text-[1.05rem] text-gray-900">Select an intern to review</h3>
+                <p class="mt-0.5 mb-0 text-[0.9rem] text-gray-500">Click any intern below to view attendance details</p>
               </div>
 
               <div v-else>
-                <div class="selection-header">
+                <div class="flex flex-col items-start justify-start gap-2 mb-4 md:mb-4">
                   <div>
-                    <h3 class="selection-title">Attendance for {{ selectedInternName }}</h3>
-                    <p class="selection-subtitle">Review and validate student intern attendance.</p>
+                    <h3 class="m-0 text-[1.05rem] text-gray-900">Attendance for {{ selectedInternName }}</h3>
+                    <p class="mt-0.5 mb-0 text-[0.9rem] text-gray-500">Review and validate student intern attendance.</p>
                   </div>
 
-                  <div class="toolbar-row">
-                    <div class="toolbar-left">
-                      <div class="search-wrap">
-                        <span class="search-icon">🔍</span>
+                  <div class="flex items-center justify-between gap-3 w-full flex-wrap border border-gray-200 bg-slate-50 rounded-xl p-2.5">
+                    <div class="flex-1 basis-[420px] min-w-[260px]">
+                      <div class="flex items-center gap-2 w-full border border-gray-200 rounded-xl bg-white px-3 py-2">
+                        <span class="text-[0.95rem] text-slate-400 leading-none">🔍</span>
                         <input
                           v-model="search"
                           type="text"
-                          class="search-input"
+                          class="w-full p-0 border-none text-[0.95rem] bg-white focus:outline-none"
                           placeholder="Search by intern name"
                         />
                       </div>
                     </div>
-                    <div class="toolbar-right">
-                      <button type="button" class="secondary-button" @click="toggleFilters">
-                        <span class="btn-icon">⚙️</span> Filters
+                    <div class="flex items-center justify-end gap-2 flex-none flex-nowrap">
+                      <button type="button" class="flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] text-[0.9rem] font-semibold cursor-pointer bg-white text-slate-900 border border-gray-200 whitespace-nowrap transition-all hover:bg-slate-50 hover:border-slate-300 disabled:opacity-70 disabled:cursor-default" @click="toggleFilters">
+                        <span class="text-base">⚙️</span> Filters
                       </button>
-                      <button type="button" class="secondary-button" @click="exportAttendance">
-                        <span class="btn-icon">📥</span> Export
+                      <button type="button" class="flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] text-[0.9rem] font-semibold cursor-pointer bg-white text-slate-900 border border-gray-200 whitespace-nowrap transition-all hover:bg-slate-50 hover:border-slate-300 disabled:opacity-70 disabled:cursor-default" @click="exportAttendance">
+                        <span class="text-base">📥</span> Export
                       </button>
                       <input
                         v-model="selectedDate"
                         type="date"
-                        class="filter-select"
+                        class="flex-none basis-[180px] px-3 py-2 rounded-[10px] border border-gray-200 text-[0.95rem] bg-white text-gray-800 focus:outline-none focus:border-blue-400"
                         @change="handleDateChange"
                       />
-                      <button type="button" class="secondary-button" @click="fetchRecords" :disabled="loading">
+                      <button type="button" class="flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] text-[0.9rem] font-semibold cursor-pointer bg-white text-slate-900 border border-gray-200 whitespace-nowrap transition-all hover:bg-slate-50 hover:border-slate-300 disabled:opacity-70 disabled:cursor-default" @click="fetchRecords" :disabled="loading">
                         {{ loading ? 'Refreshing...' : 'Refresh' }}
                       </button>
                     </div>
                   </div>
                 </div>
 
-                <div v-if="loading" class="status-text">Loading attendance records...</div>
-                <div v-else-if="error" class="status-text error">{{ error }}</div>
+                <div v-if="loading" class="text-[0.95rem] text-gray-600">Loading attendance records...</div>
+                <div v-else-if="error" class="text-[0.95rem] text-red-700">{{ error }}</div>
                 <div v-else>
-                  <div class="table-container" v-if="filteredRecords.length">
-                    <table class="interns-table">
+                  <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white" v-if="filteredRecords.length">
+                    <table class="w-full border-collapse text-[0.9rem] bg-white">
                       <thead>
                         <tr>
-                          <th>Date</th>
-                          <th>AM In</th>
-                          <th>AM Out</th>
-                          <th>PM In</th>
-                          <th>PM Out</th>
-                          <th>Total Hours</th>
-                          <th>Location Status</th>
-                          <th>Attendance Status</th>
-                          <th>Validation</th>
-                          <th>Action</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">Date</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">AM In</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">AM Out</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">PM In</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">PM Out</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">Total Hours</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">Location Status</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">Attendance Status</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">Validation</th>
+                          <th class="px-4 py-3 text-left border-b border-slate-100 bg-slate-50 text-slate-500 font-semibold uppercase text-xs tracking-wide">Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="row in paginatedRecords" :key="row.id">
-                          <td>{{ row.date || '-' }}</td>
-                          <td>{{ formatTime(row.timeInAM) }}</td>
-                          <td>{{ formatTime(row.timeOutAM) }}</td>
-                          <td>{{ formatTime(row.timeInPM) }}</td>
-                          <td>{{ formatTime(row.timeOutPM) }}</td>
-                          <td>{{ row.totalHoursLabel || '-' }}</td>
-                          <td>
-                            <div class="notes-cell">
-                              <select v-model="row.locationSlot" class="notes-select" @change="updateDisplayedLocation(row)">
+                        <tr v-for="row in paginatedRecords" :key="row.id" class="hover:bg-slate-50">
+                          <td class="px-4 py-3 text-left border-b border-slate-100">{{ row.date || '-' }}</td>
+                          <td class="px-4 py-3 text-left border-b border-slate-100">{{ formatTime(row.timeInAM) }}</td>
+                          <td class="px-4 py-3 text-left border-b border-slate-100">{{ formatTime(row.timeOutAM) }}</td>
+                          <td class="px-4 py-3 text-left border-b border-slate-100">{{ formatTime(row.timeInPM) }}</td>
+                          <td class="px-4 py-3 text-left border-b border-slate-100">{{ formatTime(row.timeOutPM) }}</td>
+                          <td class="px-4 py-3 text-left border-b border-slate-100">{{ row.totalHoursLabel || '-' }}</td>
+                          <td class="px-4 py-3 text-left border-b border-slate-100">
+                            <div class="flex flex-col gap-1">
+                              <select v-model="row.locationSlot" class="w-full px-2 py-1 border border-gray-300 rounded text-sm bg-white" @change="updateDisplayedLocation(row)">
                                 <option value="AM">AM</option>
                                 <option value="PM">PM</option>
                               </select>
-                              <div class="notes-text small-text">{{ row.displayedLocation || '-' }}</div>
+                              <div class="text-xs text-slate-500 max-w-[200px] truncate">{{ row.displayedLocation || '-' }}</div>
                             </div>
                           </td>
-                          <td>{{ row.attendanceStatus || '-' }}</td>
-                          <td>
-                            <span :class="['validation-badge', (row.validationStatus || 'Pending').toLowerCase()]">
+                          <td class="px-4 py-3 text-left border-b border-slate-100">{{ row.attendanceStatus || '-' }}</td>
+                          <td class="px-4 py-3 text-left border-b border-slate-100">
+                            <span :class="[
+                              'px-2.5 py-1 rounded-full text-xs font-semibold capitalize',
+                              (row.validationStatus || 'Pending').toLowerCase() === 'pending' ? 'bg-amber-100 text-amber-800' :
+                              (row.validationStatus || 'Pending').toLowerCase() === 'approved' ? 'bg-green-100 text-green-800' :
+                              'bg-red-100 text-red-800'
+                            ]">
                               {{ row.validationStatus || 'Pending' }}
                             </span>
                           </td>
-                          <td>
-                            <div class="action-buttons">
+                          <td class="px-4 py-3 text-left border-b border-slate-100">
+                            <div class="flex flex-wrap gap-1">
                               <button 
                                 type="button" 
-                                class="action-button" 
+                                class="px-2.5 py-1 text-xs rounded border border-gray-300 bg-gray-50 cursor-pointer whitespace-nowrap transition-colors hover:bg-gray-200" 
                                 :disabled="!!savingRowIds[row.id]"
                                 @click="approveRow(row)"
                               >
@@ -110,7 +115,7 @@
                               </button>
                               <button 
                                 type="button" 
-                                class="action-button danger" 
+                                class="px-2.5 py-1 text-xs rounded border border-red-300 text-red-700 bg-red-50 cursor-pointer whitespace-nowrap transition-colors hover:bg-red-100" 
                                 :disabled="!!savingRowIds[row.id]"
                                 @click="rejectRow(row)"
                               >
@@ -124,28 +129,28 @@
                   </div>
 
                   <!-- Pagination Controls -->
-                  <div class="pagination-container" v-if="filteredRecords.length">
-                    <div class="pagination-info">
+                  <div class="flex flex-col sm:flex-row justify-between items-center p-4 bg-slate-50 border-t border-gray-200 rounded-b-xl gap-4" v-if="filteredRecords.length">
+                    <div class="text-[0.85rem] text-slate-500">
                       Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, filteredRecords.length) }} of {{ filteredRecords.length }} entries
                     </div>
-                    <div class="pagination-controls">
-                      <div class="rows-per-page">
+                    <div class="flex items-center gap-6">
+                      <div class="flex items-center gap-2 text-[0.85rem] text-slate-500">
                         <label>Rows per page:</label>
-                        <select v-model="itemsPerPage" class="page-size-select" @change="currentPage = 1">
+                        <select v-model="itemsPerPage" class="px-2 py-1 rounded-md border border-gray-200 bg-white text-[0.85rem] outline-none" @change="currentPage = 1">
                           <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
                         </select>
                       </div>
-                      <div class="page-buttons">
+                      <div class="flex items-center gap-3">
                         <button 
-                          class="pagination-button" 
+                          class="px-3 py-1.5 text-[0.85rem] rounded-md border border-gray-200 bg-white text-slate-800 cursor-pointer transition-all hover:bg-slate-100 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed" 
                           :disabled="currentPage === 1" 
                           @click="currentPage--"
                         >
                           Previous
                         </button>
-                        <span class="page-indicator">Page {{ currentPage }} of {{ totalPages }}</span>
+                        <span class="text-[0.85rem] text-slate-800 font-medium">Page {{ currentPage }} of {{ totalPages }}</span>
                         <button 
-                          class="pagination-button" 
+                          class="px-3 py-1.5 text-[0.85rem] rounded-md border border-gray-200 bg-white text-slate-800 cursor-pointer transition-all hover:bg-slate-100 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed" 
                           :disabled="currentPage === totalPages" 
                           @click="currentPage++"
                         >
@@ -155,33 +160,37 @@
                     </div>
                   </div>
 
-                  <div v-else class="status-text">No attendance records found.</div>
+                  <div v-else class="text-[0.95rem] text-gray-600">No attendance records found.</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="batches-panel">
-            <div class="batches-header">
-              <h3 class="batches-title">Available Interns</h3>
+          <div class="border border-gray-200 rounded-xl bg-white p-5">
+            <div class="mb-3">
+              <h3 class="m-0 text-base text-gray-900">Available Interns</h3>
             </div>
 
-            <div class="batches-grid">
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(240px,240px))] justify-start gap-3">
               <button
                 v-for="intern in filteredInternCards"
                 :key="intern.id"
                 type="button"
-                class="batch-card"
-                :class="{ 'is-selected': intern.id === selectedInternId }"
+                :class="[
+                  'text-left bg-white border rounded-[10px] p-3.5 cursor-pointer transition-all',
+                  intern.id === selectedInternId 
+                    ? 'border-blue-400 shadow-[0_10px_24px_rgba(37,99,235,0.12)]' 
+                    : 'border-gray-200 hover:border-blue-200 hover:shadow-[0_8px_22px_rgba(15,23,42,0.08)] hover:-translate-y-[1px]'
+                ]"
                 @click="selectIntern(intern)"
               >
-                <div class="batch-card-top">
-                  <div class="batch-card-date">{{ intern.name || '-' }}</div>
-                  <div class="batch-card-icon">▣</div>
+                <div class="flex items-center justify-between gap-3 mb-2">
+                  <div class="font-bold text-gray-900">{{ intern.name || '-' }}</div>
+                  <div class="w-[30px] h-[30px] rounded-full bg-blue-50 flex items-center justify-center text-blue-600">▣</div>
                 </div>
-                <div class="batch-card-meta">
-                  <div class="batch-meta-row">
-                    <span class="batch-meta-dot"></span>
+                <div class="text-gray-500 text-[0.85rem]">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-blue-400"></span>
                     <span>Review attendance</span>
                   </div>
                 </div>
@@ -556,541 +565,3 @@ export default {
 }
 </script>
 
-<style scoped>
-.admin-shell {
-  min-height: 100vh;
-  display: flex;
-  background-color: #f5f5f5;
-}
-
-.admin-layout {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-header {
-  padding: 1.5rem 2rem;
-  background-color: #1976d2;
-  color: #ffffff;
-}
-
-.admin-main {
-  flex: 1;
-  padding: 1.5rem 2rem;
-}
-
-.section {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.section-header {
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  margin: 0;
-  font-size: 1.25rem;
-  color: #333;
-}
-
-.section-subtitle {
-  margin: 0.25rem 0 0;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.selection-panel {
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #ffffff;
-  padding: 1.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.selection-panel-inner {
-  min-height: 180px;
-}
-
-.selection-empty {
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  text-align: center;
-}
-
-.selection-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  background: #eef2ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: #1d4ed8;
-  margin-bottom: 0.25rem;
-}
-
-.selection-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.toolbar-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  width: 100%;
-  flex-wrap: wrap;
-  border: 1px solid #e5e7eb;
-  background: #f8fafc;
-  border-radius: 14px;
-  padding: 0.65rem;
-}
-
-.toolbar-left {
-  flex: 1 1 420px;
-  min-width: 260px;
-}
-
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  flex: 0 0 auto;
-  flex-wrap: nowrap;
-}
-
-.btn-icon {
-  font-size: 1rem;
-}
-
-.search-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #ffffff;
-  padding: 0.55rem 0.75rem;
-}
-
-.search-icon {
-  font-size: 0.95rem;
-  color: #94a3b8;
-  line-height: 1;
-}
-
-.selection-title {
-  margin: 0;
-  font-size: 1.05rem;
-  color: #111827;
-}
-
-.selection-subtitle {
-  margin: 0.15rem 0 0;
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-.selection-actions {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.batches-panel {
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #ffffff;
-  padding: 1.25rem;
-}
-
-.batches-header {
-  margin-bottom: 0.75rem;
-}
-
-.batches-title {
-  margin: 0;
-  font-size: 1rem;
-  color: #111827;
-}
-
-.batches-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 240px));
-  justify-content: start;
-  gap: 0.75rem;
-}
-
-.batch-card {
-  text-align: left;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 0.9rem;
-  cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
-}
-
-.batch-card:hover {
-  border-color: #bfdbfe;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
-  transform: translateY(-1px);
-}
-
-.batch-card.is-selected {
-  border-color: #60a5fa;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
-}
-
-.batch-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-
-.batch-card-date {
-  font-weight: 700;
-  color: #111827;
-}
-
-.batch-card-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  background: #eff6ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2563eb;
-}
-
-.batch-card-meta {
-  color: #6b7280;
-  font-size: 0.85rem;
-}
-
-.batch-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.batch-meta-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #60a5fa;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0;
-  border-radius: 0;
-  border: none;
-  font-size: 0.95rem;
-  background: #ffffff;
-}
-
-.search-input:focus {
-  outline: none;
-}
-
-.filter-select {
-  flex: 0 0 180px;
-  padding: 0.55rem 0.75rem;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  font-size: 0.95rem;
-  background-color: #fff;
-}
-
-.interns-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-  background: #ffffff;
-}
-
-.interns-table th,
-.interns-table td {
-  padding: 0.85rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.interns-table thead th {
-  background-color: #f8fafc;
-  color: #64748b;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.025em;
-}
-
-.interns-table tbody tr:hover {
-  background-color: #f8fafc;
-}
-
-.table-container {
-  overflow-x: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #ffffff;
-}
-
-.validation-badge {
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.validation-badge.pending {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.validation-badge.approved {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.validation-badge.rejected {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.notes-text.small-text {
-  font-size: 0.75rem;
-  color: #64748b;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.status-text {
-  font-size: 0.95rem;
-  color: #555;
-}
-
-.status-text.error {
-  color: #c62828;
-}
-
-.pagination-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: #f8fafc;
-  border-top: 1px solid #e5e7eb;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-
-.pagination-info {
-  font-size: 0.85rem;
-  color: #64748b;
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.rows-per-page {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: #64748b;
-}
-
-.page-size-select {
-  padding: 0.25rem 0.5rem;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  font-size: 0.85rem;
-  outline: none;
-}
-
-.page-buttons {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.pagination-button {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  color: #1e293b;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.pagination-button:hover:not(:disabled) {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-}
-
-.pagination-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.page-indicator {
-  font-size: 0.85rem;
-  color: #1e293b;
-  font-weight: 500;
-}
-
-.primary-button,
-.secondary-button {
-  padding: 0.55rem 0.95rem;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.secondary-button {
-  background-color: #ffffff;
-  color: #0f172a;
-  border: 1px solid #e5e7eb;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-
-.secondary-button:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
-}
-
-.secondary-button:disabled {
-  opacity: 0.7;
-  cursor: default;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-}
-
-.action-button {
-  padding: 0.25rem 0.4rem;
-  font-size: 0.8rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background-color: #f5f5f5;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.action-button:hover {
-  background-color: #e0e0e0;
-}
-
-.action-button.danger {
-  border-color: #ef9a9a;
-  background-color: #ffebee;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 720px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.modal-title {
-  margin: 0 0 1rem;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-.details-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 0.5rem 1rem;
-  margin-bottom: 1rem;
-}
-
-.detail-item {
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-@media (max-width: 900px) {
-  .admin-shell {
-    flex-direction: column;
-  }
-
-  .selection-header {
-    flex-direction: column;
-  }
-
-  .batches-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .attendance-grid {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

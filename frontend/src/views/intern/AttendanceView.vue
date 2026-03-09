@@ -1,98 +1,98 @@
 <template>
-  <div class="intern-layout">
-    <header class="intern-header">
-      <h1>My Attendance Records</h1>
-      <div class="intern-header-right">
-        <nav class="intern-nav">
-          <router-link to="/intern/dashboard">Dashboard</router-link>
-          <router-link to="/intern/time">Time In / Out</router-link>
-          <router-link to="/intern/attendance">My Attendance</router-link>
-          <router-link to="/intern/staff-status">Staff Status</router-link>
-          <router-link to="/intern/notifications">Notifications</router-link>
-          <router-link to="/intern/profile">Profile</router-link>
-          <router-link to="/intern/settings">Settings</router-link>
+  <div class="min-h-screen bg-slate-50 font-sans text-gray-800">
+    <header class="bg-slate-800 text-white px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+      <h1 class="m-0 text-[1.4rem] font-bold">My Attendance Records</h1>
+      <div class="flex items-center gap-4">
+        <nav class="flex flex-wrap gap-3">
+          <router-link to="/intern/dashboard" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Dashboard</router-link>
+          <router-link to="/intern/time" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Time In / Out</router-link>
+          <router-link to="/intern/attendance" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">My Attendance</router-link>
+          <router-link to="/intern/staff-status" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Staff Status</router-link>
+          <router-link to="/intern/notifications" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Notifications</router-link>
+          <router-link to="/intern/profile" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Profile</router-link>
+          <router-link to="/intern/settings" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Settings</router-link>
         </nav>
 
-        <div class="notif-wrapper" @click="toggleNotifications">
-          <div class="notif-bell">
-            <span class="bell-icon">🔔</span>
-            <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount }}</span>
+        <div class="relative cursor-pointer" @click="toggleNotifications">
+          <div class="relative w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center transition-colors hover:bg-slate-700">
+            <span class="text-base">🔔</span>
+            <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] px-1.5 py-0 min-w-[18px] text-center shadow-sm">{{ unreadCount }}</span>
           </div>
-          <div v-if="showNotifications" class="notif-panel" @click.stop>
-            <h3>Notifications</h3>
-            <ul v-if="notifications.length" class="notif-dropdown-list">
-              <li v-for="(n, idx) in notifications" :key="idx">{{ n }}</li>
+          <div v-if="showNotifications" class="absolute right-0 mt-2 bg-white text-slate-900 min-w-[220px] rounded-xl shadow-[0_10px_25px_rgba(15,23,42,0.25)] p-3 z-20" @click.stop>
+            <h3 class="m-0 mb-2 text-sm font-semibold">Notifications</h3>
+            <ul v-if="notifications.length" class="list-none p-0 m-0 text-[0.85rem]">
+              <li v-for="(n, idx) in notifications" :key="idx" class="mt-1 first:mt-0">{{ n }}</li>
             </ul>
-            <p v-else class="notif-empty">No notifications</p>
+            <p v-else class="m-0 text-[0.8rem] text-gray-500">No notifications</p>
           </div>
         </div>
       </div>
     </header>
 
     <!-- Download Format Modal -->
-    <div v-if="showDownloadModal" class="modal-overlay" @click="showDownloadModal = false">
-      <div class="modal-content" @click.stop>
-        <h3>Select Download Format</h3>
-        <p>How would you like to download your Daily Time Record (DTR)?</p>
-        <div class="modal-actions">
-          <button class="btn btn-pdf" @click="handleDownload('pdf')">
-            <span class="icon">📄</span> PDF Format
+    <div v-if="showDownloadModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]" @click="showDownloadModal = false">
+      <div class="bg-white p-8 rounded-2xl w-[90%] max-w-[400px] text-center shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]" @click.stop>
+        <h3 class="mt-0 text-slate-800 text-xl font-bold mb-2">Select Download Format</h3>
+        <p class="text-slate-500 mb-6 text-sm">How would you like to download your Daily Time Record (DTR)?</p>
+        <div class="flex flex-col gap-3 mb-6">
+          <button class="flex items-center justify-center gap-2 p-3 rounded-lg border border-slate-200 bg-slate-50 font-semibold cursor-pointer transition-all hover:bg-red-50 hover:border-red-500 hover:text-red-700" @click="handleDownload('pdf')">
+            <span class="text-lg">📄</span> PDF Format
           </button>
-          <button class="btn btn-word" @click="handleDownload('word')">
-            <span class="icon">📝</span> Word Format
+          <button class="flex items-center justify-center gap-2 p-3 rounded-lg border border-slate-200 bg-slate-50 font-semibold cursor-pointer transition-all hover:bg-blue-50 hover:border-blue-500 hover:text-blue-700" @click="handleDownload('word')">
+            <span class="text-lg">📝</span> Word Format
           </button>
         </div>
-        <button class="btn-close" @click="showDownloadModal = false">Cancel</button>
+        <button class="bg-transparent border-none text-slate-400 cursor-pointer text-sm underline hover:text-slate-500" @click="showDownloadModal = false">Cancel</button>
       </div>
     </div>
 
-    <main class="attendance-main">
-      <section class="card filter-card">
-        <h2>Filters</h2>
-        <div class="filter-grid">
+    <main class="max-w-[1100px] mx-auto my-8 px-4 flex flex-col gap-6">
+      <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-6">
+        <h2 class="mt-0 mb-4 text-[1.1rem] text-slate-900 border-b border-slate-100 pb-2">Filters</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
           <div>
-            <label for="month">Month</label>
-            <select id="month" v-model="selectedMonth">
+            <label for="month" class="block mb-1.5 text-[0.85rem] text-slate-600 font-medium">Month</label>
+            <select id="month" v-model="selectedMonth" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white">
               <option value="">All</option>
               <option value="2025-01">January 2025</option>
               <option value="2025-02">February 2025</option>
             </select>
           </div>
           <div>
-            <label for="from">From</label>
-            <input id="from" type="date" v-model="fromDate" />
+            <label for="from" class="block mb-1.5 text-[0.85rem] text-slate-600 font-medium">From</label>
+            <input id="from" type="date" v-model="fromDate" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white" />
           </div>
           <div>
-            <label for="to">To</label>
-            <input id="to" type="date" v-model="toDate" />
+            <label for="to" class="block mb-1.5 text-[0.85rem] text-slate-600 font-medium">To</label>
+            <input id="to" type="date" v-model="toDate" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white" />
           </div>
-          <div class="download-wrapper">
-            <button class="btn btn-download-active" @click="showDownloadModal = true">Download DTR</button>
+          <div class="flex justify-end md:justify-start">
+            <button class="px-5 py-2.5 rounded-full border-none bg-orange-500 text-white text-sm font-semibold cursor-pointer transition-colors hover:bg-orange-600 w-full md:w-auto" @click="showDownloadModal = true">Download DTR</button>
           </div>
         </div>
       </section>
 
-      <section class="card table-card">
-        <h2>Attendance</h2>
-        <div class="table-wrapper">
-          <table>
+      <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-6">
+        <h2 class="mt-0 mb-4 text-[1.1rem] text-slate-900 border-b border-slate-100 pb-2">Attendance</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-sm">
             <thead>
-              <tr>
-                <th>Date</th>
-                <th>Time In</th>
-                <th>Time Out</th>
-                <th>Total Hours</th>
-                <th>Tag</th>
+              <tr class="bg-slate-50">
+                <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Date</th>
+                <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Time In</th>
+                <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Time Out</th>
+                <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Total Hours</th>
+                <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Tag</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="record in paginatedRecords" :key="record.id + '-' + (record.sessionLabel || 'all')">
-                <td>{{ formatDate(record.date) }}</td>
-                <td>{{ formatTime12h(record.timeIn) }}</td>
-                <td>{{ formatTime12h(record.timeOut) }}</td>
-                <td>{{ record.totalHoursLabel || '0h 0m' }}</td>
-                <td>
-                  <span :class="['badge', record.status === 'Overtime' ? 'badge-late' : 'badge-present']">
+              <tr v-for="record in paginatedRecords" :key="record.id + '-' + (record.sessionLabel || 'all')" class="hover:bg-slate-50/50 transition-colors">
+                <td class="px-4 py-3 border-b border-slate-100 text-slate-700">{{ formatDate(record.date) }}</td>
+                <td class="px-4 py-3 border-b border-slate-100 text-slate-700">{{ formatTime12h(record.timeIn) }}</td>
+                <td class="px-4 py-3 border-b border-slate-100 text-slate-700">{{ formatTime12h(record.timeOut) }}</td>
+                <td class="px-4 py-3 border-b border-slate-100 text-slate-900 font-medium">{{ record.totalHoursLabel || '0h 0m' }}</td>
+                <td class="px-4 py-3 border-b border-slate-100">
+                  <span :class="['inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold', record.status === 'Overtime' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-green-100 text-green-800 border border-green-200']">
                     {{ record.status }}
                   </span>
                 </td>
@@ -101,10 +101,10 @@
           </table>
         </div>
 
-        <div class="pagination-wrapper" v-if="tableRecords.length > 0">
-          <div class="items-per-page">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-6 pt-4 border-t border-slate-200 gap-4" v-if="tableRecords.length > 0">
+          <div class="flex items-center gap-2 text-[0.85rem] text-slate-600">
             <label for="itemsPerPage">Showing</label>
-            <select id="itemsPerPage" v-model="itemsPerPage" @change="currentPage = 1">
+            <select id="itemsPerPage" v-model="itemsPerPage" @change="currentPage = 1" class="w-auto px-2 py-1.5 rounded-md border border-slate-300 text-slate-900 focus:outline-none">
               <option :value="10">10</option>
               <option :value="15">15</option>
               <option :value="20">20</option>
@@ -114,10 +114,10 @@
             <span>records per page</span>
           </div>
 
-          <div class="pagination-controls">
-            <button class="btn-page" :disabled="currentPage === 1" @click="currentPage--">Previous</button>
-            <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-            <button class="btn-page" :disabled="currentPage === totalPages" @click="currentPage++">Next</button>
+          <div class="flex items-center gap-4">
+            <button class="px-3.5 py-1.5 rounded-md border border-slate-300 bg-white text-slate-700 text-[0.85rem] cursor-pointer transition-colors hover:bg-slate-100 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="currentPage === 1" @click="currentPage--">Previous</button>
+            <span class="text-[0.85rem] text-slate-600 font-medium">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button class="px-3.5 py-1.5 rounded-md border border-slate-300 bg-white text-slate-700 text-[0.85rem] cursor-pointer transition-colors hover:bg-slate-100 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="currentPage === totalPages" @click="currentPage++">Next</button>
           </div>
         </div>
 
@@ -742,396 +742,3 @@ export default {
 }
 </script>
 
-<style scoped>
-.intern-layout {
-  min-height: 100vh;
-  background: #f5f7fb;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-.intern-header {
-  background: #1e293b;
-  color: #fff;
-  padding: 1rem 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.intern-header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.intern-header h1 {
-  margin: 0;
-  font-size: 1.4rem;
-}
-
-.intern-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.intern-nav a {
-  color: #e5e7eb;
-  text-decoration: none;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  border: 1px solid transparent;
-}
-
-.intern-nav a.router-link-active {
-  background: #f97316;
-  color: #111827;
-  border-color: #f97316;
-}
-
-.intern-nav a:hover {
-  background: #111827;
-}
-
-.notif-wrapper {
-  position: relative;
-  cursor: pointer;
-}
-
-.notif-bell {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: #0f172a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bell-icon {
-  font-size: 16px;
-}
-
-.notif-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #ef4444;
-  color: #fef2f2;
-  border-radius: 999px;
-  font-size: 10px;
-  padding: 0 5px;
-}
-
-.notif-panel {
-  position: absolute;
-  right: 0;
-  margin-top: 0.5rem;
-  background: #ffffff;
-  color: #111827;
-  min-width: 220px;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
-  padding: 0.75rem 0.9rem;
-  z-index: 20;
-}
-
-.notif-panel h3 {
-  margin: 0 0 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.notif-dropdown-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 0.85rem;
-}
-
-.notif-dropdown-list li + li {
-  margin-top: 0.25rem;
-}
-
-.notif-empty {
-  margin: 0;
-  font-size: 0.8rem;
-  color: #6b7280;
-}
-
-.attendance-main {
-  max-width: 1100px;
-  margin: 2rem auto;
-  padding: 0 1rem 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.card {
-  background: #ffffff;
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-  padding: 1.5rem;
-}
-
-.filter-card h2,
-.table-card h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-  color: #0f172a;
-}
-
-.filter-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  align-items: flex-end;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-size: 0.85rem;
-  color: #4b5563;
-}
-
-select,
-input[type="date"] {
-  width: 100%;
-  padding: 0.45rem 0.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid #d1d5db;
-  font-size: 0.9rem;
-}
-
-.download-wrapper {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.btn-download-active {
-  padding: 0.6rem 1.2rem;
-  border-radius: 999px;
-  border: none;
-  background: #f97316;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-download-active:hover {
-  background: #ea580c;
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 1rem;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-.modal-content h3 {
-  margin-top: 0;
-  color: #1e293b;
-}
-
-.modal-content p {
-  color: #64748b;
-  margin-bottom: 1.5rem;
-}
-
-.modal-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.btn-pdf, .btn-word {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-pdf:hover {
-  background: #fee2e2;
-  border-color: #ef4444;
-  color: #b91c1c;
-}
-
-.btn-word:hover {
-  background: #dbeafe;
-  border-color: #3b82f6;
-  color: #1d4ed8;
-}
-
-.btn-close {
-  background: none;
-  border: none;
-  color: #94a3b8;
-  cursor: pointer;
-  font-size: 0.9rem;
-  text-decoration: underline;
-}
-
-.btn-close:hover {
-  color: #64748b;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-th,
-td {
-  padding: 0.6rem 0.75rem;
-  text-align: left;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-th {
-  font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #6b7280;
-}
-
-tr:hover td {
-  background: #f9fafb;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.badge-present {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.badge-late {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-@media (max-width: 900px) {
-  .filter-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
-  .filter-grid {
-    grid-template-columns: 1fr;
-  }
-  .pagination-wrapper {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-}
-
-/* Pagination Styles */
-.pagination-wrapper {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.items-per-page {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: #4b5563;
-}
-
-.items-per-page select {
-  width: auto;
-  padding: 0.3rem 0.5rem;
-  border-radius: 0.375rem;
-  border: 1px solid #d1d5db;
-  color: #111827;
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.btn-page {
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.375rem;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  color: #374151;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-page:hover:not(:disabled) {
-  background: #f3f4f6;
-  border-color: #9ca3af;
-}
-
-.btn-page:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.page-info {
-  font-size: 0.85rem;
-  color: #4b5563;
-  font-weight: 500;
-}
-</style>

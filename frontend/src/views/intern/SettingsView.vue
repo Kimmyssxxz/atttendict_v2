@@ -1,96 +1,98 @@
 <template>
-  <div class="intern-layout">
-    <header class="intern-header">
-      <h1>Account Settings</h1>
-      <div class="intern-header-right">
-        <nav class="intern-nav">
-          <router-link to="/intern/dashboard">Dashboard</router-link>
-          <router-link to="/intern/time">Time In / Out</router-link>
-          <router-link to="/intern/attendance">My Attendance</router-link>
-          <router-link to="/intern/staff-status">Staff Status</router-link>
-          <router-link to="/intern/notifications">Notifications</router-link>
-          <router-link to="/intern/profile">Profile</router-link>
-          <router-link to="/intern/settings">Settings</router-link>
+  <div class="min-h-screen bg-slate-50 font-sans text-gray-800">
+    <header class="bg-slate-800 text-white px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+      <h1 class="m-0 text-[1.4rem] font-bold">Account Settings</h1>
+      <div class="flex items-center gap-4">
+        <nav class="flex flex-wrap gap-3">
+          <router-link to="/intern/dashboard" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Dashboard</router-link>
+          <router-link to="/intern/time" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Time In / Out</router-link>
+          <router-link to="/intern/attendance" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">My Attendance</router-link>
+          <router-link to="/intern/staff-status" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Staff Status</router-link>
+          <router-link to="/intern/notifications" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Notifications</router-link>
+          <router-link to="/intern/profile" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Profile</router-link>
+          <router-link to="/intern/settings" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Settings</router-link>
         </nav>
 
-        <div class="notif-wrapper" @click="toggleNotifications">
-          <div class="notif-bell">
-            <span class="bell-icon">🔔</span>
-            <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount }}</span>
+        <div class="relative cursor-pointer" @click="toggleNotifications">
+          <div class="relative w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center transition-colors hover:bg-slate-700">
+            <span class="text-base">🔔</span>
+            <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] px-1.5 py-0 min-w-[18px] text-center shadow-sm">{{ unreadCount }}</span>
           </div>
-          <div v-if="showNotifications" class="notif-panel" @click.stop>
-            <h3>Notifications</h3>
-            <ul v-if="notifications.length" class="notif-dropdown-list">
-              <li v-for="(n, idx) in notifications" :key="idx">{{ n }}</li>
+          <div v-if="showNotifications" class="absolute right-0 mt-2 bg-white text-slate-900 min-w-[220px] rounded-xl shadow-[0_10px_25px_rgba(15,23,42,0.25)] p-3 z-20" @click.stop>
+            <h3 class="m-0 mb-2 text-sm font-semibold">Notifications</h3>
+            <ul v-if="notifications.length" class="list-none p-0 m-0 text-[0.85rem]">
+              <li v-for="(n, idx) in notifications" :key="idx" class="mt-1 first:mt-0">{{ n }}</li>
             </ul>
-            <p v-else class="notif-empty">No notifications</p>
+            <p v-else class="m-0 text-[0.8rem] text-gray-500">No notifications</p>
           </div>
         </div>
       </div>
     </header>
 
-    <main class="settings-main">
-      <section class="card password-card">
-        <h2>Change Password</h2>
-        <form class="password-form" @submit.prevent="handleChangePassword">
-          <div class="form-group">
-            <label for="current">Current Password</label>
-            <input id="current" type="password" v-model="passwordForm.currentPassword" />
+    <main class="max-w-[900px] mx-auto my-8 px-4 pb-8 flex flex-col gap-6">
+      <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-6">
+        <h2 class="mt-0 mb-2 text-[1.1rem] text-slate-900 font-bold">Change Password</h2>
+        <form class="grid grid-cols-1 gap-3 max-w-[500px]" @submit.prevent="handleChangePassword">
+          <div class="flex flex-col">
+            <label for="current" class="mb-1 text-[0.85rem] text-slate-600 font-medium">Current Password</label>
+            <input id="current" type="password" v-model="passwordForm.currentPassword" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-[0.9rem] text-slate-900 bg-white transition-colors focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
           </div>
-          <div class="form-group">
-            <label for="new">New Password</label>
-            <input id="new" type="password" v-model="passwordForm.newPassword" />
+          <div class="flex flex-col">
+            <label for="new" class="mb-1 text-[0.85rem] text-slate-600 font-medium">New Password</label>
+            <input id="new" type="password" v-model="passwordForm.newPassword" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-[0.9rem] text-slate-900 bg-white transition-colors focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
           </div>
-          <div class="form-group">
-            <label for="confirm">Confirm New Password</label>
-            <input id="confirm" type="password" v-model="passwordForm.confirmNewPassword" />
+          <div class="flex flex-col">
+            <label for="confirm" class="mb-1 text-[0.85rem] text-slate-600 font-medium">Confirm New Password</label>
+            <input id="confirm" type="password" v-model="passwordForm.confirmNewPassword" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-[0.9rem] text-slate-900 bg-white transition-colors focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
           </div>
-          <button type="submit" class="btn btn-save" :disabled="pwdSaving || !intern.id">
+          <button type="submit" class="mt-2 py-2.5 px-6 w-full sm:w-auto self-start rounded-full border-none bg-slate-700 text-white text-[0.9rem] font-semibold cursor-pointer transition-colors hover:bg-slate-800 disabled:opacity-70 disabled:cursor-not-allowed" :disabled="pwdSaving || !intern.id">
             {{ pwdSaving ? 'Saving...' : 'Save' }}
           </button>
-          <p v-if="pwdMessage" class="note">{{ pwdMessage }}</p>
-          <p v-if="pwdError" class="note error-note">{{ pwdError }}</p>
+          <p v-if="pwdMessage" class="mt-2 mb-0 text-[0.8rem] text-emerald-600 font-medium">{{ pwdMessage }}</p>
+          <p v-if="pwdError" class="mt-2 mb-0 text-[0.8rem] text-red-600 font-medium">{{ pwdError }}</p>
         </form>
       </section>
 
-      <section class="card sessions-card">
-        <h2>Security</h2>
-        <p class="subtitle">Manage your active sessions and login history.</p>
+      <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-6">
+        <h2 class="mt-0 mb-2 text-[1.1rem] text-slate-900 font-bold">Security</h2>
+        <p class="mt-0 mb-4 text-[0.9rem] text-slate-500">Manage your active sessions and login history.</p>
 
-        <div class="sessions-list">
-          <h3>Active Sessions</h3>
-          <div
-            v-for="session in sessions"
-            :key="session.id"
-            class="session-item"
-            :class="{ current: session.isCurrent }"
-          >
-            <div class="session-icon">
-              <span>{{ session.icon }}</span>
-            </div>
-            <div class="session-info">
-              <div class="session-title-row">
-                <span class="session-title">{{ session.device }} - {{ session.browser }}</span>
-                <span v-if="session.isCurrent" class="current-badge">Current</span>
-              </div>
-              <div class="session-meta">
-                <div>
-                  <span class="meta-label">Location</span>
-                  <span class="meta-value">{{ session.location }}</span>
-                </div>
-                <div>
-                  <span class="meta-label">Last active</span>
-                  <span class="meta-value">{{ session.lastActive }}</span>
-                </div>
-              </div>
-            </div>
-            <button
-              class="btn btn-revoke"
-              type="button"
-              @click="revokeSession(session)"
+        <div>
+          <h3 class="mt-0 mb-4 text-[1rem] text-slate-900 font-bold">Active Sessions</h3>
+          <div class="flex flex-col gap-3">
+            <div
+              v-for="session in sessions"
+              :key="session.id"
+              class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border border-slate-200 bg-white [&.current]:bg-emerald-50 [&.current]:border-emerald-200"
+              :class="{ current: session.isCurrent }"
             >
-              Revoke
-            </button>
+              <div class="w-10 h-10 shrink-0 rounded-full bg-slate-100 flex items-center justify-center text-lg">
+                <span>{{ session.icon }}</span>
+              </div>
+              <div class="flex-1 min-w-0 w-full">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="font-semibold text-slate-900 truncate">{{ session.device }} - {{ session.browser }}</span>
+                  <span v-if="session.isCurrent" class="text-[0.75rem] px-2 py-0.5 rounded-full bg-emerald-500 text-emerald-50 font-medium shrink-0">Current</span>
+                </div>
+                <div class="flex flex-wrap gap-x-6 gap-y-2 text-[0.85rem]">
+                  <div>
+                    <span class="block text-slate-500 text-[0.75rem]">Location</span>
+                    <span class="block text-slate-900 font-medium">{{ session.location }}</span>
+                  </div>
+                  <div>
+                    <span class="block text-slate-500 text-[0.75rem]">Last active</span>
+                    <span class="block text-slate-900 font-medium">{{ session.lastActive }}</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                class="px-4 py-1.5 rounded-full border-none bg-red-100 text-red-700 hover:bg-red-200 text-[0.85rem] font-semibold cursor-pointer transition-colors mt-2 sm:mt-0"
+                type="button"
+                @click="revokeSession(session)"
+              >
+                Revoke
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -330,294 +332,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.intern-layout {
-  min-height: 100vh;
-  background: #f5f7fb;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
 
-.intern-header {
-  background: #1e293b;
-  color: #fff;
-  padding: 1rem 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.intern-header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.intern-header h1 {
-  margin: 0;
-  font-size: 1.4rem;
-}
-
-.intern-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.intern-nav a {
-  color: #e5e7eb;
-  text-decoration: none;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  border: 1px solid transparent;
-}
-
-.intern-nav a.router-link-active {
-  background: #f97316;
-  color: #111827;
-  border-color: #f97316;
-}
-
-.intern-nav a:hover {
-  background: #111827;
-}
-
-.notif-wrapper {
-  position: relative;
-  cursor: pointer;
-}
-
-.notif-bell {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: #0f172a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bell-icon {
-  font-size: 16px;
-}
-
-.notif-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #ef4444;
-  color: #fef2f2;
-  border-radius: 999px;
-  font-size: 10px;
-  padding: 0 5px;
-}
-
-.notif-panel {
-  position: absolute;
-  right: 0;
-  margin-top: 0.5rem;
-  background: #ffffff;
-  color: #111827;
-  min-width: 220px;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
-  padding: 0.75rem 0.9rem;
-  z-index: 20;
-}
-
-.notif-panel h3 {
-  margin: 0 0 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.notif-dropdown-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 0.85rem;
-}
-
-.notif-dropdown-list li + li {
-  margin-top: 0.25rem;
-}
-
-.notif-empty {
-  margin: 0;
-  font-size: 0.8rem;
-  color: #6b7280;
-}
-
-.settings-main {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 0 1rem 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.card {
-  background: #ffffff;
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-  padding: 1.5rem;
-}
-
-.password-card h2,
-.sessions-card h2 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-  color: #0f172a;
-}
-
-.subtitle {
-  margin: 0 0 1rem;
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-.password-form {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-size: 0.85rem;
-  color: #4b5563;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.5rem 0.6rem;
-  border-radius: 0.5rem;
-  border: 1px solid #d1d5db;
-  font-size: 0.9rem;
-}
-
-.btn-save {
-  margin-top: 0.5rem;
-  padding: 0.7rem 1.2rem;
-  border-radius: 999px;
-  border: none;
-  background: #4b5563;
-  color: #e5e7eb;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.note {
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin-top: 0.5rem;
-}
-
-.error-note {
-  color: #b91c1c;
-}
-
-.sessions-list h3 {
-  margin: 0 0 1rem;
-  font-size: 1rem;
-  color: #0f172a;
-}
-
-.session-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-}
-
-.session-item + .session-item {
-  margin-top: 0.75rem;
-}
-
-.session-item.current {
-  background: #ecfdf5;
-  border-color: #6ee7b7;
-}
-
-.session-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.session-info {
-  flex: 1;
-}
-
-.session-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.session-title {
-  font-weight: 600;
-}
-
-.current-badge {
-  font-size: 0.75rem;
-  padding: 0.1rem 0.5rem;
-  border-radius: 999px;
-  background: #22c55e;
-  color: #f0fdf4;
-}
-
-.session-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  font-size: 0.85rem;
-}
-
-.meta-label {
-  display: block;
-  color: #6b7280;
-}
-
-.meta-value {
-  display: block;
-  color: #111827;
-}
-
-.btn-revoke {
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-  border: none;
-  background: #fee2e2;
-  color: #b91c1c;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-@media (max-width: 700px) {
-  .session-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .session-meta {
-    gap: 0.75rem;
-  }
-}
-</style>

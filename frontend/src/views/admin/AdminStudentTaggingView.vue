@@ -1,68 +1,68 @@
 <template>
-  <div class="admin-shell">
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-100">
     <AdminSidebar />
 
-    <div class="admin-layout">
-      <header class="admin-header">
-        <h1>Student Tagging</h1>
+    <div class="flex-1 flex flex-col">
+      <header class="px-8 py-6 bg-blue-600 text-white">
+        <h1 class="m-0 text-2xl font-bold">Student Tagging</h1>
       </header>
 
-      <main class="admin-main">
-        <section class="section">
-          <div class="section-header">
-            <h2 class="section-title">Student Tagging</h2>
-            <p class="section-subtitle">
+      <main class="flex-1 px-8 py-6">
+        <section class="bg-white rounded-lg p-6 shadow-sm">
+          <div class="mb-4">
+            <h2 class="m-0 text-xl text-gray-800">Student Tagging</h2>
+            <p class="mt-1 mb-0 text-sm text-gray-600">
               Configure and review tagging for student interns (AM/PM, normal hours, overtime, etc.).
             </p>
           </div>
 
-          <div class="toolbar">
+          <div class="flex flex-wrap gap-3 mb-4">
             <input
               v-model="search"
               type="text"
-              class="search-input"
+              class="flex-1 basis-[240px] px-3 py-2 rounded-md border border-gray-300 text-[0.95rem] focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400"
               placeholder="Search by name, username, or email"
             />
-            <select v-model="roleFilter" class="filter-select">
+            <select v-model="roleFilter" class="flex-none basis-[200px] px-3 py-2 rounded-md border border-gray-300 text-[0.95rem] focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400">
               <option value="all">All</option>
               <option value="student-intern">Student Interns Only</option>
             </select>
           </div>
 
-          <div v-if="loading" class="status-text">Loading interns...</div>
-          <div v-else-if="error" class="status-text error">{{ error }}</div>
+          <div v-if="loading" class="text-[0.95rem] text-gray-600">Loading interns...</div>
+          <div v-else-if="error" class="text-[0.95rem] text-red-700">{{ error }}</div>
           <div v-else>
-            <table class="interns-table" v-if="filteredInterns.length">
-              <thead>
+            <table class="w-full border-collapse text-sm" v-if="filteredInterns.length">
+              <thead class="bg-gray-100">
                 <tr>
-                  <th>#</th>
-                  <th>Full Name</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Position</th>
-                  <th>Tagging</th>
-                  <th>Today AM Tag</th>
-                  <th>Today PM Tag</th>
-                  <th>Actions</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">#</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Full Name</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Username</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Email</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Role</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Position</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Tagging</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Today AM Tag</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Today PM Tag</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(intern, index) in filteredInterns" :key="intern.id">
-                  <td>{{ index + 1 }}</td>
-                  <td>{{ formatName(intern) }}</td>
-                  <td>{{ intern.username || '-' }}</td>
-                  <td>{{ intern.email || '-' }}</td>
-                  <td>{{ intern.role || '-' }}</td>
-                  <td>{{ intern.position || '-' }}</td>
-                  <td>{{ intern.tagging || '-' }}</td>
-                  <td>{{ intern.todayAmTag || '-' }}</td>
-                  <td>{{ intern.todayPmTag || '-' }}</td>
-                  <td>
-                    <div class="action-buttons">
+                  <td class="border border-gray-300 px-3 py-2">{{ index + 1 }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ formatName(intern) }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.username || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.email || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.role || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.position || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.tagging || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.todayAmTag || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.todayPmTag || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">
+                    <div class="flex gap-1">
                       <button
                         type="button"
-                        class="action-button"
+                        class="px-2.5 py-1 text-xs rounded border border-gray-300 bg-gray-50 cursor-pointer whitespace-nowrap transition-colors hover:bg-gray-200"
                         @click="openTagModal(intern)"
                         title="Edit Tagging"
                       >
@@ -74,51 +74,51 @@
               </tbody>
             </table>
 
-            <div v-else class="status-text">No student interns found.</div>
+            <div v-else class="text-[0.95rem] text-gray-600">No student interns found.</div>
           </div>
 
           <!-- Edit Tagging Modal -->
-          <div v-if="showTagModal" class="modal-backdrop">
-            <div class="modal">
-              <h3 class="modal-title">Edit Student Tagging</h3>
+          <div v-if="showTagModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-[1000]">
+            <div class="bg-white rounded-lg p-6 w-full max-w-[640px] shadow-[0_10px_25px_rgba(0,0,0,0.2)]">
+              <h3 class="m-0 mb-4 text-[1.1rem] text-gray-800 font-bold">Edit Student Tagging</h3>
 
-              <form @submit.prevent="handleSaveTagging" class="modal-form">
-                <div class="modal-grid">
-                  <div class="form-group">
-                    <label>Student</label>
-                    <input :value="selectedInternName" type="text" disabled />
+              <form @submit.prevent="handleSaveTagging" class="flex flex-col gap-4">
+                <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-x-4 gap-y-3">
+                  <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                    <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Student</label>
+                    <input :value="selectedInternName" type="text" disabled class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm bg-gray-100" />
                   </div>
 
-                  <div class="form-group">
-                    <label>Tagging (day-level default)</label>
-                    <select v-model="tagging">
+                  <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                    <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Tagging (day-level default)</label>
+                    <select v-model="tagging" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm bg-white focus:outline-none focus:border-blue-500">
                       <option value="Normal Hours">Normal Hours</option>
                       <option value="Overtime">Overtime</option>
                     </select>
                   </div>
 
-                  <div class="form-group">
-                    <label>Today AM Tag (attendance)</label>
-                    <select v-model="todayTagAM">
+                  <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                    <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Today AM Tag (attendance)</label>
+                    <select v-model="todayTagAM" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm bg-white focus:outline-none focus:border-blue-500">
                       <option value="Normal Hours">Normal Hours</option>
                       <option value="Overtime">Overtime</option>
                     </select>
                   </div>
 
-                  <div class="form-group">
-                    <label>Today PM Tag (attendance)</label>
-                    <select v-model="todayTagPM">
+                  <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                    <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Today PM Tag (attendance)</label>
+                    <select v-model="todayTagPM" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm bg-white focus:outline-none focus:border-blue-500">
                       <option value="Normal Hours">Normal Hours</option>
                       <option value="Overtime">Overtime</option>
                     </select>
                   </div>
                 </div>
 
-                <div class="modal-actions">
-                  <button type="button" class="secondary-button" @click="closeTagModal" :disabled="savingTag">
+                <div class="flex justify-end gap-2 mt-2">
+                  <button type="button" class="px-3.5 py-2 rounded text-sm cursor-pointer bg-gray-300 text-gray-800 border-none transition-colors hover:bg-gray-400" @click="closeTagModal" :disabled="savingTag">
                     Cancel
                   </button>
-                  <button type="submit" class="primary-button" :disabled="savingTag">
+                  <button type="submit" class="px-3.5 py-2 rounded text-sm cursor-pointer bg-blue-600 text-white border-none transition-colors hover:bg-blue-700 disabled:opacity-70 disabled:cursor-default" :disabled="savingTag">
                     {{ savingTag ? 'Saving...' : 'Save Tagging' }}
                   </button>
                 </div>
@@ -343,215 +343,3 @@ export default {
 }
 </script>
 
-<style scoped>
-.admin-shell {
-  min-height: 100vh;
-  display: flex;
-  background-color: #f5f5f5;
-}
-
-.admin-layout {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-header {
-  padding: 1.5rem 2rem;
-  background-color: #1976d2;
-  color: #ffffff;
-}
-
-.admin-main {
-  flex: 1;
-  padding: 1.5rem 2rem;
-}
-
-.section {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.section-header {
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  margin: 0;
-  font-size: 1.25rem;
-  color: #333;
-}
-
-.section-subtitle {
-  margin: 0.25rem 0 0;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.search-input {
-  flex: 1 1 240px;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-}
-
-.filter-select {
-  flex: 0 0 200px;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-}
-
-.interns-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.interns-table th,
-.interns-table td {
-  border: 1px solid #e0e0e0;
-  padding: 0.5rem 0.75rem;
-  text-align: left;
-}
-
-.interns-table thead {
-  background-color: #f0f0f0;
-}
-
-.status-text {
-  font-size: 0.95rem;
-  color: #555;
-}
-
-.status-text.error {
-  color: #c62828;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 640px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.modal-title {
-  margin: 0 0 1rem;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.modal-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem 1rem;
-}
-
-.modal .form-group label {
-  display: block;
-  margin-bottom: 0.35rem;
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.modal .form-group input {
-  width: 100%;
-  padding: 0.45rem 0.6rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.9rem;
-}
-
-.modal .form-group select {
-  width: 100%;
-  padding: 0.45rem 0.6rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.9rem;
-  background-color: #fff;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-.primary-button,
-.secondary-button {
-  padding: 0.5rem 0.9rem;
-  border-radius: 4px;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.primary-button {
-  background-color: #1976d2;
-  color: #ffffff;
-}
-
-.primary-button:disabled {
-  opacity: 0.7;
-  cursor: default;
-}
-
-.secondary-button {
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.action-button {
-  padding: 0.25rem 0.4rem;
-  font-size: 0.8rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background-color: #f5f5f5;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.action-button:hover {
-  background-color: #e0e0e0;
-}
-
-@media (max-width: 900px) {
-  .admin-shell {
-    flex-direction: column;
-  }
-}
-</style>

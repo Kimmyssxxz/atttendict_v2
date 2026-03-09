@@ -1,154 +1,159 @@
 <template>
-  <div class="auth-container">
-    <div class="auth-box">
-      <h2>Register</h2>
-      <form @submit.prevent="handleRegister" class="auth-form">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input
-            id="username"
-            v-model="form.username"
-            type="text"
-            required
-            class="form-control"
-            placeholder="Enter username"
-          />
+  <div class="flex justify-center items-center min-h-screen bg-gray-100 py-10 px-5">
+    <div class="bg-white p-10 rounded-lg shadow-lg w-full max-w-3xl">
+      <div class="flex justify-center items-center mb-6">
+        <img src="/DICTlogo1.png" alt="DICT Logo" class="max-w-[200px] w-full h-auto" />
+      </div>
+      <h2 class="text-center mb-6 text-gray-800 text-2xl font-bold">Register</h2>
+      <form @submit.prevent="handleRegister" class="flex flex-col">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+          <div class="mb-4">
+            <label for="username" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">Username</label>
+            <input
+              id="username"
+              v-model="form.username"
+              type="text"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter username"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="email" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">Email</label>
+            <input
+              id="email"
+              v-model="form.email"
+              type="email"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter email"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="firstName" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">First Name</label>
+            <input
+              id="firstName"
+              v-model="form.firstName"
+              type="text"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter first name"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="middleName" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">Middle Name</label>
+            <input
+              id="middleName"
+              v-model="form.middleName"
+              type="text"
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter middle name (optional)"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="lastName" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">Last Name</label>
+            <input
+              id="lastName"
+              v-model="form.lastName"
+              type="text"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter last name"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="role" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">Role</label>
+            <select
+              id="role"
+              v-model="form.role"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+            >
+              <option disabled value="">Select role</option>
+              <option value="student">Student / Intern</option>
+              <option value="staff">Staff</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label for="position" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">Position</label>
+            <input
+              id="position"
+              v-model="form.position"
+              type="text"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter position"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="assignedOffice" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">Assigned Office / Company</label>
+            <input
+              id="assignedOffice"
+              v-model="form.assignedOffice"
+              type="text"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter office or company"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="schoolOrUniversity" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">School / University</label>
+            <input
+              id="schoolOrUniversity"
+              v-model="form.schoolOrUniversity"
+              type="text"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter school or university"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="ojtRequiredHours" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">OJT Required Hours</label>
+            <input
+              id="ojtRequiredHours"
+              v-model.number="form.ojtRequiredHours"
+              type="number"
+              min="0"
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter required OJT hours"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="password" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">Password</label>
+            <input
+              id="password"
+              v-model="form.password"
+              type="password"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Enter password"
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="confirmPassword" class="block mb-2 text-gray-600 font-medium text-[0.95rem]">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              v-model="form.confirmPassword"
+              type="password"
+              required
+              class="w-full p-2.5 rounded border border-gray-300 text-[0.95rem] box-border focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Confirm password"
+            />
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="firstName">First Name</label>
-          <input
-            id="firstName"
-            v-model="form.firstName"
-            type="text"
-            required
-            class="form-control"
-            placeholder="Enter first name"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            id="email"
-            v-model="form.email"
-            type="email"
-            required
-            class="form-control"
-            placeholder="Enter email"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="middleName">Middle Name</label>
-          <input
-            id="middleName"
-            v-model="form.middleName"
-            type="text"
-            class="form-control"
-            placeholder="Enter middle name (optional)"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="lastName">Last Name</label>
-          <input
-            id="lastName"
-            v-model="form.lastName"
-            type="text"
-            required
-            class="form-control"
-            placeholder="Enter last name"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="role">Role</label>
-          <select
-            id="role"
-            v-model="form.role"
-            required
-            class="form-control"
-          >
-            <option disabled value="">Select role</option>
-            <option value="student">Student / Intern</option>
-            <option value="staff">Staff</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="position">Position</label>
-          <input
-            id="position"
-            v-model="form.position"
-            type="text"
-            required
-            class="form-control"
-            placeholder="Enter position"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="assignedOffice">Assigned Office / Company</label>
-          <input
-            id="assignedOffice"
-            v-model="form.assignedOffice"
-            type="text"
-            required
-            class="form-control"
-            placeholder="Enter assigned office or company"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="schoolOrUniversity">School / University</label>
-          <input
-            id="schoolOrUniversity"
-            v-model="form.schoolOrUniversity"
-            type="text"
-            required
-            class="form-control"
-            placeholder="Enter school or university"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="ojtRequiredHours">OJT Required Hours</label>
-          <input
-            id="ojtRequiredHours"
-            v-model.number="form.ojtRequiredHours"
-            type="number"
-            min="0"
-            class="form-control"
-            placeholder="Enter required OJT hours (optional)"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="form.password"
-            type="password"
-            required
-            class="form-control"
-            placeholder="Enter password"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <input
-            id="confirmPassword"
-            v-model="form.confirmPassword"
-            type="password"
-            required
-            class="form-control"
-            placeholder="Confirm password"
-          />
-        </div>
-
-        <button type="submit" class="auth-button">Register</button>
+        <button type="submit" class="w-full p-3.5 bg-blue-600 text-white border-none rounded text-base font-bold cursor-pointer mt-4 transition-colors duration-300 hover:bg-blue-700">Register</button>
       </form>
     </div>
   </div>
@@ -216,62 +221,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 20px;
-}
-
-.auth-box {
-  background: #ffffff;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 480px;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: #333;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #555;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  font-size: 1rem;
-}
-
-.auth-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #1976d2;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.auth-button:hover {
-  background-color: #1565c0;
-}
-</style>

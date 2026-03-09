@@ -1,41 +1,41 @@
 <template>
-  <div class="admin-shell">
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-100">
     <AdminSidebar />
 
-    <div class="admin-layout">
-      <header class="admin-header">
-        <h1>Office Hours Settings</h1>
+    <div class="flex-1 flex flex-col">
+      <header class="px-8 py-6 bg-blue-600 text-white">
+        <h1 class="m-0 text-2xl font-bold">Office Hours Settings</h1>
       </header>
 
-      <main class="admin-main">
-        <section class="section">
-          <div class="section-header">
-            <h2 class="section-title">Todays Office Hours</h2>
-            <p class="section-subtitle">
+      <main class="flex-1 px-8 py-6">
+        <section class="bg-white rounded-lg p-6 shadow-sm">
+          <div class="mb-4">
+            <h2 class="m-0 text-xl text-gray-800">Today's Office Hours</h2>
+            <p class="mt-1 mb-0 text-sm text-gray-600">
               Set the office hours that will apply for <strong>today only</strong>.
             </p>
           </div>
 
-          <form class="office-hours-form" @submit.prevent>
-            <div class="office-hours-row">
-              <label class="day-label">Today</label>
-              <div class="time-inputs">
-                <div class="time-field">
+          <form class="flex flex-col gap-5" @submit.prevent>
+            <div class="flex flex-col md:flex-row md:items-center gap-4">
+              <label class="w-[110px] font-medium text-gray-800">Today</label>
+              <div class="flex gap-3">
+                <div class="flex flex-col gap-1 text-sm text-gray-600">
                   <span>Start</span>
-                  <input v-model="today.start" type="time" />
+                  <input v-model="today.start" type="time" class="py-1.5 px-2 rounded border border-gray-300 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-200" />
                 </div>
-                <div class="time-field">
+                <div class="flex flex-col gap-1 text-sm text-gray-600">
                   <span>End</span>
-                  <input v-model="today.end" type="time" />
+                  <input v-model="today.end" type="time" class="py-1.5 px-2 rounded border border-gray-300 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-200" />
                 </div>
               </div>
             </div>
 
-            <div class="form-actions">
-              <button type="button" class="secondary-button" @click="resetTimes">
+            <div class="flex justify-end gap-2 mt-4">
+              <button type="button" class="px-3.5 py-2 rounded text-sm cursor-pointer bg-gray-300 text-gray-800 border-none transition-colors hover:bg-gray-400" @click="resetTimes">
                 Reset
               </button>
-              <button type="button" class="primary-button" @click="saveSettings">
+              <button type="button" class="px-3.5 py-2 rounded text-sm cursor-pointer bg-blue-600 text-white border-none transition-colors hover:bg-blue-700" @click="saveSettings">
                 Save Settings
               </button>
             </div>
@@ -75,130 +75,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.admin-shell {
-  min-height: 100vh;
-  display: flex;
-  background-color: #f5f5f5;
-}
-
-.admin-layout {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-header {
-  padding: 1.5rem 2rem;
-  background-color: #1976d2;
-  color: #ffffff;
-}
-
-.admin-main {
-  flex: 1;
-  padding: 1.5rem 2rem;
-}
-
-.section {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.section-header {
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  margin: 0;
-  font-size: 1.25rem;
-  color: #333;
-}
-
-.section-subtitle {
-  margin: 0.25rem 0 0;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.office-hours-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.office-hours-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.office-hours-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.day-label {
-  width: 110px;
-  font-weight: 500;
-  color: #333;
-}
-
-.time-inputs {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.time-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.time-field input {
-  padding: 0.35rem 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.9rem;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-.primary-button,
-.secondary-button {
-  padding: 0.5rem 0.9rem;
-  border-radius: 4px;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.primary-button {
-  background-color: #1976d2;
-  color: #ffffff;
-}
-
-.secondary-button {
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-@media (max-width: 900px) {
-  .admin-shell {
-    flex-direction: column;
-  }
-
-  .office-hours-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-</style>

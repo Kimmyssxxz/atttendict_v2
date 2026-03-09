@@ -1,80 +1,82 @@
 <template>
-  <aside class="admin-sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">AD</div>
+  <aside class="w-full md:w-[250px] p-4 md:px-5 md:py-6 bg-white border-r-0 md:border-r-[3px] border-gray-200 shrink-0">
+    <div class="flex items-center gap-3 mb-5">
+      <div class="w-[38px] h-[38px] rounded-full bg-gradient-to-br from-blue-700 to-blue-400 flex items-center justify-center text-gray-50 font-bold text-[0.95rem] shrink-0">AD</div>
       <div>
-        <h2 class="sidebar-title">Admin Panel</h2>
-        <p class="sidebar-subtitle">Manage users and dashboard</p>
+        <h2 class="m-0 text-[1.05rem] text-gray-900 font-bold">Admin Panel</h2>
+        <p class="mt-[0.1rem] mb-0 text-[0.8rem] text-gray-500">Manage users and dashboard</p>
       </div>
     </div>
 
-    <div class="sidebar-section">
-      <p class="sidebar-section-label">Menus</p>
-      <nav class="sidebar-nav">
+    <div class="flex md:block items-center gap-2">
+      <p class="mt-0 mb-0 md:mb-1.5 text-[0.75rem] uppercase tracking-wider text-gray-400 font-semibold">Menus</p>
+      <nav class="flex flex-row md:flex-col gap-1 w-full">
         <router-link
           to="/admin/dashboard"
-          class="sidebar-link"
-          active-class="sidebar-link-active"
+          class="flex items-center gap-2.5 px-2 md:px-3 py-1.5 md:py-2 rounded-xl text-gray-700 no-underline text-sm transition-all hover:bg-blue-50 hover:text-blue-700"
+          active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
         >
-          <span class="sidebar-icon">🏠</span>
-          <span>Dashboard</span>
+          <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">🏠</span>
+          <span class="hidden md:inline">Dashboard</span>
         </router-link>
         <button
           type="button"
-          class="sidebar-link sidebar-link-group"
+          class="flex items-center gap-2.5 px-2 md:px-3 py-1.5 md:py-2 w-full border-none bg-transparent justify-between cursor-pointer rounded-xl text-gray-700 font-sans text-sm transition-all hover:bg-blue-50 hover:text-blue-700"
           @click="userMgmtOpen = !userMgmtOpen"
         >
-          <span class="sidebar-icon">👥</span>
-          <span class="sidebar-link-group-label">Student Interns</span>
-          <span class="sidebar-link-group-chevron" :class="{ 'is-open': userMgmtOpen }">
+          <div class="flex items-center gap-2.5">
+            <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">👥</span>
+            <span class="hidden md:inline text-left">Student Interns</span>
+          </div>
+          <span class="hidden md:inline text-[0.7rem] text-gray-500 transition-transform duration-150" :class="{ 'rotate-180': userMgmtOpen }">
             ▾
           </span>
         </button>
 
-        <div v-if="userMgmtOpen" class="sidebar-submenu">
-          <div class="sidebar-submenu-line"></div>
-          <div class="sidebar-submenu-items">
+        <div v-if="userMgmtOpen" class="flex mt-0.5 hidden md:flex">
+          <div class="w-px my-1 ml-3 mr-2 bg-gray-300"></div>
+          <div class="flex-1 flex flex-col">
             <router-link
               to="/admin/manage-interns"
-              class="sidebar-link sidebar-link-child"
-              active-class="sidebar-link-active"
+              class="flex items-center gap-2.5 pl-[1.9rem] pr-3 py-1.5 rounded-xl text-gray-700 no-underline text-[0.85rem] transition-all hover:bg-blue-50 hover:text-blue-700"
+              active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
             >
-              <span class="sidebar-icon">📋</span>
+              <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">📋</span>
               <span>Manage Student Interns</span>
             </router-link>
             <router-link
               to="/admin/student-attendance-validation"
-              class="sidebar-link sidebar-link-child"
-              active-class="sidebar-link-active"
+              class="flex items-center gap-2.5 pl-[1.9rem] pr-3 py-1.5 rounded-xl text-gray-700 no-underline text-[0.85rem] transition-all hover:bg-blue-50 hover:text-blue-700"
+              active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
             >
-              <span class="sidebar-icon">✅</span>
+              <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">✅</span>
               <span>Student Attendance Validation</span>
             </router-link>
             <router-link
               to="/admin/student-tagging"
-              class="sidebar-link sidebar-link-child"
-              active-class="sidebar-link-active"
+              class="flex items-center gap-2.5 pl-[1.9rem] pr-3 py-1.5 rounded-xl text-gray-700 no-underline text-[0.85rem] transition-all hover:bg-blue-50 hover:text-blue-700"
+              active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
             >
-              <span class="sidebar-icon">🏷️</span>
+              <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">🏷️</span>
               <span>Student Attendance Tagging</span>
             </router-link>
             <router-link
               to="/admin/student-certification"
-              class="sidebar-link sidebar-link-child"
-              active-class="sidebar-link-active"
+              class="flex items-center gap-2.5 pl-[1.9rem] pr-3 py-1.5 rounded-xl text-gray-700 no-underline text-[0.85rem] transition-all hover:bg-blue-50 hover:text-blue-700"
+              active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
             >
-              <span class="sidebar-icon">📄</span>
+              <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">📄</span>
               <span>Student Certification</span>
             </router-link>
           </div>
         </div>
         <router-link
           to="/admin/settings"
-          class="sidebar-link"
-          active-class="sidebar-link-active"
+          class="flex items-center gap-2.5 px-2 md:px-3 py-1.5 md:py-2 rounded-xl text-gray-700 no-underline text-sm transition-all hover:bg-blue-50 hover:text-blue-700"
+          active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
         >
-          <span class="sidebar-icon">⚙️</span>
-          <span>Set Office Hours</span>
+          <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">⚙️</span>
+          <span class="hidden md:inline">Set Office Hours</span>
         </router-link>
       </nav>
     </div>
@@ -92,171 +94,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.admin-sidebar {
-  width: 250px;
-  padding: 1.5rem 1.25rem;
-  background-color: #ffffff;
-  border-right: 3px solid #e5e7eb;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-}
-
-.sidebar-logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #1d4ed8, #60a5fa);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #f9fafb;
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-.sidebar-title {
-  margin: 0;
-  font-size: 1.05rem;
-  color: #111827;
-}
-
-.sidebar-subtitle {
-  margin: 0.1rem 0 0;
-  font-size: 0.8rem;
-  color: #6b7280;
-}
-
-.sidebar-section-label {
-  margin: 0 0 0.35rem;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #9ca3af;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.sidebar-link {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.75rem;
-  color: #374151;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
-}
-
-.sidebar-link-child {
-  padding-left: 1.9rem;
-  font-size: 0.85rem;
-}
-
-.sidebar-link-group {
-  width: 100%;
-  border: none;
-  background: transparent;
-  justify-content: space-between;
-  cursor: pointer;
-}
-
-.sidebar-link-group-label {
-  flex: 1;
-  text-align: left;
-}
-
-.sidebar-link-group-chevron {
-  font-size: 0.7rem;
-  color: #6b7280;
-  transition: transform 0.15s ease;
-}
-
-.sidebar-link-group-chevron.is-open {
-  transform: rotate(180deg);
-}
-
-.sidebar-submenu {
-  display: flex;
-  margin-top: 0.1rem;
-}
-
-.sidebar-submenu-line {
-  width: 1px;
-  margin: 0.3rem 0.6rem 0.3rem 0.8rem;
-  background-color: #d1d5db;
-}
-
-.sidebar-submenu-items {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar-link:hover {
-  background: #edf2ff;
-  color: #1d4ed8;
-}
-
-.sidebar-link-active {
-  background: #e0edff;
-  color: #1d4ed8;
-}
-
-.sidebar-link-active .sidebar-icon {
-  background: rgba(15, 23, 42, 0.08);
-}
-
-.sidebar-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  background: #e0edff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-}
-
-@media (max-width: 900px) {
-  .admin-sidebar {
-    width: 100%;
-    padding: 1rem 1rem 0;
-  }
-
-  .sidebar-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.9rem 1rem;
-  }
-
-  .sidebar-section {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .sidebar-section-label {
-    margin-bottom: 0;
-  }
-
-  .sidebar-nav {
-    flex-direction: row;
-  }
-
-  .sidebar-link {
-    padding: 0.35rem 0.5rem;
-  }
-}
-</style>

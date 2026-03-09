@@ -1,31 +1,33 @@
 <template>
-  <div class="login-container">
-    <div class="login-box">
-      <h2>Admin Login</h2>
-      <form @submit.prevent="handleLogin" class="login-form">
-        <div class="form-group">
-          <label for="username">Username</label>
+  <div class="flex justify-center items-center min-h-screen bg-gray-100 m-0 p-5">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+      <h2 class="text-center text-gray-800 mb-6 text-2xl font-bold">Admin Login</h2>
+      <form @submit.prevent="handleLogin" class="flex flex-col">
+        <div class="mb-4">
+          <label for="username" class="block mb-2 text-gray-600">Username</label>
           <input
             type="text"
             id="username"
             v-model="username"
             required
             placeholder="Enter your username"
-            class="form-control"
+            class="w-full p-2 border border-gray-300 rounded text-base focus:border-green-500 focus:outline-none"
           />
         </div>
-        <div class="form-group">
-          <label for="password">Password</label>
+        <div class="mb-4">
+          <label for="password" class="block mb-2 text-gray-600">Password</label>
           <input
             type="password"
             id="password"
             v-model="password"
             required
             placeholder="Enter your password"
-            class="form-control"
+            class="w-full p-2 border border-gray-300 rounded text-base focus:border-green-500 focus:outline-none"
           />
         </div>
-        <button type="submit" class="login-button">Login</button>
+        <button type="submit" class="w-full p-3 bg-green-500 text-white border-none rounded text-base cursor-pointer transition-colors duration-300 hover:bg-green-600">
+          Login
+        </button>
       </form>
     </div>
   </div>
@@ -69,63 +71,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f5f5f5;
-  margin: 0;
-  padding: 20px;
-}
-
-.login-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
-h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #555;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.login-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.login-button:hover {
-  background-color: #45a049;
-}
-</style>

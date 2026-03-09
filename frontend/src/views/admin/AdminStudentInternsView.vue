@@ -1,85 +1,85 @@
 <template>
-  <div class="admin-shell">
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-100">
     <AdminSidebar />
 
-    <div class="admin-layout">
-      <header class="admin-header">
-        <h1>Student Intern Management</h1>
+    <div class="flex-1 flex flex-col">
+      <header class="px-8 py-6 bg-blue-600 text-white">
+        <h1 class="m-0 text-2xl font-bold">Student Intern Management</h1>
       </header>
 
-      <main class="admin-main">
-        <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">Student Interns</h2>
-          <p class="section-subtitle">
+      <main class="flex-1 px-8 py-6">
+        <section class="bg-white rounded-lg p-6 shadow-sm">
+        <div class="mb-4">
+          <h2 class="m-0 text-xl text-gray-800">Student Interns</h2>
+          <p class="mt-1 mb-0 text-sm text-gray-600">
             List of all student interns registered in the system (from Firestore `users` collection).
           </p>
         </div>
 
-        <div class="toolbar">
+        <div class="flex flex-wrap gap-3 mb-4">
           <input
             v-model="search"
             type="text"
-            class="search-input"
+            class="flex-1 basis-[240px] px-3 py-2 rounded-md border border-gray-300 text-[0.95rem] focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400"
             placeholder="Search by name, username, or email"
           />
-          <select v-model="roleFilter" class="filter-select">
+          <select v-model="roleFilter" class="flex-none basis-[200px] px-3 py-2 rounded-md border border-gray-300 text-[0.95rem] focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400">
             <option value="all">All</option>
             <option value="student-intern">Student Interns Only</option>
           </select>
-          <button type="button" class="primary-button" @click="openAddModal">
+          <button type="button" class="px-3.5 py-2 rounded text-sm cursor-pointer bg-blue-600 text-white border-none transition-colors hover:bg-blue-700 disabled:opacity-70 disabled:cursor-default" @click="openAddModal">
             Add Intern
           </button>
         </div>
 
-        <div v-if="loading" class="status-text">Loading interns...</div>
-        <div v-else-if="error" class="status-text error">{{ error }}</div>
+        <div v-if="loading" class="text-[0.95rem] text-gray-600">Loading interns...</div>
+        <div v-else-if="error" class="text-[0.95rem] text-red-700">{{ error }}</div>
         <div v-else>
-          <table class="interns-table" v-if="filteredInterns.length">
-            <thead>
+          <table class="w-full border-collapse text-sm" v-if="filteredInterns.length">
+            <thead class="bg-gray-100">
               <tr>
-                <th>#</th>
-                <th>Full Name</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Position</th>
-                <th>Assigned Office</th>
-                <th>School / University</th>
-                <th>OJT Required Hours</th>
-                <th>Address</th>
-                <th>Gender</th>
-                <th>Date of Birth</th>
-                <th>Course / Program</th>
-                <th>Year Level</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Actions</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">#</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Full Name</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Username</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Email</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Role</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Position</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Assigned Office</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">School / University</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">OJT Required Hours</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Address</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Gender</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Date of Birth</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Course / Program</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Year Level</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Start Date</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">End Date</th>
+                <th class="border border-gray-300 px-3 py-2 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(intern, index) in filteredInterns" :key="intern.id">
-                <td>{{ index + 1 }}</td>
-                <td>{{ formatName(intern) }}</td>
-                <td>{{ intern.username || '-' }}</td>
-                <td>{{ intern.email || '-' }}</td>
-                <td>{{ intern.role || '-' }}</td>
-                <td>{{ intern.position || '-' }}</td>
-                <td>{{ intern.assignedOffice || '-' }}</td>
-                <td>{{ intern.schoolOrUniversity || '-' }}</td>
-                <td>{{ intern.ojtRequiredHours ?? '-' }}</td>
-                <td>{{ intern.address || '-' }}</td>
-                <td>{{ intern.gender || '-' }}</td>
-                <td>{{ intern.dateOfBirth || '-' }}</td>
-                <td>{{ intern.course || '-' }}</td>
-                <td>{{ intern.yearLevel || '-' }}</td>
-                <td>{{ intern.startDate || '-' }}</td>
-                <td>{{ intern.endDate || '-' }}</td>
-                <td>
-                  <div class="action-buttons">
+                <td class="border border-gray-300 px-3 py-2">{{ index + 1 }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ formatName(intern) }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.username || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.email || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.role || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.position || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.assignedOffice || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.schoolOrUniversity || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.ojtRequiredHours ?? '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.address || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.gender || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.dateOfBirth || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.course || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.yearLevel || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.startDate || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">{{ intern.endDate || '-' }}</td>
+                <td class="border border-gray-300 px-3 py-2">
+                  <div class="flex gap-1">
                     <button
                       type="button"
-                      class="action-button"
+                      class="px-2.5 py-1 text-xs rounded border border-gray-300 bg-gray-50 cursor-pointer whitespace-nowrap transition-colors hover:bg-gray-200"
                       @click="openViewEditModal(intern, 'view')"
                       title="View"
                     >
@@ -87,7 +87,7 @@
                     </button>
                     <button
                       type="button"
-                      class="action-button"
+                      class="px-2.5 py-1 text-xs rounded border border-gray-300 bg-gray-50 cursor-pointer whitespace-nowrap transition-colors hover:bg-gray-200"
                       @click="openViewEditModal(intern, 'edit')"
                       title="Edit"
                     >
@@ -95,7 +95,7 @@
                     </button>
                     <button
                       type="button"
-                      class="action-button danger"
+                      class="px-2.5 py-1 text-xs rounded border border-red-400 text-red-700 bg-red-50 cursor-pointer whitespace-nowrap transition-colors hover:bg-red-100"
                       @click="confirmDeleteIntern(intern)"
                       title="Delete"
                     >
@@ -107,64 +107,64 @@
             </tbody>
           </table>
 
-          <div v-else class="status-text">No student interns found.</div>
+          <div v-else class="text-[0.95rem] text-gray-600">No student interns found.</div>
         </div>
 
         <!-- Add Intern Modal -->
-        <div v-if="showAddModal" class="modal-backdrop">
-          <div class="modal">
-            <h3 class="modal-title">Add Student Intern</h3>
+        <div v-if="showAddModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-[1000]">
+          <div class="bg-white rounded-lg p-6 w-full max-w-[640px] shadow-[0_10px_25px_rgba(0,0,0,0.2)]">
+            <h3 class="m-0 mb-4 text-[1.1rem] text-gray-800 font-bold">Add Student Intern</h3>
 
-            <form @submit.prevent="handleAddIntern" class="modal-form">
-              <div class="modal-grid">
-                <div class="form-group">
-                  <label>Username</label>
-                  <input v-model="newIntern.username" type="text" required />
+            <form @submit.prevent="handleAddIntern" class="flex flex-col gap-4">
+              <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-x-4 gap-y-3 max-h-[60vh] overflow-y-auto px-1">
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Username</label>
+                  <input v-model="newIntern.username" type="text" required class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>First Name</label>
-                  <input v-model="newIntern.firstName" type="text" required />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">First Name</label>
+                  <input v-model="newIntern.firstName" type="text" required class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>Middle Name</label>
-                  <input v-model="newIntern.middleName" type="text" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Middle Name</label>
+                  <input v-model="newIntern.middleName" type="text" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>Last Name</label>
-                  <input v-model="newIntern.lastName" type="text" required />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Last Name</label>
+                  <input v-model="newIntern.lastName" type="text" required class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>Email</label>
-                  <input v-model="newIntern.email" type="email" required />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Email</label>
+                  <input v-model="newIntern.email" type="email" required class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>Assigned Office</label>
-                  <input v-model="newIntern.assignedOffice" type="text" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Assigned Office</label>
+                  <input v-model="newIntern.assignedOffice" type="text" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>School / University</label>
-                  <input v-model="newIntern.schoolOrUniversity" type="text" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">School / University</label>
+                  <input v-model="newIntern.schoolOrUniversity" type="text" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>OJT Required Hours</label>
-                  <input v-model.number="newIntern.ojtRequiredHours" type="number" min="0" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">OJT Required Hours</label>
+                  <input v-model.number="newIntern.ojtRequiredHours" type="number" min="0" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>Address</label>
-                  <input v-model="newIntern.address" type="text" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Address</label>
+                  <input v-model="newIntern.address" type="text" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>Gender</label>
-                  <select v-model="newIntern.gender">
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Gender</label>
+                  <select v-model="newIntern.gender" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm bg-white focus:outline-none focus:border-blue-500">
                     <option value="" disabled>Select Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -173,19 +173,19 @@
                   </select>
                 </div>
 
-                <div class="form-group">
-                  <label>Date of Birth</label>
-                  <input v-model="newIntern.dateOfBirth" type="date" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Date of Birth</label>
+                  <input v-model="newIntern.dateOfBirth" type="date" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>Course / Program</label>
-                  <input v-model="newIntern.course" type="text" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Course / Program</label>
+                  <input v-model="newIntern.course" type="text" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>Year Level</label>
-                  <select v-model="newIntern.yearLevel">
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Year Level</label>
+                  <select v-model="newIntern.yearLevel" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm bg-white focus:outline-none focus:border-blue-500">
                     <option value="" disabled>Select Year Level</option>
                     <option value="1st Year">1st Year</option>
                     <option value="2nd Year">2nd Year</option>
@@ -195,23 +195,23 @@
                   </select>
                 </div>
 
-                <div class="form-group">
-                  <label>Start Date</label>
-                  <input v-model="newIntern.startDate" type="date" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Start Date</label>
+                  <input v-model="newIntern.startDate" type="date" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
-                <div class="form-group">
-                  <label>End Date</label>
-                  <input v-model="newIntern.endDate" type="date" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">End Date</label>
+                  <input v-model="newIntern.endDate" type="date" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500" />
                 </div>
 
               </div>
 
-              <div class="modal-actions">
-                <button type="button" class="secondary-button" @click="closeAddModal" :disabled="savingIntern">
+              <div class="flex justify-end gap-2 mt-2">
+                <button type="button" class="px-3.5 py-2 rounded text-sm cursor-pointer bg-gray-300 text-gray-800 border-none transition-colors hover:bg-gray-400" @click="closeAddModal" :disabled="savingIntern">
                   Cancel
                 </button>
-                <button type="submit" class="primary-button" :disabled="savingIntern">
+                <button type="submit" class="px-3.5 py-2 rounded text-sm cursor-pointer bg-blue-600 text-white border-none transition-colors hover:bg-blue-700 disabled:opacity-70 disabled:cursor-default" :disabled="savingIntern">
                   {{ savingIntern ? 'Saving...' : 'Save Intern' }}
                 </button>
               </div>
@@ -220,62 +220,62 @@
         </div>
 
         <!-- View/Edit Intern Modal -->
-        <div v-if="showViewEditModal" class="modal-backdrop">
-          <div class="modal">
-            <h3 class="modal-title">
+        <div v-if="showViewEditModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-[1000]">
+          <div class="bg-white rounded-lg p-6 w-full max-w-[640px] shadow-[0_10px_25px_rgba(0,0,0,0.2)]">
+            <h3 class="m-0 mb-4 text-[1.1rem] text-gray-800 font-bold">
               {{ viewEditMode === 'view' ? 'View Student Intern' : 'Edit Student Intern' }}
             </h3>
 
-            <form @submit.prevent="handleUpdateIntern" class="modal-form">
-              <div class="modal-grid">
-                <div class="form-group">
-                  <label>Username</label>
-                  <input v-model="selectedIntern.username" type="text" :disabled="viewEditMode === 'view'" />
+            <form @submit.prevent="handleUpdateIntern" class="flex flex-col gap-4">
+              <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-x-4 gap-y-3 max-h-[60vh] overflow-y-auto px-1">
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Username</label>
+                  <input v-model="selectedIntern.username" type="text" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>First Name</label>
-                  <input v-model="selectedIntern.firstName" type="text" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">First Name</label>
+                  <input v-model="selectedIntern.firstName" type="text" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>Middle Name</label>
-                  <input v-model="selectedIntern.middleName" type="text" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Middle Name</label>
+                  <input v-model="selectedIntern.middleName" type="text" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>Last Name</label>
-                  <input v-model="selectedIntern.lastName" type="text" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Last Name</label>
+                  <input v-model="selectedIntern.lastName" type="text" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>Email</label>
-                  <input v-model="selectedIntern.email" type="email" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Email</label>
+                  <input v-model="selectedIntern.email" type="email" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>Assigned Office</label>
-                  <input v-model="selectedIntern.assignedOffice" type="text" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Assigned Office</label>
+                  <input v-model="selectedIntern.assignedOffice" type="text" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>School / University</label>
-                  <input v-model="selectedIntern.schoolOrUniversity" type="text" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">School / University</label>
+                  <input v-model="selectedIntern.schoolOrUniversity" type="text" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>OJT Required Hours</label>
-                  <input v-model.number="selectedIntern.ojtRequiredHours" type="number" min="0" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">OJT Required Hours</label>
+                  <input v-model.number="selectedIntern.ojtRequiredHours" type="number" min="0" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>Address</label>
-                  <input v-model="selectedIntern.address" type="text" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Address</label>
+                  <input v-model="selectedIntern.address" type="text" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>Gender</label>
-                  <select v-model="selectedIntern.gender" :disabled="viewEditMode === 'view'">
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Gender</label>
+                  <select v-model="selectedIntern.gender" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
                     <option value="" disabled>Select Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -284,19 +284,19 @@
                   </select>
                 </div>
 
-                <div class="form-group">
-                  <label>Date of Birth</label>
-                  <input v-model="selectedIntern.dateOfBirth" type="date" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Date of Birth</label>
+                  <input v-model="selectedIntern.dateOfBirth" type="date" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>Course / Program</label>
-                  <input v-model="selectedIntern.course" type="text" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Course / Program</label>
+                  <input v-model="selectedIntern.course" type="text" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>Year Level</label>
-                  <select v-model="selectedIntern.yearLevel" :disabled="viewEditMode === 'view'">
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Year Level</label>
+                  <select v-model="selectedIntern.yearLevel" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed">
                     <option value="" disabled>Select Year Level</option>
                     <option value="1st Year">1st Year</option>
                     <option value="2nd Year">2nd Year</option>
@@ -306,26 +306,26 @@
                   </select>
                 </div>
 
-                <div class="form-group">
-                  <label>Start Date</label>
-                  <input v-model="selectedIntern.startDate" type="date" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">Start Date</label>
+                  <input v-model="selectedIntern.startDate" type="date" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
 
-                <div class="form-group">
-                  <label>End Date</label>
-                  <input v-model="selectedIntern.endDate" type="date" :disabled="viewEditMode === 'view'" />
+                <div class="flex flex-col gap-1.5 text-sm text-gray-700">
+                  <label class="font-medium text-[0.85rem] text-gray-600 mb-0.5">End Date</label>
+                  <input v-model="selectedIntern.endDate" type="date" :disabled="viewEditMode === 'view'" class="w-full px-2.5 py-1.5 rounded border border-gray-300 text-sm focus:outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed" />
                 </div>
                 
               </div>
 
-              <div class="modal-actions">
-                <button type="button" class="secondary-button" @click="closeViewEditModal" :disabled="savingIntern">
+              <div class="flex justify-end gap-2 mt-2">
+                <button type="button" class="px-3.5 py-2 rounded text-sm cursor-pointer bg-gray-300 text-gray-800 border-none transition-colors hover:bg-gray-400" @click="closeViewEditModal" :disabled="savingIntern">
                   Close
                 </button>
                 <button
                   v-if="viewEditMode === 'edit'"
                   type="submit"
-                  class="primary-button"
+                  class="px-3.5 py-2 rounded text-sm cursor-pointer bg-blue-600 text-white border-none transition-colors hover:bg-blue-700 disabled:opacity-70 disabled:cursor-default"
                   :disabled="savingIntern"
                 >
                   {{ savingIntern ? 'Saving...' : 'Save Changes' }}
@@ -571,225 +571,3 @@ export default {
 }
 </script>
 
-<style scoped>
-.admin-shell {
-  min-height: 100vh;
-  display: flex;
-  background-color: #f5f5f5;
-}
-
-.admin-layout {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-header {
-  padding: 1.5rem 2rem;
-  background-color: #1976d2;
-  color: #ffffff;
-}
-
-.admin-main {
-  flex: 1;
-  padding: 1.5rem 2rem;
-}
-
-.section {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.section-header {
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  margin: 0;
-  font-size: 1.25rem;
-  color: #333;
-}
-
-.section-subtitle {
-  margin: 0.25rem 0 0;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.search-input {
-  flex: 1 1 240px;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-}
-
-.filter-select {
-  flex: 0 0 200px;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-}
-
-.interns-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.interns-table th,
-.interns-table td {
-  border: 1px solid #e0e0e0;
-  padding: 0.5rem 0.75rem;
-  text-align: left;
-}
-
-.interns-table thead {
-  background-color: #f0f0f0;
-}
-
-.status-text {
-  font-size: 0.95rem;
-  color: #555;
-}
-
-.status-text.error {
-  color: #c62828;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 640px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.modal-title {
-  margin: 0 0 1rem;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.modal-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem 1rem;
-}
-
-.modal .form-group label {
-  display: block;
-  margin-bottom: 0.35rem;
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.modal .form-group input {
-  width: 100%;
-  padding: 0.45rem 0.6rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.9rem;
-}
-
-.modal .form-group select {
-  width: 100%;
-  padding: 0.45rem 0.6rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.9rem;
-  background-color: #fff;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-.primary-button,
-.secondary-button {
-  padding: 0.5rem 0.9rem;
-  border-radius: 4px;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.primary-button {
-  background-color: #1976d2;
-  color: #ffffff;
-}
-
-.primary-button:disabled {
-  opacity: 0.7;
-  cursor: default;
-}
-
-.secondary-button {
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.action-button {
-  padding: 0.25rem 0.4rem;
-  font-size: 0.8rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background-color: #f5f5f5;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.action-button:hover {
-  background-color: #e0e0e0;
-}
-
-.action-button.danger {
-  border-color: #c62828;
-  color: #c62828;
-  background-color: #ffebee;
-}
-
-.action-button.danger:hover {
-  background-color: #ffcdd2;
-}
-
-@media (max-width: 900px) {
-  .admin-shell {
-    flex-direction: column;
-  }
-}
-</style>

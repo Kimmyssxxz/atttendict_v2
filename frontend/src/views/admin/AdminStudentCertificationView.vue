@@ -1,68 +1,68 @@
 <template>
-  <div class="admin-shell">
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-100">
     <AdminSidebar />
 
-    <div class="admin-layout">
-      <header class="admin-header">
-        <h1>Student Certification</h1>
+    <div class="flex-1 flex flex-col">
+      <header class="px-8 py-6 bg-blue-600 text-white">
+        <h1 class="m-0 text-2xl font-bold">Student Certification</h1>
       </header>
 
-      <main class="admin-main">
-        <section class="section">
-          <div class="section-header">
-            <h2 class="section-title">Student Certification</h2>
-            <p class="section-subtitle">
+      <main class="flex-1 px-8 py-6">
+        <section class="bg-white rounded-lg p-6 shadow-sm">
+          <div class="mb-4">
+            <h2 class="m-0 text-xl text-gray-800">Student Certification</h2>
+            <p class="mt-1 mb-0 text-sm text-gray-600">
               List of student interns with their OJT hours and completion certificate actions.
             </p>
           </div>
 
-          <div class="toolbar">
+          <div class="flex flex-wrap gap-3 mb-4">
             <input
               v-model="search"
               type="text"
-              class="search-input"
+              class="flex-1 basis-[240px] px-3 py-2 rounded-md border border-gray-300 text-[0.95rem] focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400"
               placeholder="Search by name, username, or email"
             />
-            <select v-model="roleFilter" class="filter-select">
+            <select v-model="roleFilter" class="flex-none basis-[200px] px-3 py-2 rounded-md border border-gray-300 text-[0.95rem] focus:outline-none focus:ring-1 focus:ring-blue-400 focus:border-blue-400">
               <option value="all">All</option>
               <option value="student-intern">Student Interns Only</option>
             </select>
           </div>
 
-          <div v-if="loading" class="status-text">Loading interns...</div>
-          <div v-else-if="error" class="status-text error">{{ error }}</div>
+          <div v-if="loading" class="text-[0.95rem] text-gray-600">Loading interns...</div>
+          <div v-else-if="error" class="text-[0.95rem] text-red-700">{{ error }}</div>
           <div v-else>
-            <table class="interns-table" v-if="filteredInterns.length">
-              <thead>
+            <table class="w-full border-collapse text-sm" v-if="filteredInterns.length">
+              <thead class="bg-gray-100">
                 <tr>
-                  <th>#</th>
-                  <th>Full Name</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Position</th>
-                  <th>OJT Required Hours</th>
-                  <th>OJT Remaining Hours</th>
-                  <th>OJT Total Hours</th>
-                  <th>Actions</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">#</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Full Name</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Username</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Email</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Role</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Position</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">OJT Required Hours</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">OJT Remaining Hours</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">OJT Total Hours</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(intern, index) in filteredInterns" :key="intern.id">
-                  <td>{{ index + 1 }}</td>
-                  <td>{{ formatName(intern) }}</td>
-                  <td>{{ intern.username || '-' }}</td>
-                  <td>{{ intern.email || '-' }}</td>
-                  <td>{{ intern.role || '-' }}</td>
-                  <td>{{ intern.position || '-' }}</td>
-                  <td>{{ intern.ojtRequiredHours ?? '-' }}</td>
-                  <td>{{ intern.ojtRemainingHoursLabel || intern.ojtRemainingHours || '-' }}</td>
-                  <td>{{ intern.ojtTotalHoursLabel || intern.ojtTotalHours || '-' }}</td>
-                  <td>
-                    <div class="action-buttons">
+                  <td class="border border-gray-300 px-3 py-2">{{ index + 1 }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ formatName(intern) }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.username || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.email || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.role || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.position || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.ojtRequiredHours ?? '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.ojtRemainingHoursLabel || intern.ojtRemainingHours || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">{{ intern.ojtTotalHoursLabel || intern.ojtTotalHours || '-' }}</td>
+                  <td class="border border-gray-300 px-3 py-2">
+                    <div class="flex gap-1">
                       <button
                         type="button"
-                        class="action-button"
+                        class="px-2.5 py-1 text-xs rounded border border-gray-300 bg-gray-50 cursor-pointer whitespace-nowrap transition-colors hover:bg-gray-200"
                         @click="generateCertificate(intern)"
                       >
                         Generate Completion Certificate
@@ -73,7 +73,7 @@
               </tbody>
             </table>
 
-            <div v-else class="status-text">No student interns found.</div>
+            <div v-else class="text-[0.95rem] text-gray-600">No student interns found.</div>
           </div>
         </section>
       </main>
@@ -243,124 +243,3 @@ export default {
 }
 </script>
 
-<style scoped>
-.admin-shell {
-  min-height: 100vh;
-  display: flex;
-  background-color: #f5f5f5;
-}
-
-.admin-layout {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-header {
-  padding: 1.5rem 2rem;
-  background-color: #1976d2;
-  color: #ffffff;
-}
-
-.admin-main {
-  flex: 1;
-  padding: 1.5rem 2rem;
-}
-
-.section {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.section-header {
-  margin-bottom: 1rem;
-}
-
-.section-title {
-  margin: 0;
-  font-size: 1.25rem;
-  color: #333;
-}
-
-.section-subtitle {
-  margin: 0.25rem 0 0;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.search-input {
-  flex: 1 1 240px;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-}
-
-.filter-select {
-  flex: 0 0 200px;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-}
-
-.interns-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.interns-table th,
-.interns-table td {
-  border: 1px solid #e0e0e0;
-  padding: 0.5rem 0.75rem;
-  text-align: left;
-}
-
-.interns-table thead {
-  background-color: #f0f0f0;
-}
-
-.status-text {
-  font-size: 0.95rem;
-  color: #555;
-}
-
-.status-text.error {
-  color: #c62828;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.action-button {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.8rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  background-color: #f5f5f5;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.action-button:hover {
-  background-color: #e0e0e0;
-}
-
-@media (max-width: 900px) {
-  .admin-shell {
-    flex-direction: column;
-  }
-}
-</style>

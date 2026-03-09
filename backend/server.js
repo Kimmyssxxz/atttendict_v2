@@ -3,6 +3,7 @@ const cors = require('cors');
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 // Make sure you create backend/serviceAccountKey.json from Firebase Console
 let credential;
@@ -49,7 +50,7 @@ app.use(express.json());
 })();
 
 function getTodayInfo() {
-  const now = new Date('2026-03-05T17:01:00');
+  const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');

@@ -1,107 +1,108 @@
 <template>
-  <div class="intern-layout">
-    <header class="intern-header">
-      <h1>Time In / Time Out</h1>
-      <div class="intern-header-right">
-        <nav class="intern-nav">
-          <router-link to="/intern/dashboard">Dashboard</router-link>
-          <router-link to="/intern/time">Time In / Out</router-link>
-          <router-link to="/intern/attendance">My Attendance</router-link>
-          <router-link to="/intern/staff-status">Staff Status</router-link>
-          <router-link to="/intern/notifications">Notifications</router-link>
-          <router-link to="/intern/profile">Profile</router-link>
-          <router-link to="/intern/settings">Settings</router-link>
+  <div class="min-h-screen bg-slate-50 font-sans text-gray-800">
+    <header class="bg-slate-800 text-white px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+      <h1 class="m-0 text-[1.4rem] font-bold">Time In / Time Out</h1>
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <nav class="flex flex-wrap gap-3">
+          <router-link to="/intern/dashboard" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Dashboard</router-link>
+          <router-link to="/intern/time" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Time In / Out</router-link>
+          <router-link to="/intern/attendance" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">My Attendance</router-link>
+          <router-link to="/intern/staff-status" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Staff Status</router-link>
+          <router-link to="/intern/notifications" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Notifications</router-link>
+          <router-link to="/intern/profile" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Profile</router-link>
+          <router-link to="/intern/settings" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Settings</router-link>
         </nav>
 
-        <div class="notif-wrapper" @click="toggleNotifications">
-          <div class="notif-bell">
-            <span class="bell-icon">🔔</span>
-            <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount }}</span>
+        <div class="relative cursor-pointer" @click="toggleNotifications">
+          <div class="relative w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center transition-colors hover:bg-slate-700">
+            <span class="text-base">🔔</span>
+            <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] px-1.5 py-0 min-w-[18px] text-center shadow-sm">{{ unreadCount }}</span>
           </div>
-          <div v-if="showNotifications" class="notif-panel" @click.stop>
-            <h3>Notifications</h3>
-            <ul v-if="notifications.length" class="notif-list">
-              <li v-for="(n, idx) in notifications" :key="idx">{{ n }}</li>
+          <div v-if="showNotifications" class="absolute right-0 mt-2 bg-white text-slate-900 min-w-[220px] rounded-xl shadow-[0_10px_25px_rgba(15,23,42,0.25)] p-3 z-20" @click.stop>
+            <h3 class="m-0 mb-2 text-sm font-semibold">Notifications</h3>
+            <ul v-if="notifications.length" class="list-none p-0 m-0 text-[0.85rem]">
+              <li v-for="(n, idx) in notifications" :key="idx" class="mt-1 first:mt-0">{{ n }}</li>
             </ul>
-            <p v-else class="notif-empty">No notifications</p>
+            <p v-else class="m-0 text-[0.8rem] text-gray-500">No notifications</p>
           </div>
         </div>
       </div>
     </header>
 
-    <main class="time-main">
-      <section class="card time-card">
-        <h2>Today</h2>
-        <p class="note">You can time in and out for both AM and PM sessions.</p>
+    <main class="max-w-[800px] mx-auto my-8 px-4 pb-8">
+      <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-6">
+        <h2 class="mt-0 mb-2 text-[1.1rem] text-slate-900 font-bold">Today</h2>
+        <p class="text-[0.8rem] text-slate-500 mb-5">You can time in and out for both AM and PM sessions.</p>
 
-        <div class="clock">
-          <span class="label">Current Time</span>
-          <span class="value">{{ formatClockTime(clockNow) }}</span>
+        <div class="flex justify-between items-baseline px-4 py-3 border border-slate-200 rounded-xl mb-4 bg-slate-50">
+          <span class="block text-[0.8rem] text-slate-500 mb-0.5">Current Time</span>
+          <span class="text-[1.1rem] font-semibold text-slate-900">{{ formatClockTime(clockNow) }}</span>
         </div>
 
-        <div class="info-grid">
+        <div class="grid grid-cols-2 gap-4 mb-6">
           <div>
-            <span class="label">Date</span>
-            <span class="value">{{ formatDate(currentDate) }}</span>
+            <span class="block text-[0.8rem] text-slate-500 mb-0.5">Date</span>
+            <span class="text-[1.1rem] font-semibold text-slate-900">{{ formatDate(currentDate) }}</span>
           </div>
           <div>
-            <span class="label">Last Action</span>
-            <span class="value">{{ formatTime(lastActionTime) }}</span>
-          </div>
-        </div>
-
-        <div class="info-grid">
-          <div>
-            <span class="label">Time In (AM)</span>
-            <span class="value">{{ formatTime(record.timeInAM) }}</span>
-            <span class="label">AM Tag</span>
-            <span class="value">{{ displayAmTag }}</span>
-          </div>
-          <div>
-            <span class="label">Time Out (AM)</span>
-            <span class="value">{{ formatTime(record.timeOutAM) }}</span>
-          </div>
-          <div>
-            <span class="label">Time In (PM)</span>
-            <span class="value">{{ formatTime(record.timeInPM) }}</span>
-            <span class="label">PM Tag</span>
-            <span class="value">{{ displayPmTag }}</span>
-          </div>
-          <div>
-            <span class="label">Time Out (PM)</span>
-            <span class="value">{{ formatTime(record.timeOutPM) }}</span>
+            <span class="block text-[0.8rem] text-slate-500 mb-0.5">Last Action</span>
+            <span class="text-[1.1rem] font-semibold text-slate-900">{{ formatTime(lastActionTime) }}</span>
           </div>
         </div>
 
-        <div class="button-group">
-          <button class="btn btn-in" :disabled="loading || hasOpenSession" @click="startTimeIn">
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <span class="block text-[0.8rem] text-slate-500 mb-0.5">Time In (AM)</span>
+            <span class="text-[1.1rem] font-semibold text-slate-900 block mb-2">{{ formatTime(record.timeInAM) }}</span>
+            <span class="block text-[0.8rem] text-slate-500 mb-0.5">AM Tag</span>
+            <span class="text-[1.1rem] font-semibold text-slate-900 block">{{ displayAmTag }}</span>
+          </div>
+          <div>
+            <span class="block text-[0.8rem] text-slate-500 mb-0.5">Time Out (AM)</span>
+            <span class="text-[1.1rem] font-semibold text-slate-900 block mb-2">{{ formatTime(record.timeOutAM) }}</span>
+          </div>
+          <div>
+            <span class="block text-[0.8rem] text-slate-500 mb-0.5">Time In (PM)</span>
+            <span class="text-[1.1rem] font-semibold text-slate-900 block mb-2">{{ formatTime(record.timeInPM) }}</span>
+            <span class="block text-[0.8rem] text-slate-500 mb-0.5">PM Tag</span>
+            <span class="text-[1.1rem] font-semibold text-slate-900 block">{{ displayPmTag }}</span>
+          </div>
+          <div>
+            <span class="block text-[0.8rem] text-slate-500 mb-0.5">Time Out (PM)</span>
+            <span class="text-[1.1rem] font-semibold text-slate-900 block mb-2">{{ formatTime(record.timeOutPM) }}</span>
+          </div>
+        </div>
+
+        <div class="flex gap-4 mb-5">
+          <button class="flex-1 py-3 px-4 rounded-full border-none text-[0.9rem] font-semibold cursor-pointer transition-opacity hover:opacity-90 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed disabled:opacity-100 bg-green-500 text-green-950" :disabled="loading || hasOpenSession" @click="startTimeIn">
             {{ loading && loadingType === 'in' ? 'Saving...' : 'Time In' }}
           </button>
-          <button class="btn btn-out" :disabled="loading || !hasOpenSession" @click="startTimeOut">
+          <button class="flex-1 py-3 px-4 rounded-full border-none text-[0.9rem] font-semibold cursor-pointer transition-opacity hover:opacity-90 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed disabled:opacity-100 bg-red-500 text-red-50" :disabled="loading || !hasOpenSession" @click="startTimeOut">
             {{ loading && loadingType === 'out' ? 'Saving...' : 'Time Out' }}
           </button>
         </div>
 
-        <section class="card map-card">
-          <h2>Location</h2>
-          <p v-if="locationAddress" class="location-address">{{ locationAddress }}</p>
-          <div v-if="hasLocation" class="map-container">
-            <div ref="leafletMap" class="leaflet-map"></div>
+        <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-6 mt-6">
+          <h2 class="mt-0 mb-2 text-[1.1rem] text-slate-900 font-bold">Location</h2>
+          <p v-if="locationAddress" class="text-[0.85rem] text-slate-600 mb-3">{{ locationAddress }}</p>
+          <div v-if="hasLocation" class="relative w-full pb-[56.25%] overflow-hidden rounded-xl">
+            <div ref="leafletMap" class="absolute top-0 left-0 w-full h-full"></div>
           </div>
-          <p v-else class="note">No location recorded yet. Time in or time out to capture your location.</p>
+          <p v-else class="text-[0.8rem] text-slate-500 mb-5">No location recorded yet. Time in or time out to capture your location.</p>
         </section>
       </section>
     </main>
-    <div v-if="showModal" class="modal-backdrop">
-      <div class="modal">
-        <div class="modal-header" :class="modalType === 'error' ? 'modal-header-error' : 'modal-header-success'">
-          <h3>{{ modalTitle }}</h3>
+
+    <div v-if="showModal" class="fixed inset-0 bg-slate-900/45 flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-[0_20px_40px_rgba(15,23,42,0.35)] w-[min(90%,360px)] overflow-hidden">
+        <div class="px-4 py-3 text-white" :class="modalType === 'error' ? 'bg-red-500' : 'bg-green-500'">
+          <h3 class="m-0 text-[1.1rem] font-semibold">{{ modalTitle }}</h3>
         </div>
-        <div class="modal-body">
-          <p>{{ modalMessage }}</p>
+        <div class="p-5 text-[0.95rem] text-slate-900">
+          <p class="m-0">{{ modalMessage }}</p>
         </div>
-        <div class="modal-footer">
-          <button class="btn modal-btn" @click="closeModal">OK</button>
+        <div class="px-4 pb-4 pt-0 flex justify-end">
+          <button class="max-w-[120px] px-5 py-2 rounded-full border-none bg-slate-200 text-slate-900 text-[0.85rem] font-semibold cursor-pointer hover:bg-slate-300" @click="closeModal">OK</button>
         </div>
       </div>
     </div>
@@ -746,302 +747,4 @@ export default {
 }
 </script>
 
-<style scoped>
-.intern-layout {
-  min-height: 100vh;
-  background: #f5f7fb;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
 
-.intern-header {
-  background: #1e293b;
-  color: #fff;
-  padding: 1rem 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.intern-header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.intern-header h1 {
-  margin: 0;
-  font-size: 1.4rem;
-}
-
-.intern-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.intern-nav a {
-  color: #e5e7eb;
-  text-decoration: none;
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  border: 1px solid transparent;
-}
-
-.intern-nav a.router-link-active {
-  background: #f97316;
-  color: #111827;
-  border-color: #f97316;
-}
-
-.intern-nav a:hover {
-  background: #111827;
-}
-
-.notif-wrapper {
-  position: relative;
-  cursor: pointer;
-}
-
-.notif-bell {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: #0f172a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bell-icon {
-  font-size: 16px;
-}
-
-.notif-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #ef4444;
-  color: #fef2f2;
-  border-radius: 999px;
-  font-size: 10px;
-  padding: 0 5px;
-}
-
-.notif-panel {
-  position: absolute;
-  right: 0;
-  margin-top: 0.5rem;
-  background: #ffffff;
-  color: #111827;
-  min-width: 220px;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
-  padding: 0.75rem 0.9rem;
-  z-index: 20;
-}
-
-.notif-panel h3 {
-  margin: 0 0 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.notif-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 0.85rem;
-}
-
-.notif-list li + li {
-  margin-top: 0.25rem;
-}
-
-.notif-empty {
-  margin: 0;
-  font-size: 0.8rem;
-  color: #6b7280;
-}
-
-.time-main {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem 2rem;
-}
-
-.card {
-  background: #ffffff;
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-  padding: 1.5rem;
-}
-
-.map-card {
-  margin-top: 1.5rem;
-}
-
-.map-container {
-  position: relative;
-  width: 100%;
-  padding-bottom: 56.25%;
-  overflow: hidden;
-  border-radius: 0.75rem;
-}
-
-.leaflet-map {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.time-card h2 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-  color: #0f172a;
-}
-
-.note {
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin-bottom: 1.25rem;
-}
-
-.location-address {
-  font-size: 0.85rem;
-  color: #4b5563;
-  margin-bottom: 0.75rem;
-}
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.label {
-  display: block;
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin-bottom: 0.2rem;
-}
-
-.value {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.clock {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
-  margin-bottom: 1rem;
-  background: #f8fafc;
-}
-
-.button-group {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-}
-
-.btn {
-  flex: 1;
-  padding: 0.8rem 1rem;
-  border-radius: 999px;
-  border: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-in {
-  background: #22c55e;
-  color: #052e16;
-}
-
-.btn-out {
-  background: #ef4444;
-  color: #fef2f2;
-}
-
-.btn:hover {
-  opacity: 0.9;
-}
-
-.btn:disabled {
-  background: #d1d5db;
-  color: #6b7280;
-  cursor: not-allowed;
-  opacity: 1;
-}
-
-.rules {
-  margin: 0;
-  padding-left: 1.2rem;
-  font-size: 0.85rem;
-  color: #4b5563;
-}
-
-.rules li + li {
-  margin-top: 0.25rem;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-}
-
-.modal {
-  background: #ffffff;
-  border-radius: 0.75rem;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.35);
-  width: min(90%, 360px);
-  overflow: hidden;
-}
-
-.modal-header {
-  padding: 0.75rem 1rem;
-  color: #ffffff;
-}
-
-.modal-header-success {
-  background: #22c55e;
-}
-
-.modal-header-error {
-  background: #ef4444;
-}
-
-.modal-body {
-  padding: 1rem 1.25rem;
-  font-size: 0.95rem;
-  color: #111827;
-}
-
-.modal-footer {
-  padding: 0.75rem 1rem 1rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.modal-btn {
-  max-width: 120px;
-}
-</style>
