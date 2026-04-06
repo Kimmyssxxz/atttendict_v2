@@ -3,7 +3,7 @@ const cors = require('cors');
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 // Make sure you create backend/serviceAccountKey.json from Firebase Console
 let credential;
@@ -50,13 +50,24 @@ app.use(express.json());
 })();
 
 function getTodayInfo() {
-  const now = new Date('2026-04-01T07:56:21');
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
+  const now = new Date();
+  
+  // Calculate Philippines time (UTC+8) explicitly
+  // This is reliable regardless of machine-local timezone settings.
+  const phOffset = 8 * 60; // Manila is UTC+8
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const phTime = new Date(utc + (phOffset * 60000));
+  
+  const year = phTime.getFullYear();
+  const month = String(phTime.getMonth() + 1).padStart(2, '0');
+  const day = String(phTime.getDate()).padStart(2, '0');
+  
   const dateString = `${year}-${month}-${day}`;
-  const timeString = now.toTimeString().slice(0, 8); // HH:MM:SS
-  return { now, dateString, timeString };
+  const timeString = phTime.toTimeString().slice(0, 8); // HH:MM:SS
+  
+  console.log(`[Time Sync] Now: ${now.toISOString()}, Manila: ${dateString} ${timeString}`);
+  
+  return { now: phTime, dateString, timeString };
 }
 
 async function ensureDailyUserTaggingReset(userId, userData, dateString) {

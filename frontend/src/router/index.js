@@ -11,7 +11,6 @@ import DashboardView from '../views/intern/DashboardView.vue';
 import TimeView from '../views/intern/TimeView.vue';
 import AttendanceView from '../views/intern/AttendanceView.vue';
 import ProfileView from '../views/intern/ProfileView.vue';
-import SettingsView from '../views/intern/SettingsView.vue';
 import StaffDashboardView from '../views/staff/StaffDashboardView.vue';
 import NotificationsView from '../views/intern/NotificationsView.vue';
 import StaffStatusView from '../views/intern/StaffStatusView.vue';
@@ -56,8 +55,7 @@ const routes = [
   },
   {
     path: '/intern/settings',
-    name: 'InternSettings',
-    component: SettingsView
+    redirect: '/intern/profile'
   },
   {
     path: '/staff/dashboard',

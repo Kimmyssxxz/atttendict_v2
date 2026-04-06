@@ -1,64 +1,178 @@
 <template>
-  <div class="min-h-screen bg-slate-50 font-sans text-gray-800">
-    <header class="bg-slate-800 text-white px-8 py-4 flex flex-wrap items-center justify-between gap-4">
-      <h1 class="m-0 text-[1.4rem] font-bold">My Attendance Records</h1>
-      <div class="flex items-center gap-4">
-        <nav class="flex flex-wrap gap-3">
-          <router-link to="/intern/dashboard" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Dashboard</router-link>
-          <router-link to="/intern/time" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Time In / Out</router-link>
-          <router-link to="/intern/attendance" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">My Attendance</router-link>
-          <router-link to="/intern/staff-status" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Staff Status</router-link>
-          <router-link to="/intern/notifications" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Notifications</router-link>
-          <router-link to="/intern/profile" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Profile</router-link>
-          <router-link to="/intern/settings" class="text-gray-200 no-underline px-3.5 py-1.5 rounded-full text-sm border border-transparent transition-colors hover:bg-slate-900 [&.router-link-active]:bg-orange-500 [&.router-link-active]:text-slate-900 [&.router-link-active]:border-orange-500">Settings</router-link>
-        </nav>
-
-        <div class="relative cursor-pointer" @click="toggleNotifications">
-          <div class="relative w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center transition-colors hover:bg-slate-700">
-            <span class="text-base">🔔</span>
-            <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] px-1.5 py-0 min-w-[18px] text-center shadow-sm">{{ unreadCount }}</span>
-          </div>
-          <div v-if="showNotifications" class="absolute right-0 mt-2 bg-white text-slate-900 min-w-[220px] rounded-xl shadow-[0_10px_25px_rgba(15,23,42,0.25)] p-3 z-20" @click.stop>
-            <h3 class="m-0 mb-2 text-sm font-semibold">Notifications</h3>
-            <ul v-if="notifications.length" class="list-none p-0 m-0 text-[0.85rem]">
-              <li v-for="(n, idx) in notifications" :key="idx" class="mt-1 first:mt-0 border-b border-slate-100 pb-2 last:border-0 last:pb-0">{{ n.message || n }}</li>
-            </ul>
-            <p v-else class="m-0 text-[0.8rem] text-gray-500">No notifications</p>
-          </div>
+  <div class="min-h-screen bg-gray-50 font-sans text-gray-800 flex p-2 md:p-3 lg:p-4 gap-3">
+    
+    <!-- Left Sidebar Navbar -->
+    <aside class="w-[280px] bg-[#133e75] hidden lg:flex flex-col h-[calc(100vh-1rem)] md:h-[calc(100vh-1.5rem)] lg:h-[calc(100vh-2rem)] rounded-2xl shrink-0 shadow-sm sticky top-2 md:top-3 lg:top-4 overflow-y-auto custom-scrollbar">
+      <div class="px-8 py-8 shrink-0">
+        <div class="flex items-center gap-3 mb-6">
+          <img src="/4.png" alt="Logo" class="h-10 w-auto object-contain" />
+          <h1 class="m-0 text-2xl font-bold text-white">ATTENDICT</h1>
         </div>
+        <nav class="flex flex-col gap-2">
+          <router-link to="/intern/dashboard" class="text-white no-underline px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-gray-100 hover:text-black [&.router-link-active]:bg-gray-100 [&.router-link-active]:text-black border border-transparent flex items-center gap-3">
+            <span class="w-[24px] h-[24px] shrink-0 bg-current inline-block" :style="{ WebkitMaskImage: $route.path === '/intern/dashboard' ? icons.dashboardActive : icons.dashboardInactive, WebkitMaskSize: 'cover', maskImage: $route.path === '/intern/dashboard' ? icons.dashboardActive : icons.dashboardInactive, maskSize: 'cover' }"></span> Dashboard
+          </router-link>
+          <router-link to="/intern/time" class="text-white no-underline px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-gray-100 hover:text-black [&.router-link-active]:bg-gray-100 [&.router-link-active]:text-black border border-transparent flex items-center gap-3">
+            <span class="w-[24px] h-[24px] shrink-0 bg-current inline-block" :style="{ WebkitMaskImage: icons.time, WebkitMaskSize: 'cover', maskImage: icons.time, maskSize: 'cover' }"></span> Time In/Out
+          </router-link>
+          <router-link to="/intern/attendance" class="text-white no-underline px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-gray-100 hover:text-black [&.router-link-active]:bg-gray-100 [&.router-link-active]:text-black border border-transparent flex items-center gap-3">
+            <span class="w-[24px] h-[24px] shrink-0 bg-current inline-block" :style="{ WebkitMaskImage: $route.path === '/intern/attendance' ? icons.attendanceActive : icons.attendanceInactive, WebkitMaskSize: 'cover', maskImage: $route.path === '/intern/attendance' ? icons.attendanceActive : icons.attendanceInactive, maskSize: 'cover' }"></span> My Attendance
+          </router-link>
+          <router-link to="/intern/staff-status" class="text-white no-underline px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-gray-100 hover:text-black [&.router-link-active]:bg-gray-100 [&.router-link-active]:text-black border border-transparent flex items-center gap-3">
+            <span class="w-[24px] h-[24px] shrink-0 bg-current inline-block" :style="{ WebkitMaskImage: $route.path === '/intern/staff-status' ? icons.staffActive : icons.staffInactive, WebkitMaskSize: 'cover', maskImage: $route.path === '/intern/staff-status' ? icons.staffActive : icons.staffInactive, maskSize: 'cover' }"></span> Staff Status
+          </router-link>
+          <router-link to="/intern/notifications" class="text-white no-underline px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-gray-100 hover:text-black [&.router-link-active]:bg-gray-100 [&.router-link-active]:text-black border border-transparent flex items-center justify-between group">
+            <div class="flex items-center gap-3">
+              <span class="w-[24px] h-[24px] shrink-0 bg-current inline-block" :style="{ WebkitMaskImage: $route.path === '/intern/notifications' ? icons.notificationActive : icons.notificationInactive, WebkitMaskSize: 'cover', maskImage: $route.path === '/intern/notifications' ? icons.notificationActive : icons.notificationInactive, maskSize: 'cover' }"></span> 
+              Notification
+            </div>
+            <span v-if="unreadCount > 0" class="bg-red-500 text-white rounded-full text-[10px] px-2 py-0.5 min-w-[20px] text-center shadow-sm font-bold group-hover:bg-red-600 transition-colors">{{ unreadCount }}</span>
+          </router-link>
+        </nav>
       </div>
-    </header>
 
-    <main class="max-w-[1100px] mx-auto my-8 px-4 flex flex-col gap-6">
-      <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-6">
-        <h2 class="mt-0 mb-4 text-[1.1rem] text-slate-900 border-b border-slate-100 pb-2">Filters</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
-          <div>
-            <label for="month" class="block mb-1.5 text-[0.85rem] text-slate-600 font-medium">Month</label>
-            <select id="month" v-model="selectedMonth" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white">
-              <option value="">All</option>
-              <option v-for="m in availableMonths" :key="m.value" :value="m.value">
-                {{ m.label }}
-              </option>
-            </select>
+
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 w-full flex flex-col  min-w-0">
+      
+      <!-- Mobile Header Fallback -->
+      <header class="px-4 py-5 flex items-center sticky top-0 z-20 bg-gray-50 lg:hidden rounded-2xl">
+        <button @click="$router.back()" class="bg-transparent border-none p-0 cursor-pointer flex items-center justify-center shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <div class="flex-1 text-center pr-7">
+          <h1 class="m-0 text-black font-semibold text-xl tracking-wide whitespace-nowrap">My Attendance</h1>
+        </div>
+      </header>
+
+      <!-- Content Container -->
+      <div class="flex-1 w-full flex flex-col overflow-y-auto custom-scrollbar">
+        
+        <!-- Top Header Bar (Desktop Only) -->
+        <header class="hidden lg:flex p-2 items-center justify-between shrink-0">
+          <div class="flex items-center gap-2 pl-2">
+            <button @click="$router.back()" class="text-gray-500 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer flex items-center justify-center p-0">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M16.62 2.99a1.25 1.25 0 0 0-1.77 0L6.54 11.3a.996.996 0 0 0 0 1.41l8.31 8.31c.49.49 1.28.49 1.77 0s.49-1.28 0-1.77L9.38 12l7.25-7.25c.48-.48.48-1.28-.01-1.76'/%3E%3C/svg%3E" alt="Back" class="w-[22px] h-[22px] opacity-70" />
+            </button>
+            <h1 class="m-0 text-3xl font-semibold text-gray-900">My Attendance Records</h1>
           </div>
-          <div>
-            <label for="from" class="block mb-1.5 text-[0.85rem] text-slate-600 font-medium">From</label>
-            <input id="from" type="date" v-model="fromDate" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white" />
+          <div class="flex items-center gap-3 pr-2">
+            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold overflow-hidden shadow-sm cursor-pointer transition-all" @click="$router.push('/intern/profile')">
+               <img v-if="intern.photoUrl" :src="intern.photoUrl" alt="Avatar" class="w-full h-full object-cover"/>
+               <span v-else>{{ avatarInitials }}</span>
+            </div>
           </div>
-          <div>
-            <label for="to" class="block mb-1.5 text-[0.85rem] text-slate-600 font-medium">To</label>
-            <input id="to" type="date" v-model="toDate" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 bg-white" />
+        </header>
+
+        <!-- Main Content -->
+        <main class="w-full flex flex-col pb-8">
+          <template v-if="isInitialLoading">
+            <!-- SKELETON -->
+            <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-4 md:p-6 mx-4 mt-4 mb-4 animate-pulse">
+              <div class="h-5 bg-slate-200 rounded w-1/4 mb-4 hidden md:block"></div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 items-end">
+                <div class="col-span-2 md:col-span-1"><div class="h-4 bg-slate-200 rounded w-1/2 mb-1.5"></div><div class="h-[42px] bg-slate-200 rounded-lg"></div></div>
+                <div class="col-span-1"><div class="h-4 bg-slate-200 rounded w-1/2 mb-1.5"></div><div class="h-[42px] bg-slate-200 rounded-lg"></div></div>
+                <div class="col-span-1"><div class="h-4 bg-slate-200 rounded w-1/2 mb-1.5"></div><div class="h-[42px] bg-slate-200 rounded-lg"></div></div>
+                <div class="col-span-2 md:col-span-1 mt-2 md:mt-0"><div class="h-[46px] bg-slate-200 rounded-xl"></div></div>
+              </div>
+            </section>
+            
+            <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-0 md:p-6 overflow-hidden mx-4 mb-4 animate-pulse">
+              <div class="h-5 bg-slate-200 rounded w-1/4 mb-4 hidden md:block mx-6 mt-6"></div>
+              <!-- Desktop -->
+              <div class="hidden md:block overflow-x-auto px-6 pb-6">
+                <div class="h-10 bg-slate-50 w-full mb-2"></div>
+                <div v-for="i in 5" :key="i" class="h-12 bg-slate-100 w-full mb-2 rounded"></div>
+              </div>
+              <!-- Mobile -->
+              <div class="md:hidden flex flex-col divide-y divide-gray-100">
+                <div v-for="i in 5" :key="i" class="px-4 py-4 w-full flex justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-200"></div>
+                    <div class="h-4 w-16 bg-slate-200 rounded"></div>
+                  </div>
+                  <div class="h-4 w-24 bg-slate-200 rounded mt-2"></div>
+                </div>
+              </div>
+            </section>
+          </template>
+
+          <template v-else>
+            <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-4 md:p-6 mx-4 mt-4 mb-4">
+
+        <h2 class="hidden md:block mt-0 mb-4 text-[1.1rem] text-slate-900 border-b border-slate-100 pb-2">Filters</h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 items-end">
+          <div class="col-span-2 md:col-span-1 relative">
+            <label for="month" class="block mb-1.5 text-sm text-slate-600 font-medium">Month</label>
+            <button 
+              type="button"
+              @click="showMonthDropdown = !showMonthDropdown"
+              class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white h-[42px] flex justify-between items-center text-left"
+            >
+              <span :class="selectedMonth ? 'text-slate-900' : 'text-slate-500'">
+                {{ selectedMonthLabel || 'All Months' }}
+              </span>
+              <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showMonthDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+
+            <!-- Backdrop -->
+            <div v-if="showMonthDropdown" @click="showMonthDropdown = false" class="fixed inset-0 z-40"></div>
+
+            <transition
+              enter-active-class="transition ease-out duration-100"
+              enter-from-class="transform opacity-0 scale-95"
+              enter-to-class="transform opacity-100 scale-100"
+              leave-active-class="transition ease-in duration-75"
+              leave-from-class="transform opacity-100 scale-100"
+              leave-to-class="transform opacity-0 scale-95"
+            >
+              <div v-if="showMonthDropdown" class="absolute top-full left-0 z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto custom-scrollbar">
+                <div class="py-1">
+                  <button 
+                    type="button" 
+                    @click="selectMonth('')" 
+                    class="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors duration-150 text-sm"
+                    :class="selectedMonth === '' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-900'"
+                  >
+                    All Months
+                  </button>
+                  <button 
+                    v-for="m in availableMonths" 
+                    :key="m.value"
+                    type="button" 
+                    @click="selectMonth(m.value)" 
+                    class="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors duration-150 text-sm"
+                    :class="selectedMonth === m.value ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-900'"
+                  >
+                    {{ m.label }}
+                  </button>
+                </div>
+              </div>
+            </transition>
           </div>
-          <div class="flex justify-end md:justify-start">
-            <button class="px-5 py-2.5 rounded-full border-none bg-orange-500 text-white text-sm font-semibold cursor-pointer transition-colors hover:bg-orange-600 w-full md:w-auto" @click="exportPdf">Download DTR</button>
+          <div class="col-span-1 md:col-span-1">
+            <label for="from" class="block mb-1.5 text-sm text-slate-600 font-medium">From</label>
+            <input id="from" type="date" v-model="fromDate" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white h-[42px]" />
+          </div>
+          <div class="col-span-1 md:col-span-1">
+            <label for="to" class="block mb-1.5 text-sm text-slate-600 font-medium">To</label>
+            <input id="to" type="date" v-model="toDate" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white h-[42px]" />
+          </div>
+          <div class="col-span-2 md:col-span-1 mt-2 md:mt-0">
+            <button class="w-full h-[46px] rounded-xl border-none bg-[#eebb3b] text-white text-base font-semibold cursor-pointer transition-all active:scale-[0.98]" @click="exportPdf">Download DTR</button>
           </div>
         </div>
       </section>
 
-      <section class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(15,23,42,0.08)] p-6">
-        <h2 class="mt-0 mb-4 text-[1.1rem] text-slate-900 border-b border-slate-100 pb-2">Attendance</h2>
-        <div class="overflow-x-auto">
+      <section class="bg-white rounded-2xl shadow-[0_10px_25_rgba(15,23,42,0.08)] p-0 md:p-6 overflow-hidden mx-4 mb-4">
+        <h2 class="hidden md:block mt-0 mb-4 text-[1.1rem] text-slate-900 border-b border-slate-100 pb-2">Attendance</h2>
+        
+        <!-- Desktop Table View -->
+        <div class="hidden md:block overflow-x-auto">
           <table class="w-full border-collapse text-sm">
             <thead>
               <tr class="bg-slate-50">
@@ -96,31 +210,160 @@
           </table>
         </div>
 
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-6 pt-4 border-t border-slate-200 gap-4" v-if="tableRecords.length > 0">
-          <div class="flex items-center gap-2 text-[0.85rem] text-slate-600">
-            <label for="itemsPerPage">Showing</label>
-            <select id="itemsPerPage" v-model="itemsPerPage" @change="currentPage = 1" class="w-auto px-2 py-1.5 rounded-md border border-slate-300 text-slate-900 focus:outline-none">
-              <option :value="10">10</option>
-              <option :value="15">15</option>
-              <option :value="20">20</option>
-              <option :value="25">25</option>
-              <option :value="30">30</option>
-            </select>
-            <span>records per page</span>
-          </div>
+        <!-- Mobile Accordion View -->
+        <div class="md:hidden flex flex-col divide-y divide-gray-100 ">
+          <div v-for="record in paginatedRecords" :key="'mob-' + record.id + '-' + (record.sessionLabel || 'all')" class="flex flex-col">
+            <div 
+              class="flex items-center justify-between pt-2.5 pb-1 px-4 bg-white cursor-pointer transition-colors active:bg-gray-50"
+              @click="toggleRow(record.id, record.sessionLabel)"
+            >
+              <div class="flex items-center gap-3">
+                <div 
+                  class="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 transform"
+                  :class="[isRowExpanded(record.id, record.sessionLabel) ? 'bg-[#133e75] text-white rotate-180' : 'bg-[#133e75] text-white']"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-sm text-gray-900 font-semibold">Date</span>
+                </div>
+              </div>
+              <span class="text-sm text-gray-600">{{ formatDate(record.date) }}</span>
+            </div>
 
-          <div class="flex items-center gap-4">
-            <button class="px-3.5 py-1.5 rounded-md border border-slate-300 bg-white text-slate-700 text-[0.85rem] cursor-pointer transition-colors hover:bg-slate-100 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="currentPage === 1" @click="currentPage--">Previous</button>
-            <span class="text-[0.85rem] text-slate-600 font-medium">Page {{ currentPage }} of {{ totalPages }}</span>
-            <button class="px-3.5 py-1.5 rounded-md border border-slate-300 bg-white text-slate-700 text-[0.85rem] cursor-pointer transition-colors hover:bg-slate-100 hover:border-slate-400 disabled:opacity-50 disabled:cursor-not-allowed" :disabled="currentPage === totalPages" @click="currentPage++">Next</button>
+            <!-- Expanded Details -->
+            <div 
+              v-show="isRowExpanded(record.id, record.sessionLabel)" 
+              class="bg-white px-3 pb-2.5 flex flex-col overflow-hidden transition-all duration-300"
+            >
+              <div class="pl-12 flex flex-col gap-2.5">
+                <div class="flex items-center justify-between text-gray-800">
+                  <span class="text-sm font-semibold">Time in</span>
+                  <span class="text-sm text-gray-600">{{ formatTime12h(record.timeIn) }}</span>
+                </div>
+                <div class="flex items-center justify-between text-gray-800">
+                  <span class="text-sm font-semibold">Time out</span>
+                  <span class="text-sm text-gray-600">{{ formatTime12h(record.timeOut) }}</span>
+                </div>
+                <div class="flex items-center justify-between text-gray-800">
+                  <span class="text-sm font-semibold">Totals hours</span>
+                  <span class="text-sm text-gray-600">{{ record.totalHoursLabel || '0h 0m' }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-semibold">Tag</span>
+                  <span :class="[
+                    'inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold',
+                    record.status === 'Overtime' ? 'bg-red-500 text-white' : 'bg-[#00c853] text-white'
+                  ]">
+                    {{ record.status }}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-semibold">Validation</span>
+                  <span :class="[
+                    'inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold',
+                    (record.validationStatus || 'Pending') === 'Pending' ? 'bg-amber-500 text-white' :
+                    (record.validationStatus || 'Pending') === 'Approved' ? 'bg-[#00c853] text-white' :
+                    'bg-red-500 text-white'
+                  ]">
+                    {{ record.validationStatus || 'Pending' }}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
+        <div class="flex flex-row justify-between items-center mt-4 md:mt-6 pt-4 px-4 md:px-0 border-t border-slate-200 gap-4 mb-4" v-if="tableRecords.length > 0">
+          <div class="flex items-center gap-2 text-[0.75rem] md:text-[0.85rem] text-slate-600 relative">
+            <span class="hidden md:inline">Showing</span>
+            <span class="md:hidden">Showing</span>
+            
+            <div class="relative">
+              <button 
+                type="button"
+                @click="showItemsPerPageDropdown = !showItemsPerPageDropdown"
+                class="min-w-[50px] px-2 py-1 rounded-md border border-slate-200 text-slate-900 bg-white flex items-center justify-between gap-1"
+              >
+                <span>{{ itemsPerPage }}</span>
+                <svg class="w-3 h-3 text-gray-400" :class="{ 'rotate-180': showItemsPerPageDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+
+              <!-- Backdrop -->
+              <div v-if="showItemsPerPageDropdown" @click="showItemsPerPageDropdown = false" class="fixed inset-0 z-40"></div>
+
+              <transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <div v-if="showItemsPerPageDropdown" class="absolute top-full mt-1 left-0 z-50 min-w-full bg-white border border-gray-200 rounded-md shadow-lg py-1">
+                  <button 
+                    v-for="count in [10, 15, 20, 25, 30]" 
+                    :key="count"
+                    type="button" 
+                    @click="selectItemsPerPage(count)" 
+                    class="w-full px-4 py-1.5 text-left hover:bg-gray-50 transition-colors duration-150 text-sm"
+                    :class="itemsPerPage === count ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-900'"
+                  >
+                    {{ count }}
+                  </button>
+                </div>
+              </transition>
+            </div>
+            
+            <span class="whitespace-nowrap">records per page</span>
+          </div>
+
+          <div class="flex items-center gap-2 md:gap-4">
+            <button 
+              class="w-8 h-8 rounded-full border-none bg-gray-200 text-gray-500 flex items-center justify-center cursor-pointer transition-colors hover:bg-gray-300 disabled:opacity-40 disabled:cursor-not-allowed" 
+              :disabled="currentPage === 1" 
+              @click="currentPage--"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <span class="hidden md:inline text-[0.85rem] text-slate-600 font-medium whitespace-nowrap">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button 
+              class="w-8 h-8 rounded-full border-none bg-[#133e75] text-white flex items-center justify-center cursor-pointer transition-colors hover:bg-[#0d2b52] disabled:opacity-40 disabled:cursor-not-allowed shadow-sm" 
+              :disabled="currentPage === totalPages" 
+              @click="currentPage++"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
       </section>
+      </template>
+    </main>
+      </div>
+      
+      <!-- Mobile Bottom Navigation -->
+      <nav class="lg:hidden shrink-0 h-[72px] bg-white/95 backdrop-blur-md border-t border-gray-100 flex items-center justify-around px-2 z-[1000] shadow-[0_-4px_20px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)] sticky bottom-0 rounded-2xl mt-auto">
+        <router-link to="/intern/dashboard" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 text-gray-400 [&.router-link-active]:text-[#133e75] [&.router-link-active]:bg-blue-50/50">
+          <span class="w-6 h-6 bg-current inline-block" :style="{ WebkitMaskImage: $route.path === '/intern/dashboard' ? icons.dashboardActive : icons.dashboardInactive, WebkitMaskSize: 'cover', maskImage: $route.path === '/intern/dashboard' ? icons.dashboardActive : icons.dashboardInactive, maskSize: 'cover' }"></span>
+        </router-link>
+        <router-link to="/intern/attendance" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 text-gray-400 [&.router-link-active]:text-[#133e75] [&.router-link-active]:bg-blue-50/50">
+          <span class="w-6 h-6 bg-current inline-block" :style="{ WebkitMaskImage: $route.path === '/intern/attendance' ? icons.attendanceActive : icons.attendanceInactive, WebkitMaskSize: 'cover', maskImage: $route.path === '/intern/attendance' ? icons.attendanceActive : icons.attendanceInactive, maskSize: 'cover' }"></span>
+        </router-link>
+        <router-link to="/intern/time" class="flex flex-col items-center justify-center w-16 h-16 rounded-full transition-all duration-300 bg-[#133e75] text-white shadow-[0_8px_20px_rgba(19,62,117,0.4)] border-[6px] border-gray-50 active:scale-90 -mt-10 z-[110]">
+          <span class="w-8 h-8 bg-current inline-block" :style="{ WebkitMaskImage: icons.time, WebkitMaskSize: 'cover', maskImage: icons.time, maskSize: 'cover' }"></span>
+        </router-link>
+        <router-link to="/intern/staff-status" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 text-gray-400 [&.router-link-active]:text-[#133e75] [&.router-link-active]:bg-blue-50/50">
+          <span class="w-6 h-6 bg-current inline-block" :style="{ WebkitMaskImage: $route.path === '/intern/staff-status' ? icons.staffActive : icons.staffInactive, WebkitMaskSize: 'cover', maskImage: $route.path === '/intern/staff-status' ? icons.staffActive : icons.staffInactive, maskSize: 'cover' }"></span>
+        </router-link>
+        <router-link to="/intern/notifications" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 text-gray-400 [&.router-link-active]:text-[#133e75] [&.router-link-active]:bg-blue-50/50 relative">
+          <span class="w-6 h-6 bg-current inline-block" :style="{ WebkitMaskImage: $route.path === '/intern/notifications' ? icons.notificationActive : icons.notificationInactive, WebkitMaskSize: 'cover', maskImage: $route.path === '/intern/notifications' ? icons.notificationActive : icons.notificationInactive, maskSize: 'cover' }"></span>
+          <span v-if="unreadCount > 0" class="absolute top-1 right-1 bg-red-500 text-white rounded-full text-[10px] px-1 py-0 min-w-[16px] text-center shadow-sm font-bold">{{ unreadCount }}</span>
+        </router-link>
+      </nav>
     </main>
 
     <!-- Record Details Modal -->
-    <div v-if="showDetailsModal && selectedRecord" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div v-if="showDetailsModal && selectedRecord" class="fixed inset-0 z-50 flex items-center justify-center p-5">
       <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="closeDetailsModal"></div>
       <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
         <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
@@ -198,69 +441,75 @@ export default {
       fromDate: '',
       toDate: '',
       records: [],
-      internName: '',
-      internTagging: '',
       notifications: [],
       internId: null,
       showNotifications: false,
       currentPage: 1,
       itemsPerPage: 10,
       showDetailsModal: false,
-      selectedRecord: null
+      showMonthDropdown: false,
+      showItemsPerPageDropdown: false,
+      selectedRecord: null,
+      expandedRows: [], // Track expanded records in mobile view
+      icons: {
+        dashboardInactive: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M5 12H3l9-9l9 9h-2M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7'/%3E%3Cpath d='M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6'/%3E%3C/g%3E%3C/svg%3E\")",
+        dashboardActive: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='m12.707 2.293l9 9c.63.63.184 1.707-.707 1.707h-1v6a3 3 0 0 1-3 3h-1v-7a3 3 0 0 0-2.824-2.995L13 12h-2a3 3 0 0 0-3 3v7H7a3 3 0 0 1-3-3v-6H3c-.89 0-1.337-1.077-.707-1.707l9-9a1 1 0 0 1 1.414 0M13 14a1 1 0 0 1 1 1v7h-4v-7a1 1 0 0 1 .883-.993L11 14z'/%3E%3C/svg%3E\")",
+        time: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M3 12a9 9 0 1 0 18 0a9 9 0 0 0-18 0'/%3E%3Cpath d='M12 7v5l3 3'/%3E%3C/g%3E%3C/svg%3E\")",
+        attendanceInactive: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23000' stroke-linejoin='round' d='M3.5 4.5v-2h9V6m-10 2h11m-11-3.5v8h11V6h-6L6 4.5z' stroke-width='1'/%3E%3C/svg%3E\")",
+        attendanceActive: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' fill-rule='evenodd' d='M3 2.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5v3h.5a.5.5 0 0 1 .5.5v6.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-8a.5.5 0 0 1 .5-.5H3zM3 5v2.5h10v-1H7.5a.5.5 0 0 1-.354-.146L5.793 5zm9 .5V3H4v1h2a.5.5 0 0 1 .354.146L7.707 5.5z' clip-rule='evenodd'/%3E%3C/svg%3E\")",
+        staffInactive: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='4'%3E%3Cpath d='M10 44h28a2 2 0 0 0 2-2V14H30V4H10a2 2 0 0 0-2 2v36a2 2 0 0 0 2 2M30 4l10 10'/%3E%3Ccircle cx='24' cy='24' r='4'/%3E%3Cpath d='M32 36a8 8 0 1 0-16 0'/%3E%3C/g%3E%3C/svg%3E\")",
+        staffActive: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cdefs%3E%3Cmask id='SVGgA8a3bBK'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round' stroke-width='4'%3E%3Cpath fill='%23fff' stroke='%23fff' d='M10 44h28a2 2 0 0 0 2-2V14H30V4H10a2 2 0 0 0-2 2v36a2 2 0 0 0 2 2'/%3E%3Cpath stroke='%23fff' d='m30 4l10 10'/%3E%3Ccircle cx='24' cy='24' r='4' fill='%23000' stroke='%23000'/%3E%3Cpath stroke='%23000' d='M32 36a8 8 0 1 0-16 0'/%3E%3C/g%3E%3C/mask%3E%3C/defs%3E%3Cpath fill='%23000' d='M0 0h48v48H0z' mask='url(%23SVGgA8a3bBK)'/%3E%3C/svg%3E\")",
+        notificationInactive: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z'/%3E%3Cpath fill='%23000' d='M5 9a7 7 0 0 1 14 0v3.764l1.822 3.644A1.1 1.1 0 0 1 19.838 18h-3.964a4.002 4.002 0 0 1-7.748 0H4.162a1.1 1.1 0 0 1-.984-1.592L5 12.764zm5.268 9a2 2 0 0 0 3.464 0zM12 4a5 5 0 0 0-5 5v3.764a2 2 0 0 1-.211.894L5.619 16h12.763l-1.17-2.342a2 2 0 0 1-.212-.894V9a5 5 0 0 0-5-5'/%3E%3C/g%3E%3C/svg%3E\")",
+        notificationActive: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='none'%3E%3Cpath d='m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z'/%3E%3Cpath fill='%23000' d='M12 2a7 7 0 0 0-7 7v3.528a1 1 0 0 1-.105.447l-1.717 3.433A1.1 1.1 0 0 0 4.162 18h15.676a1.1 1.1 0 0 0 .984-1.592l-1.716-3.433a1 1 0 0 1-.106-.447V9a7 7 0 0 0-7-7m0 19a3 3 0 0 1-2.83-2h5.66A3 3 0 0 1 12 21'/%3E%3C/g%3E%3C/svg%3E\")",
+        settings: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='m20.35 8.923l-.366-.204l-.113-.064a2 2 0 0 1-.67-.66c-.018-.027-.034-.056-.066-.112a2 2 0 0 1-.3-1.157l.006-.425c.012-.68.018-1.022-.078-1.328a2 2 0 0 0-.417-.736c-.214-.24-.511-.412-1.106-.754l-.494-.285c-.592-.341-.889-.512-1.204-.577a2 2 0 0 0-.843.007c-.313.07-.606.246-1.191.596l-.003.002l-.354.211c-.056.034-.085.05-.113.066c-.278.155-.588.24-.907.25c-.032.002-.065.002-.13.002l-.13-.001a2 2 0 0 1-.91-.252c-.028-.015-.055-.032-.111-.066l-.357-.214c-.589-.354-.884-.53-1.199-.601a2 2 0 0 0-.846-.006c-.316.066-.612.238-1.205.582l-.003.001l-.488.283l-.005.004c-.588.34-.883.512-1.095.751a2 2 0 0 0-.415.734c-.095.307-.09.649-.078 1.333l.007.424c0 .065.003.097.002.128a2 2 0 0 1-.301 1.027c-.033.056-.048.084-.065.11a2 2 0 0 1-.675.664l-.112.063l-.361.2c-.602.333-.903.5-1.121.738a2 2 0 0 0-.43.73c-.1.307-.1.65-.099 1.338l.002.563c.001.683.003 1.024.104 1.329a2 2 0 0 0 .427.726c.218.236.516.402 1.113.734l.358.199c.061.034.092.05.121.068a2 2 0 0 1 .74.781l.067.12a2 2 0 0 1 .23 1.038l-.007.407c-.012.686-.017 1.03.079 1.337c.085.272.227.523.417.736c.214.24.512.411 1.106.754l.494.285c.593.341.889.512 1.204.577a2 2 0 0 0 .843-.007c.314-.07.607-.246 1.194-.598l.354-.212l.113-.066c.278-.154.588-.24.907-.25l.13-.001h.13c.318.01.63.097.91.252l.092.055l.376.226c.59.354.884.53 1.199.6a2 2 0 0 0 .846.008c.315-.066.613-.239 1.206-.583l.495-.287c.588-.342.883-.513 1.095-.752c.19-.213.33-.463.415-.734c.095-.305.09-.644.078-1.318l-.008-.44v-.127a2 2 0 0 1 .3-1.028l.065-.11a2 2 0 0 1 .675-.664l.11-.061l.002-.001l.361-.2c.602-.334.903-.5 1.122-.738c.194-.21.34-.46.429-.73c.1-.305.1-.647.098-1.327l-.002-.574c-.001-.683-.002-1.025-.103-1.33a2 2 0 0 0-.428-.725c-.217-.236-.515-.402-1.111-.733z'/%3E%3Cpath d='M8 12a4 4 0 1 0 8 0a4 4 0 0 0-8 0'/%3E%3C/g%3E%3C/svg%3E\")"
+      },
+      intern: {
+        id: null,
+        username: '',
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        photoUrl: '',
+      },
+      unreadCount: 0,
+      isInitialLoading: true,
+      isDesktop: window.innerWidth >= 1024,
+    };
+  },
+  async created() {
+    try {
+      await this.loadInternProfile();
+      this.syncNotifications();
+      await this.fetchAttendanceHistory();
+    } finally {
+      this.isInitialLoading = false;
     }
   },
-  created() {
-    const stored = localStorage.getItem('internUser');
-    if (!stored) {
-      alert('No logged-in intern found. Please log in again.');
-      this.$router.push({ name: 'Login' }); // adjust route name if needed
-      return;
-    }
-
-    const intern = JSON.parse(stored);
-    this.internId = intern.id || null;
-
-    fetch(`http://localhost:3001/users/${encodeURIComponent(intern.id)}`)
-      .then((res) => res.ok ? res.json() : null)
-      .then((userJson) => {
-        const u = userJson && userJson.user ? userJson.user : intern;
-        const first = u.firstName || u.firstname || '';
-        const last = u.lastName || u.lastname || '';
-        const middle = u.middleName || u.middlename || u.middleInitial || '';
-
-        this.internTagging = u.tagging || '';
-
-        if (last || first || middle) {
-          const main = `${last}${last && (first || middle) ? ', ' : ''}${first}`.trim();
-          const withMiddle = middle ? `${main} ${middle}`.trim() : main;
-          this.internName = withMiddle;
-        } else {
-          this.internName = u.fullName || u.name || '';
-        }
-      })
-      .catch(() => {
-        const first = intern.firstName || intern.firstname || '';
-        const last = intern.lastName || intern.lastname || '';
-        const middle = intern.middleName || intern.middlename || intern.middleInitial || '';
-        if (last || first || middle) {
-          const main = `${last}${last && (first || middle) ? ', ' : ''}${first}`.trim();
-          const withMiddle = middle ? `${main} ${middle}`.trim() : main;
-          this.internName = withMiddle;
-        } else {
-          this.internName = intern.fullName || intern.name || '';
-        }
-
-        this.internTagging = intern.tagging || '';
-      });
-
-    fetch(`http://localhost:3001/attendance/intern/history?internId=${encodeURIComponent(intern.id)}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Failed to fetch attendance history');
-        }
-        return res.json();
-      })
-      .then((json) => {
+  mounted() {
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+  methods: {
+    formatNotification(n) {
+      const msg = typeof n === 'string' ? n : (n.message || '');
+      if (!msg) return '';
+      // Bold times (e.g., 10:58 AM)
+      let formatted = msg.replace(/(\d{1,2}:\d{2}\s?(?:AM|PM))/gi, '<strong>$1</strong>');
+      // Bold keywords (e.g., updated)
+      formatted = formatted.replace(/(updated)/gi, '<strong>$1</strong>');
+      return formatted;
+    },
+    handleResize() {
+      this.isDesktop = window.innerWidth >= 1024;
+    },
+    async fetchAttendanceHistory() {
+      if (!this.intern.id) return;
+      try {
+        const res = await fetch(`http://localhost:3001/attendance/intern/history?internId=${encodeURIComponent(this.intern.id)}`);
+        if (!res.ok) throw new Error('Failed to fetch attendance history');
+        const json = await res.json();
         this.records = (json.data || []).map((r) => ({
           id: r.id,
           date: r.date,
@@ -286,47 +535,84 @@ export default {
           validationStatusPM: r.validationStatusPM || 'Pending',
           rejectReasonPM: r.rejectReasonPM || null,
         }));
-
-        // Load notifications for header bell
-        if (this.internId) {
-          try {
-            const key = `internNotifications_${this.internId}`;
-            const unreadKey = `internNotificationsUnread_${this.internId}`;
-            const raw = localStorage.getItem(key);
-            if (raw) {
-              const list = JSON.parse(raw);
-              if (Array.isArray(list)) {
-                this.notifications = list;
-              }
-            }
-            const unreadRaw = localStorage.getItem(unreadKey);
-            if (unreadRaw != null) {
-              const num = parseInt(unreadRaw, 10);
-              if (!Number.isNaN(num) && num >= 0) {
-                this.unreadCount = num;
-              }
-            } else {
-              this.unreadCount = this.notifications.length;
-            }
-          } catch (e) {}
-        }
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('Attendance history fetch error:', err);
-        alert('Failed to load attendance records.');
-      });
-  },
-  methods: {
-    openDetailsModal(record) {
-      this.selectedRecord = record;
-      this.showDetailsModal = true;
+      }
+    },
+    syncNotifications() {
+      const internId = this.intern.id;
+      if (!internId) return;
+      try {
+        const key = `internNotifications_${internId}`;
+        const unreadKey = `internNotificationsUnread_${internId}`;
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const list = JSON.parse(raw);
+          if (Array.isArray(list)) {
+            this.notifications = list;
+          }
+        }
+        const unreadRaw = localStorage.getItem(unreadKey);
+        if (unreadRaw != null) {
+          const num = parseInt(unreadRaw, 10);
+          if (!Number.isNaN(num) && num >= 0) {
+            this.unreadCount = num;
+          }
+        } else {
+          this.unreadCount = this.notifications.length;
+        }
+      } catch (e) {}
     },
     closeDetailsModal() {
       this.showDetailsModal = false;
       this.selectedRecord = null;
     },
+    toggleRow(recordId, sessionLabel) {
+      const key = `${recordId}-${sessionLabel || 'all'}`;
+      if (this.expandedRows.includes(key)) {
+        this.expandedRows = [];
+      } else {
+        this.expandedRows = [key];
+      }
+    },
+    isRowExpanded(recordId, sessionLabel) {
+      const key = `${recordId}-${sessionLabel || 'all'}`;
+      return this.expandedRows.includes(key);
+    },
     toggleNotifications() {
       this.showNotifications = !this.showNotifications
+    },
+    selectMonth(val) {
+      this.selectedMonth = val;
+      this.showMonthDropdown = false;
+    },
+    selectItemsPerPage(val) {
+      this.itemsPerPage = val;
+      this.currentPage = 1;
+      this.showItemsPerPageDropdown = false;
+    },
+    async loadInternProfile() {
+      try {
+        const stored = localStorage.getItem('internUser');
+        if (!stored) return;
+        const basic = JSON.parse(stored);
+        const internId = basic.id;
+        if (!internId) return;
+
+        const res = await fetch(`http://localhost:3001/users/${encodeURIComponent(internId)}`);
+        if (!res.ok) {
+          this.intern = { ...this.intern, ...basic };
+          return;
+        }
+        const data = await res.json();
+        if (data && data.user) {
+          this.intern = data.user;
+        } else {
+          this.intern = { ...this.intern, ...basic };
+        }
+      } catch (err) {
+        console.error('Error fetching intern profile:', err);
+      }
     },
     formatDate(dateStr) {
       if (!dateStr) return '';
@@ -430,7 +716,7 @@ export default {
       tableHtmlOne += '<div style="font-family:serif;margin:20px 20px 10px 20px;font-size:11px;">';
       tableHtmlOne += '<div style="text-align:center;margin-bottom:4px;">Civil Service Form No. 48</div>';
       tableHtmlOne += '<div style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:10px;">DAILY TIME RECORD</div>';
-      tableHtmlOne += `<div style="text-align:center;margin:10px 0 2px 0;border-bottom:1px solid #000;padding-bottom:2px;">${this.internName || '(Name)'}</div>`;
+      tableHtmlOne += `<div style="text-align:center;margin:10px 0 2px 0;border-bottom:1px solid #000;padding-bottom:2px;">${this.formattedName || '(Name)'}</div>`;
       tableHtmlOne += `<div style="margin-top:6px;">For the month of <span style="text-decoration:underline;">${monthName} ${year}</span></div>`;
       tableHtmlOne += '<div style="margin-top:2px;display:flex;justify-content:space-between;align-items:flex-start;font-size:9px;">';
       tableHtmlOne += '<div>Official hours of arrival<br/>and departure</div>';
@@ -518,7 +804,7 @@ export default {
         </div>
         <div style="height:40px;"></div>
         <div style="text-align:center;font-family:sans-serif;font-size:9px;margin-top:10px;">
-          <div>${this.internName || '&nbsp;'}</div>
+          <div>${this.formattedName || '&nbsp;'}</div>
           <div style="border-top:1px solid #000;margin:0 20px 2px 20px;height:1px;"></div>
           <div>OJT Intern</div>
         </div>
@@ -547,6 +833,23 @@ export default {
     }
   },
   computed: {
+    formattedName() {
+      const { firstName, middleName, lastName } = this.intern;
+      if (!firstName && !lastName) return 'Intern';
+      const middleInitial = middleName ? `${middleName.charAt(0)}. ` : '';
+      return `${firstName} ${middleInitial}${lastName}`.trim();
+    },
+    avatarInitials() {
+      const first = this.intern.firstName ? this.intern.firstName.charAt(0).toUpperCase() : '';
+      const last = this.intern.lastName ? this.intern.lastName.charAt(0).toUpperCase() : '';
+      const combined = `${first}${last}`;
+      return combined || '?';
+    },
+    selectedMonthLabel() {
+      if (!this.selectedMonth) return '';
+      const found = this.availableMonths.find(m => m.value === this.selectedMonth);
+      return found ? found.label : '';
+    },
     availableMonths() {
       const months = [];
       const startYear = 2026;

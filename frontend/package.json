@@ -15,11 +15,14 @@
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "leaflet": "^1.9.4",
+    "lucide-vue-next": "^1.0.0",
     "vue": "^3.5.27",
     "vue-router": "^4.6.4",
     "vue3-apexcharts": "^1.11.1"
   },
   "devDependencies": {
+    "@iconify-json/basil": "^1.2.4",
+    "@iconify/tailwind": "^1.2.0",
     "@vitejs/plugin-vue": "^6.0.3",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
