@@ -110,20 +110,7 @@
                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 transition text-gray-700"
               >
                 <option value="">Select city/municipality</option>
-                <option value="Baco">Baco</option>
-                <option value="Bansud">Bansud</option>
-                <option value="Bongabong">Bongabong</option>
-                <option value="Bulalacao">Bulalacao</option>
-                <option value="Calapan City">Calapan City</option>
-                <option value="Gloria">Gloria</option>
-                <option value="Mansalay">Mansalay</option>
-                <option value="Naujan">Naujan</option>
-                <option value="Pinamalayan">Pinamalayan</option>
-                <option value="Pola">Pola</option>
-                <option value="Puerto Galera">Puerto Galera</option>
-                <option value="San Teodoro">San Teodoro</option>
-                <option value="Socorro">Socorro</option>
-                <option value="Victoria">Victoria</option>
+                <option v-for="city in availableCities" :key="city" :value="city">{{ city }}</option>
               </select>
               <p v-if="validationErrors.city" class="text-red-500 text-xs mt-1">{{ validationErrors.city }}</p>
             </div>
@@ -181,18 +168,7 @@
               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 transition text-gray-700"
             >
               <option value="">Select sector</option>
-              <option value="Person with disability (PWD)">Person with disability (PWD)</option>
-              <option value="Senior Citizen">Senior Citizen</option>
-              <option value="Women">Women</option>
-              <option value="Out-Of-School Youth and Adults (OSYA)">Out-Of-School Youth and Adults (OSYA)</option>
-              <option value="Overseas Filipino Workers (OFW)">Overseas Filipino Workers (OFW)</option>
-              <option value="Student">Student</option>
-              <option value="Teacher">Teacher</option>
-              <option value="MSME's">MSME's</option>
-              <option value="Indigenous People">Indigenous People</option>
-              <option value="Government Workers - Local">Government Workers - Local</option>
-              <option value="Government Workers - National">Government Workers - National</option>
-              <option value="Other">Other</option>
+              <option v-for="sect in availableSectors" :key="sect" :value="sect">{{ sect }}</option>
             </select>
             <p v-if="validationErrors.sector" class="text-red-500 text-xs mt-1">{{ validationErrors.sector }}</p>
           </div>
@@ -283,77 +259,58 @@
           <!-- Modal Content -->
 
           <div class="p-6 space-y-4 text-gray-700">
-            <div>
-            <h4 class="font-bold text-blue-900 mb-2">Privacy Notice</h4>
-              <p class="text-sm leading-relaxed">
-                In compliance with Republic Act No. 10173, otherwise known as the Data Privacy Act of 2012,
-                the Department of Information and Communications Technology (DICT) Oriental Mindoro is committed to
-                protecting your personal data and upholding your right to privacy. All personal information
-                collected through this Client Log Book system shall be processed in a lawful, fair, and
-                transparent manner.
-              </p>
-            </div>
-
-            <div>
-              <h4 class="font-bold text-blue-900 mb-2">Collection of Personal Information</h4>
-              <p class="text-sm leading-relaxed">
-                The system collects personal data including your full name, age, gender, contact number,
-                email address, city, barangay, and details of the services you availed. The collection
-                of such information is necessary to properly document client transactions, monitor
-                service utilization, and generate official reports required for government operations.
-              </p>
-            </div>
-
-            <div>
-              <h4 class="font-bold text-blue-900 mb-2">Purpose and Legal Basis of Processing</h4>
-              <p class="text-sm leading-relaxed">
-                Your personal data is processed for legitimate government purposes including service
-                facilitation, client profiling, internal record-keeping, performance evaluation, and
-                improvement of public service delivery. Processing is based on your voluntary consent
-                and in accordance with applicable laws and regulations.
-              </p>
-            </div>
-
-            <div>
-              <h4 class="font-bold text-blue-900 mb-2">Data Protection and Security Measures</h4>
-              <p class="text-sm leading-relaxed">
-                DICT Oriental Mindoro implements appropriate organizational, physical, and technical safeguards to ensure
-                the confidentiality, integrity, and availability of your personal data. Access to the
-                information is limited only to authorized personnel. Measures are in place to protect
-                against unauthorized access, disclosure, alteration, or destruction of data.
-              </p>
-            </div>
-
-            <div>
-              <h4 class="font-bold text-blue-900 mb-2">Data Sharing and Retention</h4>
-              <p class="text-sm leading-relaxed">
-                Personal data shall not be disclosed to unauthorized third parties. Information may only
-                be shared when required by law, by authorized government agencies, or as necessary for
-                official reporting. Data will be retained only for as long as necessary to fulfill the
-                stated purposes and in accordance with government record-keeping policies.
-              </p>
-            </div>
-
-            <div>
-              <h4 class="font-bold text-blue-900 mb-2">Rights of the Data Subject</h4>
-              <p class="text-sm leading-relaxed">
-                As a data subject, you have the right to be informed, to access, to correct inaccurate
-                information, to object to processing, to request erasure or blocking of your data,
-                and to file a complaint with the National Privacy Commission in case of violation of
-                your data privacy rights.
-              </p>
-            </div>
+            <div class="text-sm leading-relaxed whitespace-pre-wrap">{{ dataPrivacyText }}</div>
           </div>
         </div>
       </div>
     </Transition>
   </div>
+
+  <!-- Completion Modal -->
+  <Transition name="fade" appear>
+    <div v-if="showCompletionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+        <div class="text-center">
+          <!-- Success Icon -->
+          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          
+          <!-- Success Message -->
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Thank You!</h3>
+          <p class="text-gray-600 mb-6">
+            Your logbook entry has been successfully recorded. Your information has been saved and you can now proceed with your visit.
+          </p>
+          
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <button
+              @click="handleNewResponse"
+              class="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Submit Another Response
+            </button>
+            <button
+              @click="handleCloseModal"
+              class="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { createClientLogbookEntry } from '../../services/logbook'
+import { createClientLogbookEntry } from '../../services/clientServices'
+import { getFormSettings, updateServicesInSettings } from '../../services/clientFormSettings'
+import { subscribeToFormSettings } from '../../services/clientFormSettings'
 
 const form = ref({
   fullName: '',
@@ -371,51 +328,90 @@ const form = ref({
 
 const showDataPrivacyModal = ref(false)
 const showSuccess = ref(false)
+const showCompletionModal = ref(false)
 const submitting = ref(false)
 const errorMessage = ref('')
 const validationErrors = ref<Record<string, string>>({})
+const logbookId = ref('')
 
 const router = useRouter()
 
-const serviceOptions = [
-  'Free Public Wi-Fi',
-  'Training',
-  'Inquiry',
-  'Coordination',
-  'Free Printing',
-  'Free Scanning',
-  'Free ICT Equipment Usage',
-  'SIM Card Registration Assistance',
-  'eGov PH App Assistance',
-  'Co-Working Space',
-  'Examination',
-  'Online Government Services (NBI, DFA, PSA etc.)',
-]
+const serviceOptions = ref([])
 
-const barangayData = {
-  'Baco': ['Alag', 'Bangkatan', 'Baras', 'Bayanan', 'Burbuli', 'Catwiran I', 'Catwiran II', 'Dulangan I', 'Dulangan II', 'Lantuyang', 'Lumangbayan', 'Malapad', 'Mangangan I', 'Mangangan II', 'Mayabig', 'Pambisan', 'Poblacion', 'Pulantubig', 'Putican-Cabulo', 'San Andres', 'San Ignacio', 'Santa Cruz', 'Santa Rosa I', 'Santa Rosa II', 'Tabon-Tabon', 'Tagumpay', 'Water'],
-  'Bansud': ['Alcadesma', 'Bato', 'Conrazon', 'Malo', 'Manihala', 'Pag-asa', 'Poblacion', 'Proper Bansud', 'Proper Tiguisan', 'Rosacara', 'Salcedo', 'Sumagui', 'Villa Pag-asa'],
-  'Bongabong': ['Anilao', 'Aplaya', 'Bagong Bayan I', 'Bagong Bayan II', 'Batangan', 'Bukal', 'Camantigue', 'Carmundo', 'Cawayan', 'Dayhagan', 'Formon', 'Hagan', 'Hagupit', 'Ipil', 'Kaligtasan', 'Labasan', 'Labonan', 'Libertad', 'Lisap', 'Luna', 'Malitbog', 'Mapang', 'Masaguisi', 'Mina de Oro', 'Morente', 'Ogbot', 'Orconuma', 'Poblacion', 'Pulosahi', 'Sagana', 'San Isidro', 'San Jose', 'San Juan', 'Sigange', 'Sta. Cruz', 'Tawas'],
-  'Bulalacao': ['Bagong Sikat', 'Balatasan', 'Benli', 'Cabugao', 'Cambunang', 'Campaasan', 'Liwagao', 'Maasin', 'Maujao', 'Milagrosa', 'Nasukob', 'Poblacion', 'San Francisco', 'San Isidro', 'San Juan', 'San Roque'],
-  'Calapan City': ['Balingayan', 'Balite', 'Baruyan', 'Batino', 'Bayanan I', 'Bayanan II', 'Biga', 'Bondoc', 'Bucayao', 'Buhuan', 'Bulusan', 'Calero', 'Camansihan', 'Camilmil', 'Canubing I', 'Canubing II', 'Comunal', 'Guinobatan', 'Gulod', 'Gutad', 'Ibaba East', 'Ibaba West', 'Ilaya', 'Lalud', 'Lazareto', 'Libis', 'Lumangbayan', 'Mahal Na Pangalan', 'Maidlang', 'Malad', 'Malamig', 'Managpi', 'Masipit', 'Nag-Iba I', 'Nag-Iba II', 'Navotas', 'Pachoca', 'Palhi', 'Panggalaan', 'Parang', 'Patas', 'Personas', 'Putingtubig', 'San Antonio', 'San Raphael (Salong)', 'San Vicente Central', 'San Vicente East', 'San Vicente North', 'San Vicente South', 'San Vicente West', 'Sapul', 'Silonay', 'Sta. Cruz', 'Sta. Isabel', 'Santa Maria Village', 'Santa Rita', 'Santo Niño', 'Suqui', 'Tawagan', 'Tawiran', 'Tibag', 'Wawa'],
-  'Gloria': ['Agsalin', 'Agos', 'Alma Villa', 'Andres Bonifacio', 'Balete', 'Banus', 'Banutan', 'Buong Lupa', 'Bulaklakan', 'Gaudencio Antonino', 'Guimbonan', 'Kawit', 'Lucio Laurel', 'Macario Adriatico', 'Malamig', 'Malayong', 'Maligaya', 'Malubay', 'Manguyang', 'Maragooc', 'Mirayan', 'Narra', 'Papandungin', 'San Antonio', 'Santa Maria', 'Santa Theresa', 'Tambong'],
-  'Mansalay': ['Balugo', 'B. del Mundo', 'Bonbon', 'Budburan', 'Cabalwa', 'Don Pedro', 'Maliwanag', 'Manaul', 'Panaytayan', 'Poblacion', 'Roma', 'Sta. Brigida', 'Santa Maria', 'Sta. Teresita', 'Villa Celestial', 'Wasig', 'Waygan'],
-  'Naujan': ['Poblacion I', 'Poblacion II', 'Poblacion III', 'Adrialuna', 'Andres Ylagan', 'Antipolo', 'Apitong', 'Arangin', 'Aurora', 'Bacungan', 'Bagong Buhay', 'Balite', 'Bancuro', 'Banuton', 'Barcenaga', 'Bayani', 'Buhangin', 'Caburo', 'Concepcion', 'Dao', 'Del Pilar', 'Estrella', 'Evangelista', 'Gamao', 'General Esco', 'Herrera', 'Inarawan', 'Kalinisan', 'Laguna', 'Mabini', 'Magtibay', 'Mahabang Parang', 'Malaya', 'Malinao', 'Malvar', 'Masagana', 'Masaguing', 'Melgar A', 'Melgar B', 'Metolza', 'Montelago', 'Montemayor', 'Motoderazo', 'Mulawin', 'Nag-Iba 1', 'Nag-Iba 2', 'Pagkakaisa', 'Paitan', 'Paniquian', 'Pinagsabangan 1', 'Pinagsabangan 2', 'Piñahan', 'Sampaguita', 'San Agustin 1', 'San Agustin 2', 'San Andres', 'San Antonio', 'San Carlos', 'San Isidro', 'San Jose', 'San Luis', 'San Nicolas', 'San Pedro', 'Sta. Cruz', 'Sta. Isabel', 'Sta. Maria', 'Santiago', 'Sto. Niño', 'Tagumpay', 'Tigkan'],
-  'Pinamalayan': ['Anoling', 'Bacungan', 'Bangbang', 'Banilad', 'Buli', 'Cacawan', 'Calingag', 'Delrazon', 'Guinhawa', 'Inclanay', 'Lumambayan', 'Malaya', 'Maliancog', 'Maningcol', 'Marayos', 'Marfrancisco', 'Nabuslot', 'Pagalagala', 'Palayan', 'Pambisan Malaki', 'Pambisan Maliit', 'Pangao', 'Papag', 'Parang', 'Poblacion', 'Putinggapi', 'San Isidro', 'San Pedro', 'Santo Nino', 'Tabionan', 'Talabaan', 'Tanauan', 'Tarawa', 'Tumapon', 'Villa Maligaya'],
-  'Pola': ['Bacawan', 'Bacungan', 'Batuhan', 'Bayanan', 'Beriara', 'Budburan', 'Cabugao Banahaw', 'Dagum', 'Ilaya', 'Labaan', 'Linawahan', 'Mabini', 'Magdugo', 'Manoot', 'Pag-asa', 'Palanas', 'Poblacion', 'San Vicente', 'Song-of-India', 'Sto. Nino', 'Tabora', 'Tarik'],
-  'Puerto Galera': ['Aninuan', 'Baclayan', 'Balatero', 'Dulangan', 'Palangan', 'Sabang', 'San Antonio', 'San Isidro', 'Santo Niño', 'Sinandigan', 'Tabinay', 'Villaflor', 'Poblacion'],
-  'San Teodoro': ['Zone I', 'Zone II', 'Zone III', 'Zone IV', 'Calao', 'Cawayan', 'Kay-Ibabao', 'Salingcomot'],
-  'Socorro': ['Batong Dalig', 'Bayuin', 'Bugtong Na Tuog', 'Calocmoy', 'Calubayan', 'Catiningan', 'Epiz', 'Happy Valley', 'La Fortuna', 'Leuteboro I', 'Leuteboro II', 'Mabuhay I', 'Mabuhay II', 'Malugay', 'Maria Concepcion', 'Matungao', 'Monteverde', 'Pasi I', 'Pasi II', 'Santo Domingo', 'Subaan', 'Villareal', 'Zone I', 'Zone II', 'Zone III', 'Zone IV'],
-  'Victoria': ['Alcate', 'Antonino', 'Babangonan', 'Bagong Buhay', 'Bagong Silang', 'Bambanin', 'Bethel', 'Canaan', 'Concepcion', 'Duongan', 'Leido', 'Loyal', 'Mabini', 'Macatoc', 'Malabo', 'Merit', 'Ordovilla', 'Pakyas', 'Poblacion I', 'Poblacion II', 'Poblacion III', 'Poblacion IV', 'Sampaguita', 'San Antonio', 'San Cristobal', 'San Gabriel', 'San Gelacio', 'San Isidro', 'San Juan', 'San Narciso', 'Urdaneta', 'Villa Cerveza'],
+const availableCities = ref<string[]>([])
+const availableSectors = ref<string[]>([])
+const dataPrivacyText = ref<string>('')
+const geographyData = ref<Record<string, string[]>>({})
+
+const loadServices = async () => {
+  try {
+    const config = await getFormSettings('clientLogbook')
+    
+    if (config) {
+      if (config.services && config.services.length > 0) {
+        serviceOptions.value = config.services
+      }
+      if (config.sectors && config.sectors.length > 0) {
+        availableSectors.value = config.sectors
+      }
+      if (config.geography) {
+        geographyData.value = config.geography
+        availableCities.value = Object.keys(config.geography).sort((a,b) => a.localeCompare(b))
+      }
+      if (config.dataPrivacyText) {
+        dataPrivacyText.value = config.dataPrivacyText
+      }
+    }
+  } catch (error) {
+    console.error('Error loading configuration:', error)
+  }
 }
 
-const availableBarangays = computed(() => {
-  return barangayData[form.value.city] || []
+onMounted(() => {
+  loadServices()
+  
+  // Set up real-time listener for configuration changes
+  const unsubscribe = subscribeToFormSettings('clientLogbook', (data) => {
+    if (data) {
+      if (data.services) {
+        serviceOptions.value = data.services
+      }
+      if (data.sectors) {
+        availableSectors.value = data.sectors
+      }
+      if (data.geography) {
+        geographyData.value = data.geography
+        availableCities.value = Object.keys(data.geography).sort((a,b) => a.localeCompare(b))
+      }
+      if (data.dataPrivacyText) {
+        dataPrivacyText.value = data.dataPrivacyText
+      }
+    }
+  })
+  
+  // Store unsubscribe function for cleanup
+  ;(window as any)._logbookConfigUnsubscribe = unsubscribe
 })
 
+onUnmounted(() => {
+  // Clean up real-time listener
+  if ((window as any)._logbookConfigUnsubscribe) {
+    ;(window as any)._logbookConfigUnsubscribe()
+  }
+})
+
+const availableBarangays = computed(() => {
+  return geographyData.value[form.value.city] || []
+})
+
+const disposableDomains = ['mailinator.com', 'guerrillamail.com', 'yopmail.com', 'tempmail.net', 'temp-mail.org', '10minutemail.com', 'trashmail.com']
+
 const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  if (!emailRegex.test(email)) return false
+  const domain = email.split('@')[1]?.toLowerCase()
+  if (domain && disposableDomains.some(d => domain.includes(d))) return false
+  return true
 }
 
 const validatePhoneNumber = (phone: string): boolean => {
@@ -449,7 +445,7 @@ const validateForm = () => {
   if (!form.value.email.trim()) {
     validationErrors.value.email = 'Email is required'
   } else if (!validateEmail(form.value.email)) {
-    validationErrors.value.email = 'Enter a valid email address'
+    validationErrors.value.email = 'Enter a valid email address (disposable emails not allowed)'
   }
 
   if (!form.value.city) {
@@ -527,9 +523,21 @@ const submitForm = async () => {
       // ignore
     }
 
-    await router.push({
-      path: '/client/evaluation'
-    })
+    // Check if DTC Training is among the services and redirect accordingly
+    const hasDtcTraining = form.value.services.some(service => 
+      service.toLowerCase().includes('dtc training')
+    )
+
+    if (hasDtcTraining) {
+      sessionStorage.setItem('logbookId', id)
+      await router.push({
+        path: '/client/dtc-training-evaluation'
+      })
+    } else {
+      // Show completion modal for non-DTC services
+      logbookId.value = id
+      showCompletionModal.value = true
+    }
   } catch (e: any) {
     console.error('Submission failed:', e)
     errorMessage.value = e?.message || 'Failed to save logbook entry to Firestore.'
@@ -553,6 +561,18 @@ const clearForm = () => {
     agreementConfirmation: '',
   }
   validationErrors.value = {}
+}
+
+const handleNewResponse = () => {
+  showCompletionModal.value = false
+  clearForm()
+  window.scrollTo(0, 0)
+}
+
+const handleCloseModal = () => {
+  showCompletionModal.value = false
+  // Optionally redirect to a thank you page or home
+  router.push('/client/logbook')
 }
 </script>
 

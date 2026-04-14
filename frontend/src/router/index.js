@@ -23,6 +23,11 @@ import StaffStatusView from '../views/intern/StaffStatusView.vue';
 import ClientLogBook from '../views/client/ClientLogBook.vue';
 import ClientEvaluation from '../views/client/ClientEvaluation.vue';
 import staffRoutes from './staff.routes.js';
+import DtcTrainingEvaluation from '../views/client/DtcTrainingEvaluation.vue';
+import AdminClientLogBookView from '../views/admin/AdminClientLogBookView.vue';
+import AdminDtcEvaluationFormView from '../views/admin/AdminDtcEvaluationFormView.vue';
+import AdminDtcEvaluationView from '../views/admin/AdminDtcEvaluationView.vue';
+import AdminClientLogBookSettingsView from '../views/admin/AdminClientLogBookSettingsView.vue';
 
 const routes = [
   {
@@ -121,6 +126,26 @@ const routes = [
     component: AdminArchivedAttendanceView,
   },
   {
+    path: '/admin/client-logbook',
+    name: 'AdminClientLogBook',
+    component: AdminClientLogBookView,
+  },
+  {
+    path: '/admin/dtc-evaluation-form',
+    name: 'AdminDtcEvaluationForm',
+    component: AdminDtcEvaluationFormView,
+  },
+  {
+    path: '/admin/client-logbook-settings',
+    name: 'AdminClientLogBookSettings',
+    component: AdminClientLogBookSettingsView,
+  },
+  {
+    path: '/admin/dtc-evaluations',
+    name: 'AdminDtcEvaluations',
+    component: AdminDtcEvaluationView,
+  },
+  {
     path: '/auth/admin/login',
     name: 'AdminLogin',
     component: AdminLoginView
@@ -136,9 +161,9 @@ const routes = [
     component: ClientLogBook
   },
   {
-    path: '/client/evaluation',
-    name: 'ClientEvaluation',
-    component: ClientEvaluation
+    path: '/client/dtc-training-evaluation',
+    name: 'DtcTrainingEvaluation',
+    component: DtcTrainingEvaluation
   },
   {
     path: '/',

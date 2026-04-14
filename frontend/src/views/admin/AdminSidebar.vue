@@ -22,6 +22,57 @@
         <button
           type="button"
           class="flex items-center gap-2.5 px-2 md:px-3 py-1.5 md:py-2 w-full border-none bg-transparent justify-between cursor-pointer rounded-xl text-gray-700 font-sans text-sm transition-all hover:bg-blue-50 hover:text-blue-700"
+          @click="clientMgmtOpen = !clientMgmtOpen"
+        >
+          <div class="flex items-center gap-2.5">
+            <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">👥</span>
+            <span class="hidden md:inline text-left">Clients</span>
+          </div>
+          <span class="hidden md:inline text-[0.7rem] text-gray-500 transition-transform duration-150" :class="{ 'rotate-180': clientMgmtOpen }">
+            ▾
+          </span>
+        </button>
+
+        <div v-if="clientMgmtOpen" class="flex mt-0.5 hidden md:flex">
+          <div class="w-px my-1 ml-3 mr-2 bg-gray-300"></div>
+          <div class="flex-1 flex flex-col">
+            <router-link
+              to="/admin/client-logbook"
+              class="flex items-center gap-2.5 pl-[1.9rem] pr-3 py-1.5 rounded-xl text-gray-700 no-underline text-[0.85rem] transition-all hover:bg-blue-50 hover:text-blue-700"
+              active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
+            >
+              <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">📋</span>
+              <span>Client Logbook</span>
+            </router-link>
+            <router-link
+              to="/admin/client-logbook-settings"
+              class="flex items-center gap-2.5 pl-[1.9rem] pr-3 py-1.5 rounded-xl text-gray-700 no-underline text-[0.85rem] transition-all hover:bg-blue-50 hover:text-blue-700"
+              active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
+            >
+              <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">⚙️</span>
+              <span>Logbook Settings</span>
+            </router-link>
+            <router-link
+              to="/admin/dtc-evaluation-form"
+              class="flex items-center gap-2.5 pl-[1.9rem] pr-3 py-1.5 rounded-xl text-gray-700 no-underline text-[0.85rem] transition-all hover:bg-blue-50 hover:text-blue-700"
+              active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
+            >
+              <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">⚙️</span>
+              <span>DTC Evaluation Form</span>
+            </router-link>
+            <router-link
+              to="/admin/dtc-evaluations"
+              class="flex items-center gap-2.5 pl-[1.9rem] pr-3 py-1.5 rounded-xl text-gray-700 no-underline text-[0.85rem] transition-all hover:bg-blue-50 hover:text-blue-700"
+              active-class="bg-blue-100 text-blue-700 [&>span:first-child]:bg-black/5"
+            >
+              <span class="w-[26px] h-[26px] rounded-full bg-blue-50 flex items-center justify-center text-sm transition-colors">📊</span>
+              <span>DTC Evaluations</span>
+            </router-link>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="flex items-center gap-2.5 px-2 md:px-3 py-1.5 md:py-2 w-full border-none bg-transparent justify-between cursor-pointer rounded-xl text-gray-700 font-sans text-sm transition-all hover:bg-blue-50 hover:text-blue-700"
           @click="toggleUserMgmt"
         >
           <div class="flex items-center gap-2.5">
@@ -142,6 +193,7 @@ export default {
     return {
       userMgmtOpen: false,
       staffMgmtOpen: false,
+      clientMgmtOpen: false,
     };
   },
   mounted() {
