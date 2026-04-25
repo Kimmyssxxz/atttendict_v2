@@ -225,7 +225,7 @@
                           <span class="text-[9px] font-bold text-gray-300">|</span>
                           <span class="text-[10px] font-bold text-gray-400">{{ log.status }}</span>
                        </div>
-                       <p class="text-[10px] text-gray-500 truncate" v-if="getLogAddress(log)">{{ getLogAddress(log) }}</p>
+                       <p class="text-[10px] text-gray-500 truncate" v-if="getLogAddress(log) && log.status !== 'At Office'">{{ getLogAddress(log) }}</p>
                     </div>
                     <div class="w-2 h-2 rounded-full shadow-inner" :class="getLogType(log) === 'time-in' ? 'bg-emerald-500' : 'bg-orange-500'"></div>
                  </div>
@@ -402,7 +402,7 @@
                   <div class="absolute left-[141px] -ml-[7px] mt-[10px] w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm z-10" :class="getLogType(log) === 'time-in' ? 'bg-emerald-500' : 'bg-orange-500'"></div>
                   <div class="flex-1 ml-12 bg-gray-50 p-5 rounded-2xl border border-gray-100 hover:bg-white hover:border-blue-100 transition-all">
                     <div class="flex items-center gap-3 mb-4"><span class="px-3 py-1 rounded-md text-xs font-bold uppercase" :class="getLogType(log) === 'time-in' ? 'bg-emerald-100 text-emerald-800' : 'bg-orange-100 text-orange-800'">{{ getLogType(log) === 'time-in' ? 'Time In' : 'Time Out' }}</span><span class="text-xs text-gray-500 font-medium">{{ log.status }}</span></div>
-                    <div v-if="getLogAddress(log)" class="text-sm text-gray-600 mb-4">{{ getLogAddress(log) }}</div>
+                    <div v-if="getLogAddress(log) && log.status !== 'At Office'" class="text-sm text-gray-600 mb-4">{{ getLogAddress(log) }}</div>
                     <div class="flex gap-4" v-if="(log.latitude && log.longitude && log.status !== 'At Office') || getLogPhoto(log)">
                       <div v-if="log.latitude && log.longitude && log.status !== 'At Office'" class="flex-1 rounded-xl overflow-hidden border border-gray-200 h-32 bg-gray-100 shadow-inner"><iframe :src="getOsmEmbedUrl(log.latitude, log.longitude)" class="w-full h-full border-0"></iframe></div>
                       <div v-if="getLogPhoto(log)" class="w-40 rounded-xl overflow-hidden border border-gray-200 h-32 cursor-pointer relative group-img" @click="openModal('Photo Preview', '', 'image', getLogPhoto(log))">
