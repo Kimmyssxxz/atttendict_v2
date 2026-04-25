@@ -1,58 +1,54 @@
 <template>
-  <div class="min-h-screen flex flex-col md:flex-row bg-gray-50">
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-50/50">
     <AdminSidebar />
     
     <div class="flex-1 flex flex-col">
-      <header class="px-8 py-6 bg-blue-600 text-white shadow-sm">
-        <h1 class="m-0 text-2xl font-bold">DTC Evaluation Form Management</h1>
+      <header class="px-8 py-6 bg-white text-gray-900">
+        <h1 class="m-0 text-3xl font-semibold">DTC Evaluation Form Management</h1>
       </header>
       
-      <main class="flex-1 px-8 py-8">
-        <div class="p-8 bg-white rounded-xl shadow-sm">
+      <main class="flex-1 px-6 py-6 font-sans">
+        <TableSkeleton v-if="loading" :rows="10" />
+        <div v-else class="p-8 bg-white rounded-xl shadow-sm border border-gray-100">
           <!-- Header Section -->
-          <div class="mb-8 pb-8 border-b border-gray-100">
-            <h1 class="text-3xl font-bold text-gray-900 mb-3">DTC Training Course Evaluation Form</h1>
-            <p class="text-gray-600 leading-relaxed">{{ formConfig.description }}</p>
-            <p class="text-xs text-gray-400 mt-4">Last updated: {{ lastUpdated }}</p>
+          <div class="mb-4 pb-8 border-b border-gray-100">
+            <h1 class="text-2xl font-medium text-gray-900">DTC Training Course Evaluation Form</h1>
+            <p class="text-gray-600">{{ formConfig.description }}</p>
+            <p class="text-sm text-gray-400 mt-4">Last updated: {{ lastUpdated }}</p>
           </div>
 
           <!-- Navigation Tabs -->
-          <div class="mb-8 pb-6 border-b border-gray-100">
+          <div class="mb-6 pb-6 border-b border-gray-100">
             <nav class="flex gap-1 overflow-x-auto">
               <button
                 @click="switchTab('header')"
                 :class="[
-                  'flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all whitespace-nowrap border-b-2',
+                  'flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all whitespace-nowrap border-b-2',
                   activeTab === 'header'
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-[#eebb3b] border-[#eebb3b]'
                     : 'text-gray-600 border-transparent hover:text-gray-900'
                 ]"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
                 Header
               </button>
               <button
                 @click="switchTab('resourcePerson')"
                 :class="[
-                  'flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all whitespace-nowrap border-b-2',
+                  'flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all whitespace-nowrap border-b-2',
                   activeTab === 'resourcePerson'
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-[#eebb3b] border-[#eebb3b]'
                     : 'text-gray-600 border-transparent hover:text-gray-900'
                 ]"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                
                 <span>Resource Person ({{ formConfig.resourcePersonQuestions.length }})</span>
               </button>
               <button
                 @click="switchTab('courseContent')"
                 :class="[
-                  'flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all whitespace-nowrap border-b-2',
+                  'flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all whitespace-nowrap border-b-2',
                   activeTab === 'courseContent'
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-[#eebb3b] border-[#eebb3b]'
                     : 'text-gray-600 border-transparent hover:text-gray-900'
                 ]"
               >
@@ -64,15 +60,13 @@
               <button
                 @click="switchTab('venue')"
                 :class="[
-                  'flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all whitespace-nowrap border-b-2',
+                  'flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all whitespace-nowrap border-b-2',
                   activeTab === 'venue'
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-[#eebb3b] border-[#eebb3b]'
                     : 'text-gray-600 border-transparent hover:text-gray-900'
                 ]"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+                
                 <span>Venue ({{ formConfig.venueQuestions.length }})</span>
               </button>
               <button
@@ -80,13 +74,11 @@
                 :class="[
                   'flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all whitespace-nowrap border-b-2',
                   activeTab === 'resourcePersons'
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-[#eebb3b] border-[#eebb3b]'
                     : 'text-gray-600 border-transparent hover:text-gray-900'
                 ]"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+                
                 <span>Resource Persons ({{ formConfig.resourcePersons.length }})</span>
               </button>
             </nav>
@@ -122,7 +114,7 @@
                 <h2 class="text-lg font-semibold text-gray-900">Resource Person Evaluation Questions</h2>
                 <button
                   @click="addQuestion('resourcePerson')"
-                  class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  class="flex items-center gap-2 px-4 py-2 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 transition-colors text-sm font-medium"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -131,14 +123,14 @@
                 </button>
               </div>
               <div class="space-y-4">
-                <div v-for="(question, index) in formConfig.resourcePersonQuestions" :key="index" class="border border-gray-200 rounded-lg p-5 hover:border-blue-300 hover:shadow-sm transition-all">
+                <div v-for="(question, index) in formConfig.resourcePersonQuestions" :key="index" class="border border-gray-200 rounded-lg p-5  transition-all">
                   <div class="flex items-start justify-between gap-4 mb-4">
                     <span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Q{{ index + 1 }}</span>
                     <div class="flex gap-2">
                       <button
                         v-if="!question.isEditing"
                         @click="toggleEdit('resourcePerson', index)"
-                        class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        class="p-2 text-blue-400 hover:text-blue-600  rounded-lg transition-colors"
                         title="Edit"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,7 +140,7 @@
                       <button
                         v-if="question.isEditing"
                         @click="saveEdit('resourcePerson', index)"
-                        class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        class="p-2 text-green-400 hover:text-green-600  rounded-lg transition-colors"
                         title="Save"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,7 +149,7 @@
                       </button>
                       <button
                         @click="removeQuestion('resourcePerson', index)"
-                        class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        class="p-2 text-red-400 hover:text-red-600  rounded-lg transition-colors"
                         title="Delete"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,7 +178,7 @@
                 <h2 class="text-lg font-semibold text-gray-900">Course Content Evaluation Questions</h2>
                 <button
                   @click="addQuestion('courseContent')"
-                  class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  class="flex items-center gap-2 px-4 py-2 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 transition-colors text-sm font-medium"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -195,14 +187,14 @@
                 </button>
               </div>
               <div class="space-y-4">
-                <div v-for="(question, index) in formConfig.courseContentQuestions" :key="index" class="border border-gray-200 rounded-lg p-5 hover:border-blue-300 hover:shadow-sm transition-all">
+                <div v-for="(question, index) in formConfig.courseContentQuestions" :key="index" class="border border-gray-200 rounded-lg p-5 transition-all">
                   <div class="flex items-start justify-between gap-4 mb-4">
                     <span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Q{{ index + 1 }}</span>
                     <div class="flex gap-2">
                       <button
                         v-if="!question.isEditing"
                         @click="toggleEdit('courseContent', index)"
-                        class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        class="p-2 text-blue-400 hover:text-blue-600  rounded-lg transition-colors"
                         title="Edit"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,7 +204,7 @@
                       <button
                         v-if="question.isEditing"
                         @click="saveEdit('courseContent', index)"
-                        class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        class="p-2 text-green-400 hover:text-green-600  rounded-lg transition-colors"
                         title="Save"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -221,7 +213,7 @@
                       </button>
                       <button
                         @click="removeQuestion('courseContent', index)"
-                        class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        class="p-2 text-red-400 hover:text-red-600  rounded-lg transition-colors"
                         title="Delete"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,7 +242,7 @@
                 <h2 class="text-lg font-semibold text-gray-900">Venue Evaluation Questions</h2>
                 <button
                   @click="addQuestion('venue')"
-                  class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  class="flex items-center gap-2 px-4 py-2 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 transition-colors text-sm font-medium"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -259,14 +251,14 @@
                 </button>
               </div>
               <div class="space-y-4">
-                <div v-for="(question, index) in formConfig.venueQuestions" :key="index" class="border border-gray-200 rounded-lg p-5 hover:border-blue-300 hover:shadow-sm transition-all">
+                <div v-for="(question, index) in formConfig.venueQuestions" :key="index" class="border border-gray-200 rounded-lg p-5 transition-all">
                   <div class="flex items-start justify-between gap-4 mb-4">
                     <span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Q{{ index + 1 }}</span>
                     <div class="flex gap-2">
                       <button
                         v-if="!question.isEditing"
                         @click="toggleEdit('venue', index)"
-                        class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        class="p-2 text-blue-400 hover:text-blue-600  rounded-lg transition-colors"
                         title="Edit"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,7 +268,7 @@
                       <button
                         v-if="question.isEditing"
                         @click="saveEdit('venue', index)"
-                        class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        class="p-2 text-green-400 hover:text-green-600  rounded-lg transition-colors"
                         title="Save"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,7 +277,7 @@
                       </button>
                       <button
                         @click="removeQuestion('venue', index)"
-                        class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        class="p-2 text-red-400 hover:text-red-600  rounded-lg transition-colors"
                         title="Delete"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,7 +306,7 @@
                 <h2 class="text-lg font-semibold text-gray-900">Resource Persons</h2>
                 <button
                   @click="addResourcePerson"
-                  class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  class="flex items-center gap-2 px-4 py-2 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 transition-colors text-sm font-medium"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -323,7 +315,7 @@
                 </button>
               </div>
               <div class="space-y-4">
-                <div v-for="(person, index) in formConfig.resourcePersons" :key="index" class="border border-gray-200 rounded-lg p-5 hover:border-blue-300 hover:shadow-sm transition-all">
+                <div v-for="(person, index) in formConfig.resourcePersons" :key="index" class="border border-gray-200 rounded-lg p-5  transition-all">
                   <div class="flex items-center justify-between gap-4">
                     <div class="flex-1">
                       <div v-if="!person.isEditing" class="text-gray-700 leading-relaxed text-base">
@@ -341,7 +333,7 @@
                       <button
                         v-if="!person.isEditing"
                         @click="toggleResourcePersonEdit(index)"
-                        class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        class="p-2 text-blue-400 hover:text-blue-600  rounded-lg transition-colors"
                         title="Edit"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,7 +343,7 @@
                       <button
                         v-if="person.isEditing"
                         @click="saveResourcePersonEdit(index)"
-                        class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        class="p-2 text-green-400 hover:text-green-600  rounded-lg transition-colors"
                         title="Save"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -360,7 +352,7 @@
                       </button>
                       <button
                         @click="removeResourcePerson(index)"
-                        class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        class="p-2 text-red-400 hover:text-red-600  rounded-lg transition-colors"
                         title="Delete"
                       >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -385,7 +377,7 @@
             <button
               @click="saveChanges"
               :disabled="saving"
-              class="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-400 transition-colors font-medium text-sm"
+              class="px-6 py-3 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 disabled:bg-gray-400 transition-colors font-medium text-sm"
             >
               {{ saving ? 'Saving...' : 'Save Changes' }}
             </button>
@@ -394,6 +386,41 @@
       </main>
     </div>
   </div>
+
+  <!-- Success Modal -->
+  <Transition
+    enter-active-class="transition duration-300 ease-out"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition duration-200 ease-in"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div v-if="showSuccessModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50">
+      <div 
+        class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all"
+        @click.stop
+      >
+        <div class="p-8 text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Save Successful</h3>
+          <p class="text-gray-600 mb-8">DTC Evaluation form configuration has been updated successfully.</p>
+          
+          <button
+            @click="showSuccessModal = false"
+            class="w-full py-3 px-4 bg-[#133e75] text-white font-semibold rounded-xl hover:bg-[#133e75]/90 transition-all active:scale-[0.98]"
+          >
+            Great, thanks!
+          </button>
+        </div>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <script setup>
@@ -402,8 +429,11 @@ import { collection, doc, setDoc, getDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { getFormSettings, updateFormSettings } from '../../services/clientFormSettings'
 import AdminSidebar from './AdminSidebar.vue'
+import TableSkeleton from '../../components/skeletons/TableSkeleton.vue'
 
+const loading = ref(false)
 const saving = ref(false)
+const showSuccessModal = ref(false)
 const lastUpdated = ref(new Date().toLocaleString())
 const activeTab = ref('header')
 
@@ -545,7 +575,7 @@ const saveChanges = async () => {
     
     if (success) {
       lastUpdated.value = new Date().toLocaleString()
-      alert('DTC Evaluation form configuration saved successfully!')
+      showSuccessModal.value = true
     } else {
       alert('Error saving configuration. Please try again.')
     }
@@ -558,6 +588,7 @@ const saveChanges = async () => {
 }
 
 const loadConfiguration = async () => {
+  loading.value = true
   try {
     console.log('Loading configuration...')
     const config = await getFormSettings('dtcEvaluation')
@@ -594,6 +625,8 @@ const loadConfiguration = async () => {
     })
   } catch (error) {
     console.error('Error loading form configuration:', error)
+  } finally {
+    loading.value = false
   }
 }
 

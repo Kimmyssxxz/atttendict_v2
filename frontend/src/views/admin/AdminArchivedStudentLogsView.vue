@@ -2,6 +2,7 @@
   <div class="min-h-screen flex bg-gray-50/50 font-sans antialiased text-gray-900">
     <AdminSidebar activeNav="archive" />
 
+
     <div class="flex-1 flex flex-col min-w-0">
       <header class="px-8 py-6 bg-white ">
         <div class="flex items-center gap-4">
@@ -11,16 +12,17 @@
             </svg>
           </router-link>
           <div>
-            <h1 class="text-3xl font-semibold text-gray-900">Archived Attendance Logs</h1>
-            <p class="text-gray-500 ">View staff attendance logs that have been archived.</p>
+            <h1 class="text-3xl font-semibold text-gray-900">Archived Student Records</h1>
+            <p class="text-gray-500 ">View student profiles that have been archived.</p>
           </div>
         </div>
       </header>
 
+
       <main class="flex-1 overflow-auto px-6 py-6">
         <TableSkeleton v-if="loading" :rows="8" />
         <div v-else>
-          
+         
           <!-- Table Section -->
           <section class="bg-white rounded-xl shadow-sm overflow-hidden">
             <!-- Table Header / Search -->
@@ -29,99 +31,89 @@
                 <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path fill="currentColor" d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0s.41-1.08 0-1.49zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14"/>
                 </svg>
-                <input 
+                <input
                   v-model="searchQuery"
-                  type="text" 
-                  placeholder="Search staff, date, or address..."
-                  class="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-blue-500/10 transition-all "
+                  type="text"
+                  placeholder="Search student name, username, or email..."
+                  class="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none  focus:ring-blue-500/10  transition-all "
                 />
               </div>
             </div>
+
 
             <!-- Table Container -->
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
                   <tr class="bg-gray-50/80 text-xs text-gray-500">
-                    <th class="px-6 py-4">Staff Member</th>
-                    <th class="px-6 py-4">Date</th>
-                    <th class="px-6 py-4">Time In</th>
-                    <th class="px-6 py-4">Time Out</th>
-                    <th class="px-6 py-4">Status</th>
-                    <th class="px-6 py-4">Location/Address</th>
+                    <th class="px-6 py-4">Student</th>
+                    <th class="px-6 py-4">Username</th>
+                    <th class="px-6 py-4">Email</th>
+                    <th class="px-6 py-4">Assigned Office</th>
+                    <th class="px-6 py-4">OJT Required Hrs</th>
                     <th class="px-6 py-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                  <tr v-if="archivedAttendances.length === 0">
-                    <td colspan="7" class="px-6 py-20 text-center text-gray-400 font-medium">No archived attendance records found.</td>
+                  <tr v-if="archivedStudents.length === 0">
+                    <td colspan="6" class="px-6 py-20 text-center text-gray-400 font-medium">No archived student records found.</td>
                   </tr>
-                  <tr 
-                    v-for="att in archivedAttendances" 
-                    :key="att.id"
+                  <tr
+                    v-for="student in archivedStudents"
+                    :key="student.id"
                     class="hover:bg-blue-50/30 transition-colors group"
                   >
-                    <!-- Staff Member -->
+                    <!-- Student Member -->
                     <td class="px-6 py-5 whitespace-nowrap">
                       <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm shadow-sm overflow-hidden border border-white ring-1 ring-blue-50">
-                          <img v-if="getStaffPhoto(att.staffId)" :src="getStaffPhoto(att.staffId)" class="w-full h-full object-cover" />
-                          <span v-else>{{ getStaffInitials(att.staffId) }}</span>
+                          <img v-if="student.photoUrl" :src="student.photoUrl" class="w-full h-full object-cover" />
+                          <span v-else>{{ getStudentInitials(student) }}</span>
                         </div>
                         <div>
-                          <p class="font-bold text-gray-900 leading-tight">{{ getStaffName(att.staffId) }}</p>
-                          <p class="text-[10px] text-gray-400 tracking-wider font-semibold uppercase">{{ getStaffPosition(att.staffId) }}</p>
+                          <p class="font-bold text-gray-900 leading-tight">{{ getStudentName(student) }}</p>
+                          <p class="text-[10px] text-gray-400 tracking-wider font-semibold uppercase">{{ student.position || 'Student Intern' }}</p>
                         </div>
                       </div>
                     </td>
 
-                    <!-- Date -->
-                    <td class="px-6 py-5 whitespace-nowrap text-xs font-bold text-gray-700 tabular-nums">
-                      {{ formatDate(att.date) }}
+
+                    <!-- Username -->
+                    <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-700">
+                      {{ student.username || '-' }}
                     </td>
 
-                    <!-- Time In -->
-                    <td class="px-6 py-5 whitespace-nowrap">
-                      <div class="flex flex-col">
-                        <span class="text-xs font-bold text-gray-800">{{ att.timeInAM || '-' }} <span class="text-[10px] text-gray-400 font-medium">AM</span></span>
-                        <span class="text-xs font-bold text-gray-800">{{ att.timeInPM || '-' }} <span class="text-[10px] text-gray-400 font-medium">PM</span></span>
-                      </div>
+
+                    <!-- Email -->
+                    <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-700">
+                      {{ student.email || '-' }}
                     </td>
 
-                    <!-- Time Out -->
-                    <td class="px-6 py-5 whitespace-nowrap">
-                      <div class="flex flex-col">
-                        <span class="text-xs font-bold text-gray-800">{{ att.timeOutAM || '-' }} <span class="text-[10px] text-gray-400 font-medium">AM</span></span>
-                        <span class="text-xs font-bold text-gray-800">{{ att.timeOutPM || '-' }} <span class="text-[10px] text-gray-400 font-medium">PM</span></span>
-                      </div>
+
+                    <!-- Assigned Office -->
+                    <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-700">
+                      {{ student.assignedOffice || '-' }}
                     </td>
 
-                    <!-- Status -->
-                    <td class="px-6 py-5 whitespace-nowrap">
-                      <span :class="getStatusClass(att.staffStatus)" class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border">
-                        {{ att.staffStatus || 'Pending' }}
-                      </span>
+
+                    <!-- Req Hours -->
+                    <td class="px-6 py-5 whitespace-nowrap text-sm text-gray-700 font-medium">
+                      {{ student.ojtRequiredHours ?? '-' }}
                     </td>
 
-                    <!-- Address -->
-                    <td class="px-6 py-5 whitespace-nowrap">
-                      <div class="max-w-[200px] overflow-hidden text-ellipsis italic text-[11px] text-gray-500 leading-relaxed bg-gray-50/50 px-2 py-1 rounded-lg border border-gray-100">
-                        {{ att.LocAM?.address || att.LocPM?.address || att.address || 'Location data unavailable' }}
-                      </div>
-                    </td>
 
                     <!-- Actions -->
                     <td class="px-6 py-5 whitespace-nowrap flex gap-2">
-                      <button 
-                        @click="restoreAttendance(att)" 
-                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-transparent hover:border-green-100" 
-                        title="Restore Log"
+                      <button
+                        @click="restoreStudent(student)"
+                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors border border-transparent hover:border-green-100"
+                        title="Restore Account"
                       >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>
                       </button>
-                      <button 
-                        @click="deleteAttendance(att)" 
-                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100" 
+                      <button
+                        @click="deleteStudent(student)"
+                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
                         title="Delete Permanently"
                       >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -135,6 +127,7 @@
         </div>
       </main>
 
+
     </div>
  
      <!-- Restore Confirmation Modal -->
@@ -147,9 +140,9 @@
                <path d="M20 20v-7a4 4 0 0 0-4-4H4"></path>
              </svg>
            </div>
-           <h3 class="text-2xl font-bold text-gray-900 mb-2">Restore Attendance Log</h3>
+           <h3 class="text-2xl font-bold text-gray-900 mb-2">Restore Student</h3>
            <p class="text-gray-600 mb-8">
-             Restore archived attendance for <span class="font-bold text-gray-900">{{ getStaffName(attendanceToRestore?.staffId) }}</span>?
+             Restore archived student intern <span class="font-bold text-gray-900">{{ getStudentName(studentToRestore) }}</span>? Their attendance logs will also be restored.
            </p>
            <div class="flex gap-3">
              <button 
@@ -183,7 +176,7 @@
            </div>
            <h3 class="text-2xl font-bold text-red-600 mb-2">Delete Permanently</h3>
            <p class="text-gray-600 mb-8">
-             Are you sure you want to PERMANENTLY delete the attendance for <span class="font-bold text-gray-900">{{ getStaffName(attendanceToDelete?.staffId) }}</span>? This action cannot be undone.
+             Are you sure you want to PERMANENTLY delete <span class="font-bold text-gray-900">{{ getStudentName(studentToDelete) }}</span>? This action cannot be undone.
            </p>
            <div class="flex gap-3">
              <button 
@@ -207,16 +200,16 @@
   </div>
 </template>
 
+
 <script>
 import AdminSidebar from './AdminSidebar.vue'
 import TableSkeleton from '../../components/skeletons/TableSkeleton.vue'
-import { mapActions, mapState } from 'pinia'
-import { useStaffAttendanceStore } from '../../stores/staffAttendanceStore'
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, serverTimestamp, writeBatch } from 'firebase/firestore'
 import { db } from '../../firebase.js'
 
+
 export default {
-  name: 'AdminArchivedAttendanceView',
+  name: 'AdminArchivedStudentLogsView',
   components: {
     AdminSidebar,
     TableSkeleton
@@ -224,127 +217,116 @@ export default {
   data() {
     return {
       searchQuery: '',
+      students: [],
+      loading: false,
       showRestoreModal: false,
       showDeleteModal: false,
-      attendanceToRestore: null,
-      attendanceToDelete: null,
+      studentToRestore: null,
+      studentToDelete: null,
       restoring: false,
       deleting: false,
     }
   },
   computed: {
-    ...mapState(useStaffAttendanceStore, ['staffAttendances', 'staffUsers', 'loading']),
-    
-    archivedAttendances() {
-      return this.staffAttendances.filter(att => {
-        if (!att.isArchived) return false
-
-        const staffName = this.getStaffName(att.staffId).toLowerCase()
-        const date = this.formatDate(att.date).toLowerCase()
-        const addr = (att.LocAM?.address || att.LocPM?.address || att.address || '').toLowerCase()
-        const query = this.searchQuery.toLowerCase()
-        
-        return staffName.includes(query) || date.includes(query) || addr.includes(query)
+    archivedStudents() {
+      return this.students.filter(student => {
+        const studentName = this.getStudentName(student).toLowerCase()
+        const username = (student.username || '').toLowerCase()
+        const email = (student.email || '').toLowerCase()
+        const queryStr = this.searchQuery.toLowerCase()
+       
+        return studentName.includes(queryStr) || username.includes(queryStr) || email.includes(queryStr)
       })
     }
   },
   methods: {
-    ...mapActions(useStaffAttendanceStore, ['fetchAllStaffAttendances', 'fetchStaffUsers', 'deleteStaffAttendance']),
-    
-    getStaffName(staffId) {
-      const user = this.staffUsers.find(u => u.id === staffId)
-      return user ? `${user.firstName} ${user.lastName}` : 'Unknown Staff'
+    async fetchData() {
+      this.loading = true
+      try {
+        const qUsers = query(collection(db, 'users'), where('role', 'in', ['student', 'intern']), where('isArchived', '==', true))
+        const snapUsers = await getDocs(qUsers)
+        this.students = snapUsers.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      } catch(e) {
+        console.error('Error fetching student logs', e)
+      } finally {
+        this.loading = false
+      }
     },
-    
-    getStaffPhoto(staffId) {
-      return this.staffUsers.find(u => u.id === staffId)?.photoUrl || null
+    getStudentName(user) {
+      if (!user) return 'Unknown Student'
+      return `${user.firstName || ''} ${user.lastName || ''}`.trim()
     },
-
-    getStaffPosition(staffId) {
-      return this.staffUsers.find(u => u.id === staffId)?.position || 'Staff'
-    },
-
-    getStaffInitials(staffId) {
-      const user = this.staffUsers.find(u => u.id === staffId)
+    getStudentInitials(user) {
       if (!user) return '?'
       return `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase()
     },
-
-    formatDate(dateStr) {
-      if (!dateStr) return '-'
-      const [y, m, d] = dateStr.split('-')
-      if (!y || !m || !d) return dateStr
-      const date = new Date(y, m - 1, d)
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    },
-
-    getStatusClass(status) {
-      switch (status) {
-        case 'At Office': return 'bg-blue-50 text-blue-700 border-blue-200'
-        case 'On Field': return 'bg-amber-50 text-amber-700 border-amber-200'
-        case 'Travel': return 'bg-purple-50 text-purple-700 border-purple-200'
-        case 'Leave': return 'bg-red-50 text-red-700 border-red-200'
-        default: return 'bg-gray-50 text-gray-700 border-gray-200'
-      }
-    },
-
-    restoreAttendance(att) {
-      this.attendanceToRestore = att
+    restoreStudent(student) {
+      this.studentToRestore = student
       this.showRestoreModal = true
     },
-
     async confirmRestore() {
-      if (!this.attendanceToRestore) return
+      if (!this.studentToRestore) return
       this.restoring = true
       try {
-        const docRef = doc(db, 'staff_attendance', this.attendanceToRestore.id)
+        // 1. Restore student profile
+        const docRef = doc(db, 'users', this.studentToRestore.id)
         await updateDoc(docRef, {
           isArchived: false,
           updatedAt: serverTimestamp()
         })
-        
-        const store = useStaffAttendanceStore()
-        const index = store.staffAttendances.findIndex(a => a.id === this.attendanceToRestore.id)
-        if (index !== -1) {
-          store.staffAttendances[index].isArchived = false
+
+        // 2. Restore associated attendance records
+        const attendanceQuery = query(
+          collection(db, 'intern_attendance'), 
+          where('internId', '==', this.studentToRestore.id), 
+          where('isArchived', '==', true)
+        )
+        const attendanceSnap = await getDocs(attendanceQuery)
+
+        if (!attendanceSnap.empty) {
+          const batch = writeBatch(db)
+          attendanceSnap.docs.forEach((d) => {
+            batch.update(d.ref, { isArchived: false })
+          })
+          await batch.commit()
         }
+
+        this.students = this.students.filter(s => s.id !== this.studentToRestore.id)
         this.showRestoreModal = false
-        this.attendanceToRestore = null
+        this.studentToRestore = null
       } catch (e) {
-        console.error("Error restoring log:", e)
-        alert("Failed to restore log.")
+        console.error("Error restoring student:", e)
+        alert("Failed to restore student.")
       } finally {
         this.restoring = false
       }
     },
-
-    deleteAttendance(att) {
-      this.attendanceToDelete = att
+    deleteStudent(student) {
+      this.studentToDelete = student
       this.showDeleteModal = true
     },
-
     async confirmDelete() {
-      if (!this.attendanceToDelete) return
+      if (!this.studentToDelete) return
       this.deleting = true
       try {
-        const res = await this.deleteStaffAttendance(this.attendanceToDelete.id)
-        if (!res.success) throw new Error(res.error)
+        await deleteDoc(doc(db, 'users', this.studentToDelete.id))
+        this.students = this.students.filter(s => s.id !== this.studentToDelete.id)
         this.showDeleteModal = false
-        this.attendanceToDelete = null
+        this.studentToDelete = null
       } catch (e) {
-        console.error('Error deleting log:', e)
-        alert('Failed to delete log.')
+        console.error('Error deleting student:', e)
+        alert('Failed to delete student.')
       } finally {
         this.deleting = false
       }
     }
   },
-  async mounted() {
-    this.fetchStaffUsers()
-    this.fetchAllStaffAttendances()
+  mounted() {
+    this.fetchData()
   }
 }
 </script>
+
 
 <style scoped>
 .modal-enter-active,
@@ -365,3 +347,6 @@ export default {
   transform: scale(0.9) translateY(20px);
 }
 </style>
+
+
+

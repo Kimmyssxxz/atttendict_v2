@@ -30,7 +30,12 @@ const staffRoutes = [
     path: '/staff/settings',
     name: 'StaffSettings',
     component: StaffSettings
-  }
+  },
+  // {
+  //   path: '/staff/fingerprint',
+  //   name: 'StaffFingerprint',
+  //   component: () => import('../views/staff/StaffFingerprint.vue')
+  // }
 ];
 
 export default staffRoutes;

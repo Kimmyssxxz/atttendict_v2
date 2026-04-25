@@ -1,12 +1,18 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+  <div class="min-h-screen bg-gray-50/50 pt-8 pb-32 px-4">
     <div class="max-w-4xl mx-auto">
+      <!-- Logos -->
+      <div class="flex flex-row items-center justify-center gap-4 mb-6 w-full">
+        <img src="/dictlogo2.png" alt="DICT Logo" class="h-12 sm:h-16 w-auto object-contain"/>
+        <img src="/Bagongpilipinas.png" alt="Bagong Pilipinas Logo" class="h-12 sm:h-16 w-auto object-contain"/>
+      </div>
+
       <!-- Header -->
-      <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
-        <h1 class="text-3xl font-bold text-gray-800 text-center mb-4">
+      <div class="bg-[#133e75] rounded-lg p-8 mb-6">
+        <h1 class="text-4xl font-bold text-white text-center mb-2">
           {{ formConfig.title }}
         </h1>
-        <div class="text-sm text-gray-600 text-center space-y-2">
+        <div class="text-xl text-white text-center space-y-2">
           <p>
             {{ formConfig.description }}
           </p>
@@ -14,11 +20,11 @@
       </div>
 
       <!-- Step 1: Personal Information, Data Privacy, Training Information -->
-      <div v-if="currentStep === 1" class="bg-white rounded-lg shadow-lg p-8">
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">Personal Information</h2>
+      <div v-if="currentStep === 1" class="bg-white rounded-lg p-8">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-6">Personal Information</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-lg text-gray-700 mb-2">
               Email *
             </label>
             <input
@@ -29,8 +35,8 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Full Name (First Name, Middle Initial, Last Name)
+            <label class="block text-lg  text-gray-700 mb-2">
+              Full Name (First Name, M.I, Last Name)
             </label>
             <input
               v-model="form.fullName"
@@ -42,15 +48,15 @@
           </div>
         </div>
 
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Data Privacy</h3>
+        <h3 class="text-2xl font-semibold text-gray-800 mb-2">Data Privacy</h3>
         <div class="mb-8">
          
-          <p class="text-sm text-gray-600 mb-4">
+          <p class="text-base text-gray-600 mb-4">
             The DICT recognizes their responsibilities under the Republic Act No. 10173 (Act), also known as the Data Privacy Act of 2012. The personal data to be obtained from this interview will be analyzed, entered, and stored within the Department's authorized information and communications system and will only be accessed by the DICT Oriental Mindoro and authorized personnel. The DICT Oriental Mindoro instituted appropriate organizational, technical, and physical security measures to ensure the protection of the participants' personal data.
           </p>
     
           <div class="mb-4">
-            <p class="text-sm font-medium text-gray-700 mb-2">
+            <p class="text-base text-gray-700 mb-2">
               By answering our evaluation form, you explicitly consent to the collection, processing, and storage of your personal information by members of the DICT Oriental Mindoro-Digital Transformation Center for the purposes described above.
             </p>
             <label class="flex items-center">
@@ -60,28 +66,59 @@
                 required
                 class="mr-2"
               />
-              <span class="text-sm font-medium text-gray-700">I agree</span>
+              <span class="text-base font-medium text-gray-700">I agree</span>
             </label>
           </div>
         </div>
 
-        <h2 class="text-xl font-semibold text-gray-800 mb-6">Training Information</h2>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Training Information</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-lg text-gray-700 mb-2">
               Resource Person Name *
             </label>
-            <select
-              v-model="form.resourcePerson"
-              required
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 transition text-gray-700"
-            >
-              <option value="">Select Resource Person</option>
-              <option v-for="person in formConfig.resourcePersons" :key="person.value" :value="person.value">
-                {{ person.value }}
-              </option>
-              <option value="other">Other</option>
-            </select>
+            <div class="relative custom-dropdown">
+              <button 
+                type="button" 
+                @click.stop="showResourcePersonDropdown = !showResourcePersonDropdown"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 transition text-left flex justify-between items-center text-gray-700 bg-white"
+              >
+                <span>{{ form.resourcePerson === 'other' ? (form.otherResourcePerson || 'Other (Please specify)') : (form.resourcePerson || 'Select Resource Person') }}</span>
+                <svg class="w-5 h-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showResourcePersonDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+
+              <transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <div v-if="showResourcePersonDropdown" class="absolute top-full left-0 z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto custom-scrollbar">
+                  <div class="py-1">
+                    <button 
+                      v-for="person in formConfig.resourcePersons" 
+                      :key="person.value"
+                      type="button" 
+                      @click="selectResourcePerson(person.value)" 
+                      class="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 text-sm font-medium"
+                      :class="form.resourcePerson === person.value ? 'bg-blue-50 text-[#133e75]' : 'text-gray-700'"
+                    >
+                      {{ person.value }}
+                    </button>
+                    <button 
+                      type="button" 
+                      @click="selectResourcePerson('other')" 
+                      class="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 text-sm font-medium border-t border-gray-50"
+                      :class="form.resourcePerson === 'other' ? 'bg-blue-50 text-[#133e75]' : 'text-gray-700'"
+                    >
+                      Other
+                    </button>
+                  </div>
+                </div>
+              </transition>
+            </div>
             <input
               v-if="form.resourcePerson === 'other'"
               v-model="form.otherResourcePerson"
@@ -91,7 +128,7 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-lg text-gray-700 mb-2">
               Training/Activity Title *
             </label>
             <input
@@ -102,7 +139,7 @@
             />
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-lg text-gray-700 mb-2">
               Date of the training *
             </label>
             <input
@@ -234,17 +271,17 @@
 
       </div>
 
-      <!-- Navigation Buttons -->
-      <div class="bg-white rounded-lg shadow-lg p-6 mt-2">
-        <div class="flex justify-between items-center">
+      <!-- Navigation Buttons (Fixed Bottom) -->
+      <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 sm:p-6 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center px-4">
           <div></div>
-          <div class="flex space-x-8">
+          <div class="flex space-x-4 sm:space-x-8">
             <button
               v-if="currentStep > 1"
               @click="prevStep"
               type="button"
-                class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors text-xs sm:text-sm"
-           >
+              class="px-4 py-2 sm:px-6 sm:py-2.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all font-semibold text-sm sm:text-base border border-gray-200"
+            >
               Previous
             </button>
             
@@ -254,12 +291,12 @@
               type="button"
               :disabled="!isCurrentStepComplete"
               :class="[
-                'w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 rounded-full transition-colors text-xs sm:text-sm',
+                'px-4 py-2 sm:px-6 sm:py-2.5 rounded-full transition-all font-semibold text-sm sm:text-base',
                 isCurrentStepComplete 
-                  ? 'bg-blue-200 text-blue-800 hover:bg-blue-300' 
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  ? 'bg-[#133e75] text-white hover:bg-[#133e75]/90 shadow-md' 
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
               ]"
-           >
+            >
               Next
             </button>
             
@@ -267,9 +304,9 @@
               v-if="currentStep === totalSteps"
               @click="submitForm"
               :disabled="isSubmitting"
-              class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 disabled:bg-gray-400 transition-colors"
+              class="bg-green-600 text-white px-6 py-2.5 sm:px-8 rounded-full font-bold hover:bg-green-700 disabled:bg-gray-300 transition-all shadow-md items-center flex gap-2"
             >
-           
+              <svg v-if="isSubmitting" class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
               {{ isSubmitting ? 'Submitting...' : 'Submit Evaluation' }}
             </button>
           </div>
@@ -277,8 +314,8 @@
       </div>
 
       <!-- Success Message -->
-      <div v-if="showSuccess" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-8 max-w-md mx-4">
+      <div v-if="showSuccess" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
+        <div class="bg-white  border border-gray-200  rounded-xl p-8 max-w-md mx-4">
           <h3 class="text-xl font-semibold text-gray-800 mb-4">Thank You!</h3>
           <div class="text-sm text-gray-600 space-y-2 mb-6">
             <p>
@@ -297,7 +334,7 @@
           <button
             type="button"
             @click="closeSuccessAndRedirect"
-             class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-blue-200 text-blue-800 hover:bg-blue-300 transition-colors text-xs sm:text-sm"
+             class="w-full sm:w-auto px-3 py-1.5 sm:px-4 sm:py-2 items-center rounded-full bg-blue-200 text-blue-800 hover:bg-blue-300 transition-colors text-xs sm:text-sm"
            >
            Close
           </button> 
@@ -309,7 +346,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { createDtcTrainingEvaluation } from '@/services/clientServices'
 import { getFormSettings } from '@/services/clientFormSettings'
@@ -319,6 +356,7 @@ const isSubmitting = ref(false)
 const currentStep = ref(1)
 const totalSteps = 4
 const showSuccess = ref(false)
+const showResourcePersonDropdown = ref(false)
 const logbookId = ref('')
 
 // Form configuration from Firestore
@@ -430,6 +468,14 @@ const prevStep = () => {
   }
 }
 
+const selectResourcePerson = (val) => {
+  form.resourcePerson = val
+  showResourcePersonDropdown.value = false
+  if (val !== 'other') {
+    form.otherResourcePerson = ''
+  }
+}
+
 const clearForm = () => {
   form.email = ''
   form.fullName = ''
@@ -453,6 +499,18 @@ onMounted(() => {
     logbookId.value = storedLogbookId
     sessionStorage.removeItem('logbookId') 
   }
+
+  // Click outside listener for dropdown
+  const handleOutsideClick = (e) => {
+    if (!e.target.closest('.custom-dropdown')) {
+      showResourcePersonDropdown.value = false
+    }
+  }
+  window.addEventListener('click', handleOutsideClick)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('click', handleOutsideClick)
 })
 
 const submitForm = async () => {

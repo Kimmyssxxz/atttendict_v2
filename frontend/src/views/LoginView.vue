@@ -2,6 +2,11 @@
   <!-- Mobile View -->
   <div v-if="isMobile" class="min-h-screen flex items-center justify-center bg-white p-6 font-sans">
     <div class="w-full max-w-[400px] bg-white rounded-xl shadow-lg p-8 sm:p-12 flex flex-col items-center">
+      <div class="flex flex-row items-center justify-center gap-3 mb-6 w-full">
+        <img src="/dictlogo2.png" alt="DICT Logo" class="h-10 sm:h-12 w-auto object-contain"/>
+        <img src="/Bagongpilipinas.png" alt="Bagong Pilipinas Logo" class="h-10 sm:h-12 w-auto object-contain"/>
+        <img src="/3.png" alt="Attendict Logo" class="h-10 sm:h-12 w-auto object-contain"/>
+      </div>
       <h1 class="text-3xl font-bold text-gray-900 mb-1">Hello Again!</h1>
       <p class="text-gray-500 text-base mb-8">Welcome back, you've been missed.</p>
 
@@ -41,9 +46,17 @@
           </button>
         </div>
 
+        <div class="flex justify-end w-full -mt-1">
+          <router-link to="/auth/forgot-password" class="text-sm text-[#133e75] hover:underline font-medium">Forgot Password?</router-link>
+        </div>
+
         <div>
-           <button type="submit" class="w-full px-8 py-3.5 mt-4 bg-[#133e75] text-white font-semibold rounded-xl cursor-pointer transition-colors duration-300 hover:bg-[#133e75]/80">
-             Login
+           <button type="submit" :disabled="isLoading" class="w-full px-8 py-3.5 mt-2 bg-[#133e75] text-white font-semibold rounded-xl cursor-pointer transition-colors duration-300 hover:bg-[#133e75]/80 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center">
+             <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+             </svg>
+             {{ isLoading ? 'Logging in...' : 'Login' }}
            </button>
         </div>
       </form>
@@ -60,7 +73,9 @@
       
       <!-- Header links (Top right) & Logo (Top left) -->
       <div class="absolute top-0 left-0 w-full p-6 flex justify-center lg:justify-start items-center z-20">
-        <div class="flex flex-row items-center gap-2 font-bold text-xl text-blue-600">
+        <div class="flex flex-row items-center gap-3 font-bold text-xl text-blue-600">
+          <img src="/dictlogo2.png" alt="DICT Logo" class="h-12 w-auto object-contain lg:block hidden"/>
+          <img src="/Bagongpilipinas.png" alt="Bagong Pilipinas Logo" class="h-12 w-auto object-contain lg:block hidden"/>
           <img src="/3.png" alt="Logo" class="h-12 w-auto object-contain hidden sm:block"/>
           <span class="text-gray-900 text-3xl">ATTENDICT</span>
         </div>
@@ -71,10 +86,10 @@
 
         
         <!-- Central Circular Graphic area -->
-        <div class="relative w-[28rem] h-[28rem] bg-orange-50 rounded-full flex items-center justify-center shadow-sm border border-orange-100 z-10">
-          <DotLottieVue style="height: 500px; width: 500px" autoplay loop src="https://lottie.host/6ad83ae1-839d-473d-98ae-3918a1a36e92/vId07eA74k.json" />
+        <div class="relative w-[28rem] h-[28rem]  flex items-center justify-center  z-10">
+          <DotLottieVue style="height: 500px; width: 500px" autoplay loop src="https://lottie.host/eb77402f-d9a7-478c-9ac5-026aa8b6b889/iaB5skKvtQ.lottie" />
         </div>
-      </div>
+      </div
 
       <!-- Right Side Form -->
       <div class="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 sm:p-12 z-10 pt-24 ">
@@ -120,9 +135,17 @@
               </button>
             </div>
 
+            <div class="flex justify-end w-full -mt-2">
+              <router-link to="/auth/forgot-password" class="text-sm text-[#133e75] hover:underline font-medium">Forgot Password?</router-link>
+            </div>
+
             <div>
-               <button type="submit" class="w-full px-8 py-3 mt-4 bg-[#133e75] text-white font-medium rounded-lg cursor-pointer transition-colors duration-300 hover:bg-[#133e75]/80">
-                 Login
+               <button type="submit" :disabled="isLoading" class="w-full px-8 py-3 bg-[#133e75] text-white font-medium rounded-lg cursor-pointer transition-colors duration-300 hover:bg-[#133e75]/80 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center">
+                 <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                 </svg>
+                 {{ isLoading ? 'Logging in...' : 'Login' }}
                </button>
             </div>
           </form>
@@ -134,6 +157,40 @@
       </div>
     </div>
   </div>
+
+  <!-- Success/Error Modal -->
+  <transition
+    enter-active-class="transition ease-out duration-300"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition ease-in duration-200"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all">
+        <!-- Success Icon -->
+        <div v-if="modalType === 'success'" class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <!-- Error Icon -->
+        <div v-else class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+          <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+        
+        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ modalTitle }}</h3>
+        <p class="text-sm text-gray-500 mb-6 px-2">{{ modalMessage }}</p>
+        
+        <button @click="closeModal" class="w-full inline-flex justify-center items-center rounded-xl px-4 py-3 bg-[#133e75] text-sm font-semibold text-white hover:bg-[#133e75]/90 focus:outline-none transition-colors">
+          {{ modalType === 'success' ? 'Continue' : 'Try Again' }}
+        </button>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -150,6 +207,12 @@ export default {
       password: '',
       showPassword: false,
       isMobile: window.innerWidth < 1024,
+      isLoading: false,
+      showModal: false,
+      modalType: 'error',
+      modalTitle: '',
+      modalMessage: '',
+      modalAction: null,
     };
   },
   mounted() {
@@ -159,8 +222,23 @@ export default {
     window.removeEventListener('resize', this.handleResize);
   },
   methods: {
+    closeModal() {
+      this.showModal = false;
+      if (this.modalAction && this.modalAction.type === 'redirect') {
+        this.$router.push(this.modalAction.route);
+      }
+      this.modalAction = null;
+    },
+    showCustomModal(type, title, message, action = null) {
+      this.modalType = type;
+      this.modalTitle = title;
+      this.modalMessage = message;
+      this.modalAction = action;
+      this.showModal = true;
+    },
     async handleLogin() {
       console.log('Login attempt started for user:', this.username);
+      this.isLoading = true;
       try {
         console.log('Sending request to backend...');
         const response = await fetch('http://localhost:3001/auth/login', {
@@ -179,11 +257,17 @@ export default {
           let details = '';
           try {
             const errData = await response.json();
-            details = errData?.message ? ` - ${errData.message}` : '';
+            if (errData?.errorCode === 'NOT_VERIFIED') {
+              this.showCustomModal('error', 'Not Verified', errData.message || 'Account not verified. Redirecting to verification page.', {
+                type: 'redirect', route: { name: 'OtpVerification', query: { email: errData.email || this.username } }
+              });
+              return;
+            }
+            details = errData?.message ? `${errData.message}` : `Login failed (${response.status})`;
           } catch {
-            // ignore
+            details = `Login failed (${response.status})`;
           }
-          throw new Error(`Login failed (${response.status})${details}`);
+          throw new Error(details);
         }
 
         const data = await response.json();
@@ -199,18 +283,20 @@ export default {
         if (user.role === 'student' || user.role === 'intern') {
           localStorage.setItem('user', JSON.stringify(user));
           localStorage.setItem('internUser', JSON.stringify(user));
-          this.$router.push({ name: 'InternDashboard' });
+          this.showCustomModal('success', 'Login Successful', 'Welcome back! Redirecting to dashboard...', { type: 'redirect', route: { name: 'InternDashboard' } });
         } else if (user.role === 'staff') {
           localStorage.setItem('user', JSON.stringify(user));
           localStorage.setItem('staffUser', JSON.stringify(user));
-          this.$router.push({ name: 'StaffDashboard' });
+          this.showCustomModal('success', 'Login Successful', 'Welcome back! Redirecting to dashboard...', { type: 'redirect', route: { name: 'StaffDashboard' } });
         } else {
           console.error('Unhandled role type:', user.role);
           throw new Error('This login page is only for intern and staff accounts.');
         }
       } catch (error) {
         console.error('Login error:', error);
-        alert(error?.message || 'Login failed. Please check your credentials.');
+        this.showCustomModal('error', 'Login Failed', error?.message || 'Please check your credentials and try again.');
+      } finally {
+        this.isLoading = false;
       }
     },
     handleResize() {

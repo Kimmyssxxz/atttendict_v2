@@ -1,18 +1,19 @@
 <template>
-  <div class="min-h-screen flex flex-col md:flex-row bg-gray-100">
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-50/50">
     <AdminSidebar />
     
     <div class="flex-1 flex flex-col">
-      <header class="px-8 py-6 bg-blue-600 text-white">
-        <h1 class="m-0 text-2xl font-bold">DTC Training Evaluations</h1>
+      <header class="px-8 py-6 bg-white text-gray-900">
+        <h1 class="m-0 text-3xl font-semibold">DTC Training Evaluations</h1>
       </header>
       
-      <main class="flex-1 px-8 py-6">
-        <div class="bg-white p-6 rounded-2xl">
+    <main class="flex-1 px-6 py-6 font-sans">
+        <TableSkeleton v-if="loading" :rows="10" />
+        <div v-else class="p-8 bg-white rounded-xl shadow-sm border border-gray-100">
           <!-- Header Section -->
-          <div class="mb-6">
+          <div class="mb-4 pb-8 border-b border-gray-100">
             <h2 class="text-2xl font-medium text-gray-900">DTC Training Evaluations</h2>
-            <p class="text-gray-500 mt-1">Manage and review DTC training evaluation submissions.</p>
+            <p class="text-gray-600">Manage and review DTC training evaluation submissions.</p>
           </div>
 
           <!-- Search and Actions -->
@@ -21,7 +22,7 @@
               <div class="relative flex-1 sm:flex-none">
                 <input 
                   v-model="filters.search" 
-                  class="w-full sm:w-[300px] pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200"
+                  class="w-full sm:w-[300px] pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-200"
                   placeholder="Search evaluations..."
                 />
                 <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +51,7 @@
               <div class="flex gap-2">
                 <button 
                   @click="exportAllToPDF"
-                  class="flex items-center justify-center gap-1 px-3 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 text-sm"
+                  class="flex items-center justify-center gap-1 px-3 py-2 bg-[#b92e2b] text-white rounded-full hover:bg-[#b92e2b]/80 text-sm"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -58,8 +59,17 @@
                   <span>PDF</span>
                 </button>
                 <button 
+                  @click="exportAllToWord"
+                  class="flex items-center justify-center gap-1 px-3 py-2 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 text-sm"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  <span>Word</span>
+                </button>
+                <button 
                   @click="loadEvaluations"
-                  class="flex items-center justify-center gap-1 px-3 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 text-sm"
+                  class="flex items-center justify-center gap-1 px-3 py-2 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 text-sm"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -95,31 +105,31 @@
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 cursor-pointer whitespace-nowrap">
+                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 whitespace-nowrap">
                     <div class="flex items-center">Date</div>
                   </th>
-                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 cursor-pointer whitespace-nowrap">
+                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 whitespace-nowrap">
                     <div class="flex items-center">Name</div>
                   </th>
-                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 cursor-pointer whitespace-nowrap">
+                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 whitespace-nowrap">
                     <div class="flex items-center">Training</div>
                   </th>
-                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 cursor-pointer whitespace-nowrap">
+                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 whitespace-nowrap">
                     <div class="flex items-center">RP</div>
                   </th>
-                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 cursor-pointer whitespace-nowrap">
+                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 whitespace-nowrap">
                     <div class="flex items-center">RP Avg</div>
                   </th>
-                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 cursor-pointer whitespace-nowrap">
+                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 whitespace-nowrap">
                     <div class="flex items-center">Content Avg</div>
                   </th>
-                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 cursor-pointer whitespace-nowrap">
+                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 whitespace-nowrap">
                     <div class="flex items-center">Venue Avg</div>
                   </th>
-                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 cursor-pointer whitespace-nowrap">
+                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 whitespace-nowrap">
                     <div class="flex items-center">Overall</div>
                   </th>
-                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 cursor-pointer whitespace-nowrap">
+                  <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 whitespace-nowrap">
                     <div class="flex items-center">Actions</div>
                   </th>
                 </tr>
@@ -215,25 +225,44 @@
                   </td>
                   
                   <!-- Actions -->
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex gap-2">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex items-center gap-2">
                       <button
                         @click="viewDetails(evaluation)"
-                        class="px-3 py-1 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors text-sm"
+                        class="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded"
+                        title="View details"
                       >
-                        View
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
                       </button>
                       <button
                         @click="exportToPDF(evaluation)"
-                        class="px-3 py-1 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors text-sm"
+                        class="text-[#b92e2b] hover:text-[#b92e2b]/80 p-1 hover:bg-red-50 rounded"
+                        title="Export to PDF"
                       >
-                        PDF
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                      </button>
+                      <button
+                        @click="exportToWord(evaluation)"
+                        class="text-[#133e75] hover:text-[#133e75]/80 p-1 hover:bg-blue-50 rounded"
+                        title="Export to Word"
+                      >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
                       </button>
                       <button
                         @click="openDeleteModal(evaluation.id)"
-                        class="px-3 py-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors text-sm"
+                        class="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded"
+                        title="Delete evaluation"
                       >
-                        Delete
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
                       </button>
                     </div>
                   </td>
@@ -242,22 +271,15 @@
             </table>
           </div>
 
-          <!-- Loading State -->
-          <div v-if="loading" class="text-center py-8">
-            <div class="flex justify-center items-center">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span class="ml-2 text-gray-600">Loading evaluations...</span>
-            </div>
-          </div>
         </div>
       </main>
     </div>
 
     <!-- Details Modal -->
-    <div v-if="showDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div v-if="showDetailsModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 transition-all duration-300">
       <div class="bg-white rounded-2xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold text-gray-900">Evaluation Details</h2>
+          <h2 class="text-3xl font-semibold text-gray-900">Evaluation Details</h2>
           <button
             @click="showDetailsModal = false"
             class="text-gray-400 hover:text-gray-600"
@@ -388,12 +410,7 @@
         
 
         <div class="mt-6 flex justify-end gap-4">
-          <button
-            @click="exportToPDF(selectedEvaluation)"
-            class="px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors"
-          >
-            Export to PDF
-          </button>
+          <span class="flex-1"></span>
           <button
             @click="showDetailsModal = false"
             class="px-4 py-2 bg-gray-300 text-gray-700 rounded-full hover:bg-gray-400 transition-colors"
@@ -405,20 +422,16 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-black/40  flex items-center justify-center p-4 z-50 transition-all duration-300">
       <div class="bg-white rounded-lg shadow-xl max-w-sm w-full">
         <div class="p-6">
-          <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
-            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <h3 class="text-lg font-semibold text-gray-900 text-center mb-2">Delete Evaluation</h3>
+
+          <h3 class="text-2xl font-semibold text-gray-900 text-center mb-2">Delete Evaluation</h3>
           <p class="text-gray-600 text-center mb-6">Are you sure you want to delete this evaluation? This action cannot be undone.</p>
           <div class="flex gap-3">
             <button
               @click="closeDeleteModal"
-              class="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
+              class="flex-1 px-4 py-2  rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 font-medium"
             >
               Cancel
             </button>
@@ -669,6 +682,7 @@
 import { ref, reactive, onMounted, computed, nextTick } from 'vue'
 import { getDtcTrainingEvaluations, getDtcTrainingEvaluationsByDateRange, deleteDtcTrainingEvaluation } from '../../services/clientServices'
 import AdminSidebar from './AdminSidebar.vue'
+import TableSkeleton from '../../components/skeletons/TableSkeleton.vue'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import html2canvas from 'html2canvas'
@@ -839,99 +853,235 @@ const calculateOverallRating = (evaluation) => {
   return (rpAvg * 0.5 + ccAvg * 0.3 + venueAvg * 0.2)
 }
 
-const exportToPDF = async (evaluation) => {
-  pdfTargetEvaluation.value = evaluation
-  await nextTick()
-  
-  // Wait to ensure all CSS rendering is painted
-  await new Promise(resolve => setTimeout(resolve, 150))
-  
-  if (!pdfExportArea.value) {
-    console.error("PDF export area not found")
-    pdfTargetEvaluation.value = null
-    return
-  }
+const loadImage = (url) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = (e) => reject(e)
+    img.src = url
+  })
+}
 
+const getBase64Image = async (url) => {
   try {
-    const canvas = await html2canvas(pdfExportArea.value, {
-      scale: 2, // High resolution
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff'
-    })
-    
-    const imgData = canvas.toDataURL('image/png')
-    
-    // Set a constant width (210mm is A4 width)
-    const pdfWidth = 210
-    // Calculate required height based on canvas ratio
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width
-    // Ensure the PDF is at least a full standard A4 page (297mm) tall
-    const finalHeight = Math.max(pdfHeight, 297)
-    
-    // Create a PDF with a CUSTOM format height so it natively fits the entire evaluation seamlessly on one long page
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: [pdfWidth, finalHeight]
-    })
-    
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
-    
-    const fileName = `DTC_Evaluation_${evaluation.fullName?.replace(/[^a-zA-Z0-9]/g, '_') || 'Unknown'}_${formatDate(evaluation.submittedAt).replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
-    pdf.save(fileName)
-  } catch (err) {
-    console.error("Failed to generate PDF:", err)
-  } finally {
-    pdfTargetEvaluation.value = null
+    const img = await loadImage(url)
+    const canvas = document.createElement('canvas')
+    canvas.width = img.width
+    canvas.height = img.height
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0)
+    return canvas.toDataURL('image/png')
+  } catch(e) {
+    return ''
   }
 }
 
-const exportAllToPDF = async () => {
-  isExportingAll.value = true
-  await nextTick()
+const exportToPDF = async (evaluation) => {
+  const doc = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' })
+  const pageWidth = doc.internal.pageSize.getWidth()
   
-  // Wait to ensure styling paints
-  await new Promise(resolve => setTimeout(resolve, 150))
-  
-  if (!pdfExportAllArea.value) {
-    console.error("PDF export area not found")
-    isExportingAll.value = false
-    return
-  }
-
   try {
-    const canvas = await html2canvas(pdfExportAllArea.value, {
-      scale: 2, // High resolution
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff'
-    })
-    
-    const imgData = canvas.toDataURL('image/png')
-    
-    // Set a constant width (Landscape A4 width is 297mm)
-    const pdfWidth = 297
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width
-    // Ensure the PDF is at least a full standard landscape A4 page (210mm) tall
-    const finalHeight = Math.max(pdfHeight, 210)
-    
-    // Create custom formatting landscape page perfectly fitting the table
-    const pdf = new jsPDF({
-      orientation: 'landscape',
-      unit: 'mm',
-      format: [pdfWidth, finalHeight]
-    })
-    
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
-    
-    const fileName = `All_DTC_Evaluations_${new Date().toISOString().split('T')[0]}.pdf`
-    pdf.save(fileName)
-  } catch (err) {
-    console.error("Failed to generate PDF:", err)
-  } finally {
-    isExportingAll.value = false
-  }
+    const logo1 = await loadImage('/dictlogo2.png')
+    const logo2 = await loadImage('/Bagongpilipinas.png')
+    // Logo size: 60x60
+    doc.addImage(logo1, 'PNG', 35, 10, 60, 60)
+    doc.addImage(logo2, 'PNG', pageWidth - 95, 10, 60, 60)
+  } catch(e) { console.error('Error loading logos', e) }
+
+  doc.setFont('Times', 'normal')
+  doc.setFontSize(10)
+  const text1 = 'REPUBLIC OF THE PHILIPPINES'
+  doc.text(text1, pageWidth / 2, 30, { align: 'center' })
+
+  doc.setFont('Times', 'bold')
+  doc.setFontSize(11)
+  const text2 = 'DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY'
+  doc.text(text2, pageWidth / 2, 45, { align: 'center' })
+
+  doc.setFont('Times', 'normal')
+  doc.setFontSize(11)
+  const text3 = 'Training Evaluation Individual Report'
+  doc.text(text3, pageWidth / 2, 65, { align: 'center' })
+
+  const details = [
+    ['Name:', evaluation.fullName || 'N/A'],
+    ['Training Title:', evaluation.trainingTitle || 'N/A'],
+    ['Reference Person:', evaluation.resourcePerson || 'N/A'],
+    ['Date Submitted:', formatDate(evaluation.submittedAt)]
+  ]
+
+  autoTable(doc, {
+    body: details,
+    startY: 110,
+    styles: { fontSize: 10 },
+    theme: 'plain'
+  })
+
+  // Summary Ratings
+  const summaryData = [
+    ['Category', 'Average Rating'],
+    ['Resource Person', calculateAverageRating(evaluation.resourcePersonEvaluation).toFixed(1)],
+    ['Course Content', calculateAverageRating(evaluation.courseContentEvaluation).toFixed(1)],
+    ['Venue', calculateAverageRating(evaluation.venueEvaluation).toFixed(1)],
+    ['Overall Rating', calculateOverallRating(evaluation).toFixed(1)]
+  ]
+
+  autoTable(doc, {
+    head: [summaryData[0]],
+    body: summaryData.slice(1),
+    startY: doc.lastAutoTable.finalY + 20,
+    headStyles: { fillColor: [59, 130, 246] }
+  })
+
+  const fileName = `Evaluation_${evaluation.fullName?.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
+  doc.save(fileName)
+}
+
+const exportToWord = async (evaluation) => {
+  const logoDict = await getBase64Image('/dictlogo2.png')
+  const logoBp = await getBase64Image('/Bagongpilipinas.png')
+  const dictImgHtml = logoDict ? `<img src="${logoDict}" width="75" height="75" />` : ''
+  const bpImgHtml = logoBp ? `<img src="${logoBp}" width="75" height="75" />` : ''
+
+  let html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset='utf-8'><title>Evaluation Report</title></head>
+    <body style="font-family: 'Times New Roman', serif;">
+      <table width="100%" style="margin-bottom: 20px;">
+        <tr>
+          <td width="20%" align="left">${dictImgHtml}</td>
+          <td width="60%" align="center">
+            <p style="font-size: 14pt; margin: 0;">REPUBLIC OF THE PHILIPPINES</p>
+            <p style="font-size: 12pt; font-weight: bold; margin: 0;">DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY</p>
+            <p style="font-size: 12pt; margin: 10px 0 0 0;">Training Evaluation Individual Report</p>
+          </td>
+          <td width="20%" align="right">${bpImgHtml}</td>
+        </tr>
+      </table>
+      <h3>Participant Information</h3>
+      <p><b>Name:</b> ${evaluation.fullName || 'N/A'}</p>
+      <p><b>Training:</b> ${evaluation.trainingTitle || 'N/A'}</p>
+      <p><b>Resource Person:</b> ${evaluation.resourcePerson || 'N/A'}</p>
+      <p><b>Date:</b> ${formatDate(evaluation.submittedAt)}</p>
+      
+      <h3>Rating Summary</h3>
+      <table border="1" cellspacing="0" cellpadding="5" style="border-collapse: collapse; width: 100%;">
+        <tr style="background-color: #f2f2f2;"><th>Category</th><th>Rating</th></tr>
+        <tr><td>Resource Person</td><td>${calculateAverageRating(evaluation.resourcePersonEvaluation).toFixed(1)}</td></tr>
+        <tr><td>Course Content</td><td>${calculateAverageRating(evaluation.courseContentEvaluation).toFixed(1)}</td></tr>
+        <tr><td>Venue</td><td>${calculateAverageRating(evaluation.venueEvaluation).toFixed(1)}</td></tr>
+        <tr><td><b>Overall Rating</b></td><td><b>${calculateOverallRating(evaluation).toFixed(1)}</b></td></tr>
+      </table>
+    </body></html>`
+
+  const blob = new Blob(['\ufeff', html], { type: 'application/msword' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `Evaluation_${evaluation.fullName?.replace(/[^a-zA-Z0-9]/g, '_')}.doc`
+  link.click()
+}
+
+const exportAllToPDF = async () => {
+  const doc = new jsPDF({ unit: 'pt', format: 'legal', orientation: 'landscape' })
+  const pageWidth = doc.internal.pageSize.getWidth()
+  
+  try {
+    const logo1 = await loadImage('/dictlogo2.png')
+    const logo2 = await loadImage('/Bagongpilipinas.png')
+    doc.addImage(logo1, 'PNG', 40, 10, 65, 65)
+    doc.addImage(logo2, 'PNG', pageWidth - 105, 10, 65, 65)
+  } catch(e) { console.error('Error loading logos', e) }
+
+  doc.setFont('Times', 'normal')
+  doc.setFontSize(11)
+  doc.text('REPUBLIC OF THE PHILIPPINES', pageWidth / 2, 35, { align: 'center' })
+  doc.setFont('Times', 'bold')
+  doc.setFontSize(13)
+  doc.text('DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY', pageWidth / 2, 55, { align: 'center' })
+  doc.setFont('Times', 'normal')
+  doc.setFontSize(12)
+  doc.text('DTC Training Evaluations Report', pageWidth / 2, 75, { align: 'center' })
+
+  const tableColumn = ["Date", "Name", "Training", "RP", "RP Avg", "Content Avg", "Venue Avg", "Overall"]
+  const tableRows = filteredEvaluations.value.map(e => [
+    formatDate(e.submittedAt),
+    e.fullName || 'N/A',
+    e.trainingTitle || 'N/A',
+    e.resourcePerson || 'N/A',
+    calculateAverageRating(e.resourcePersonEvaluation).toFixed(1),
+    calculateAverageRating(e.courseContentEvaluation).toFixed(1),
+    calculateAverageRating(e.venueEvaluation).toFixed(1),
+    calculateOverallRating(e).toFixed(1)
+  ])
+
+  autoTable(doc, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 110,
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [59, 130, 246] }
+  })
+
+  doc.save(`All_DTC_Evaluations_${new Date().toISOString().split('T')[0]}.pdf`)
+}
+
+const exportAllToWord = async () => {
+  const logoDict = await getBase64Image('/dictlogo2.png')
+  const logoBp = await getBase64Image('/Bagongpilipinas.png')
+  const dictImgHtml = logoDict ? `<img src="${logoDict}" width="75" height="75" />` : ''
+  const bpImgHtml = logoBp ? `<img src="${logoBp}" width="75" height="75" />` : ''
+
+  let html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head>
+      <meta charset='utf-8'>
+      <style>
+        @page WordSection1 { size: 841.9pt 595.3pt; mso-page-orientation: landscape; margin: 1.0in; }
+        div.WordSection1 { page: WordSection1; }
+        table { border-collapse: collapse; width: 100%; font-size: 10pt; }
+        th, td { border: 1px solid black; padding: 5px; text-align: left; }
+        th { background-color: #f2f2f2; }
+      </style>
+    </head>
+    <body>
+      <div class="WordSection1">
+        <table width="100%" style="border: none; margin-bottom: 20px;">
+          <tr style="border: none;">
+            <td width="20%" style="border: none;">${dictImgHtml}</td>
+            <td width="60%" align="center" style="border: none;">
+              <p style="font-size: 14pt; margin: 0;">REPUBLIC OF THE PHILIPPINES</p>
+              <p style="font-size: 12pt; font-weight: bold; margin: 0;">DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY</p>
+              <p style="font-size: 12pt; margin: 10px 0 0 0;">DTC Training Evaluations Report</p>
+            </td>
+            <td width="20%" style="border: none;">${bpImgHtml}</td>
+          </tr>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th><th>Name</th><th>Training</th><th>RP</th><th>RP Avg</th><th>Content</th><th>Venue</th><th>Overall</th>
+            </tr>
+          </thead>
+          <tbody>`
+
+  filteredEvaluations.value.forEach(e => {
+    html += `<tr>
+      <td>${formatDate(e.submittedAt)}</td>
+      <td>${e.fullName || 'N/A'}</td>
+      <td>${e.trainingTitle || 'N/A'}</td>
+      <td>${e.resourcePerson || 'N/A'}</td>
+      <td>${calculateAverageRating(e.resourcePersonEvaluation).toFixed(1)}</td>
+      <td>${calculateAverageRating(e.courseContentEvaluation).toFixed(1)}</td>
+      <td>${calculateAverageRating(e.venueEvaluation).toFixed(1)}</td>
+      <td>${calculateOverallRating(e).toFixed(1)}</td>
+    </tr>`
+  })
+
+  html += `</tbody></table></div></body></html>`
+
+  const blob = new Blob(['\ufeff', html], { type: 'application/msword' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `All_DTC_Evaluations_${new Date().toISOString().split('T')[0]}.doc`
+  link.click()
 }
 
 onMounted(() => {
@@ -945,21 +1095,7 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
-  border: 1px solid #e5e7eb;
-}
-
-/* Modal backdrop */
-.fixed {
-  position: fixed;
-}
-
-.inset-0 {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
+/* Modal backdrop scroll lock helper or redundant styles (Tailwind handles fixed inset-0) */
 
 /* Scrollbar for modal */
 .overflow-y-auto::-webkit-scrollbar {

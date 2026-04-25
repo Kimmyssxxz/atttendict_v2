@@ -105,17 +105,25 @@
             </div>
             <div class="flex gap-4 justify-center">
               <button 
-                class="flex-1 max-w-[180px] py-3.5 px-4 rounded-xl border-none text-[1rem] font-medium cursor-pointer transition-all hover:opacity-90 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:opacity-100 bg-[#eebb3b] text-white" 
+                class="flex-1 max-w-[180px] py-3.5 px-4 rounded-xl border-none text-[1rem] font-medium cursor-pointer transition-all hover:opacity-90 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:opacity-100 bg-[#eebb3b] text-white flex justify-center items-center" 
                 :disabled="loading || hasOpenSession" 
                 @click="startTimeIn"
               >
+                <svg v-if="loading && loadingType === 'in'" class="animate-spin -ml-1 mr-2 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
                 {{ loading && loadingType === 'in' ? 'Saving...' : 'Time in' }}
               </button>
               <button 
-                class="flex-1 max-w-[180px] py-3.5 px-4 rounded-xl border-none text-[1rem] font-medium cursor-pointer transition-all hover:opacity-90 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:opacity-100 bg-[#b92e2b] text-white" 
+                class="flex-1 max-w-[180px] py-3.5 px-4 rounded-xl border-none text-[1rem] font-medium cursor-pointer transition-all hover:opacity-90 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:opacity-100 bg-[#b92e2b] text-white flex justify-center items-center" 
                 :disabled="loading || !hasOpenSession" 
                 @click="startTimeOut"
               >
+                <svg v-if="loading && loadingType === 'out'" class="animate-spin -ml-1 mr-2 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
                 {{ loading && loadingType === 'out' ? 'Saving...' : 'Time out' }}
               </button>
             </div>
@@ -229,17 +237,25 @@
           </div>
           <div class="flex gap-4 justify-center">
             <button 
-              class="flex-1 py-2.5 px-1.5 rounded-xl border-none text-base font-medium cursor-pointer transition-all hover:opacity-90 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:opacity-100 bg-[#eebb3b] text-white" 
+              class="flex-1 py-2.5 px-1.5 rounded-xl border-none text-base font-medium cursor-pointer transition-all hover:opacity-90 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:opacity-100 bg-[#eebb3b] text-white flex justify-center items-center" 
               :disabled="loading || hasOpenSession" 
               @click="startTimeIn"
             >
+              <svg v-if="loading && loadingType === 'in'" class="animate-spin -ml-0.5 mr-1.5 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
               {{ loading && loadingType === 'in' ? 'Saving...' : 'Time in' }}
             </button>
             <button 
-              class="flex-1 py-2.5 px-1.5 rounded-xl border-none text-base font-medium cursor-pointer transition-all hover:opacity-90 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:opacity-100 bg-[#b92e2b] text-white" 
+              class="flex-1 py-2.5 px-1.5 rounded-xl border-none text-base font-medium cursor-pointer transition-all hover:opacity-90 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed disabled:opacity-100 bg-[#b92e2b] text-white flex justify-center items-center" 
               :disabled="loading || !hasOpenSession" 
               @click="startTimeOut"
             >
+              <svg v-if="loading && loadingType === 'out'" class="animate-spin -ml-0.5 mr-1.5 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
               {{ loading && loadingType === 'out' ? 'Saving...' : 'Time out' }}
             </button>
           </div>
@@ -897,6 +913,10 @@ export default {
         this.openModal('Error', 'No logged-in intern found. Please login again.', 'error');
         return;
       }
+      
+      this.loading = true;
+      this.loadingType = 'in';
+      
       let location = null;
       let reverseGeocodedAddress = '';
       if (navigator.geolocation) {
@@ -934,8 +954,7 @@ export default {
         } catch (e) {
         }
       }
-      this.loading = true
-      this.loadingType = 'in'
+      
       try {
         const res = await fetch('http://localhost:3001/attendance/intern/time-in', {
           method: 'POST',

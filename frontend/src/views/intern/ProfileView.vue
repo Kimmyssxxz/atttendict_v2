@@ -28,6 +28,10 @@
             </div>
             <span v-if="unreadCount > 0" class="bg-red-500 text-white rounded-full text-[10px] px-2 py-0.5 min-w-[20px] text-center shadow-sm font-bold group-hover:bg-red-600 transition-colors">{{ unreadCount }}</span>
           </router-link>
+        
+          <button type="button" @click="confirmLogout" class="text-white no-underline px-4 py-3 rounded-lg text-lg font-medium transition-colors hover:bg-red-500/20 hover:text-red-100 border border-transparent flex items-center gap-3 cursor-pointer w-full text-left bg-transparent mt-auto mt-4">
+            <span class="w-[24px] h-[24px] shrink-0 bg-current inline-block" :style="{ WebkitMaskImage: icons.logout, WebkitMaskSize: 'cover', maskImage: icons.logout, maskSize: 'cover' }"></span> Logout
+          </button>
         </nav>
       </div>
 
@@ -235,7 +239,10 @@
 
             <!-- Save Profile Button (Mobile) -->
             <div class="flex flex-col items-center gap-4 px-2 mt-4 mb-20">
-              <button @click="handleSaveInfo" :disabled="infoSaving" class="w-full py-3.5 rounded-2xl bg-[#eebb3b] text-white font-semibold shadow-lg shadow-[#eebb3b]/20 text-sm ">
+              <button type="button" @click="confirmLogout" class="w-full py-3.5 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-all shadow-md mb-2">
+                Logout
+              </button>
+              <button @click="handleSaveInfo" :disabled="infoSaving" class="w-full py-3.5 rounded-xl bg-[#133e75] text-white font-semibold text-sm ">
                 {{ infoSaving ? 'Saving...' : 'Save Profile Changes' }}
               </button>
             </div>
@@ -429,6 +436,9 @@
 
             <!-- Save Changes Button (Desktop) -->
             <div class="flex items-center justify-end gap-5 mt-6 mb-10 pr-2">
+              <button type="button" @click="confirmLogout" class="px-10 py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-all shadow-md">
+                Logout
+              </button>
               <button type="button" @click="handleSaveInfo" :disabled="infoSaving" class="px-10 py-3 rounded-xl bg-[#eebb3b] text-white font-bold hover:bg-[#eebb3b]/90 transition-all shadow-md">
                 {{ infoSaving ? 'Saving...' : 'Save Profile Changes' }}
               </button>
@@ -457,8 +467,39 @@
         <span v-if="unreadCount > 0" class="absolute top-1 right-1 bg-red-500 text-white rounded-full text-[10px] px-1 py-0 min-w-[16px] text-center shadow-sm font-bold">{{ unreadCount }}</span>
       </router-link>
     </nav>
-  </div>
-</template>
+ 
+     <!-- Logout Confirmation Modal -->
+     <Transition name="modal">
+       <div v-if="showLogoutModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[9999]">
+         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center border border-gray-100">
+           <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+             <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+             </svg>
+           </div>
+           <h3 class="text-2xl font-bold text-gray-900 mb-2">Sign Out</h3>
+           <p class="text-gray-600 mb-8">
+             Are you sure you want to log out of your account?
+           </p>
+           <div class="flex gap-3">
+             <button 
+               @click="showLogoutModal = false"
+               class="flex-1 py-3 bg-gray-50 text-gray-700 rounded-xl font-semibold hover:bg-gray-100 transition-all cursor-pointer"
+             >
+               Cancel
+             </button>
+             <button 
+               @click="executeLogout"
+               class="flex-1 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition-all cursor-pointer"
+             >
+               Logout
+             </button>
+           </div>
+         </div>
+       </div>
+     </Transition>
+   </div>
+ </template>
 
 
 <script>
@@ -473,6 +514,7 @@ export default {
       showGenderDropdown: false,
       showYearDropdown: false,
       icons: {
+        logout: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14l5-5l-5-5m5 5H9'/%3E%3C/svg%3E\")",
         dashboard: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M11 4.68v3.88a2.45 2.45 0 0 1-1.509 2.258A2.4 2.4 0 0 1 8.56 11H4.68a2.44 2.44 0 0 1-2.43-2.44V4.69a2.44 2.44 0 0 1 2.43-2.44h3.88A2.44 2.44 0 0 1 11 4.68m10.75.01v3.87a2.4 2.4 0 0 1-.71 1.72a2.38 2.38 0 0 1-1.72.72h-3.88a2.45 2.45 0 0 1-2.256-1.502A2.4 2.4 0 0 1 13 8.56V4.69a2.4 2.4 0 0 1 .72-1.72a2.42 2.42 0 0 1 1.72-.72h3.88a2.44 2.44 0 0 1 2.43 2.44M11 15.45v3.87a2.44 2.44 0 0 1-2.44 2.43H4.68a2.45 2.45 0 0 1-1.72-.71a2.4 2.4 0 0 1-.71-1.72v-3.87a2.4 2.4 0 0 1 .71-1.72A2.47 2.47 0 0 1 4.68 13h3.88A2.46 2.46 0 0 1 11 15.45m10.75 1.93A4.37 4.37 0 1 1 17.37 13a4.4 4.4 0 0 1 4.049 2.707c.22.53.332 1.099.331 1.673'/%3E%3C/svg%3E\")",
         time: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M3 12a9 9 0 1 0 18 0a9 9 0 0 0-18 0'/%3E%3Cpath d='M12 7v5l3 3'/%3E%3C/g%3E%3C/svg%3E\")",
         attendance: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2'/%3E%3Cpath d='M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2m0 12v-5m3 5v-1m3 1v-3'/%3E%3C/g%3E%3C/svg%3E\")",
@@ -525,6 +567,7 @@ export default {
       sessions: [],
       isInitialLoading: true,
       isDesktop: window.innerWidth >= 1024,
+      showLogoutModal: false,
     };
   },
   computed: {
@@ -581,6 +624,19 @@ export default {
     window.removeEventListener('resize', this.handleResize);
   },
   methods: {
+    confirmLogout() {
+      this.showLogoutModal = true;
+    },
+    executeLogout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('internUser');
+      const internId = this.internId || (this.intern && this.intern.id);
+      if (internId) {
+        localStorage.removeItem('internNotifications_' + internId);
+        localStorage.removeItem('internNotificationsUnread_' + internId);
+      }
+      this.$router.push('/auth/login');
+    },
     handleResize() {
       this.isDesktop = window.innerWidth >= 1024;
     },
@@ -905,5 +961,39 @@ export default {
   },
 };
 </script>
+ 
+ <style scoped>
+ .custom-scrollbar::-webkit-scrollbar {
+   width: 4px;
+ }
+ .custom-scrollbar::-webkit-scrollbar-track {
+   background: transparent;
+ }
+ .custom-scrollbar::-webkit-scrollbar-thumb {
+   background: #e2e8f0;
+   border-radius: 10px;
+ }
+ .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+   background: #cbd5e1;
+ }
+ 
+ .modal-enter-active,
+ .modal-leave-active {
+   transition: opacity 0.3s ease;
+ }
+ 
+ .modal-enter-from,
+ .modal-leave-to {
+   opacity: 0;
+ }
+ 
+ .modal-enter-active .bg-white {
+   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+ }
+ 
+ .modal-enter-from .bg-white {
+   transform: scale(0.9) translateY(20px);
+ }
+ </style>
 
 

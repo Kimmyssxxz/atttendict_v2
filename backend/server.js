@@ -1,11 +1,87 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
+const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 
+const nodemailer = require('nodemailer');
+
+let transporter;
+
+async function initMailer() {
+  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+    console.log('[Mailer] Custom SMTP configuration loaded.');
+  } else {
+    // Fallback to test account
+    const testAccount = await nodemailer.createTestAccount();
+    transporter = nodemailer.createTransport({
+      host: testAccount.smtp.host,
+      port: testAccount.smtp.port,
+      secure: testAccount.smtp.secure,
+      auth: {
+        user: testAccount.user,
+        pass: testAccount.pass,
+      },
+    });
+    console.log('[Mailer] Running in Testing mode (Ethereal test account). Emails will not reach real inboxes.');
+  }
+}
+initMailer();
+
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+async function sendOtpEmail(email, otp, context = 'verify') {
+  if (!transporter) {
+    console.warn(`[OTP] Mailer not initialized yet. OTP for ${email} is ${otp}`);
+    return;
+  }
+  try {
+    let subject = 'Verify your Attendict account';
+    let textBody = `Welcome to Attendict!\n\nYour verification code is: ${otp}\n\nThis code will expire in 10 minutes.`;
+    let htmlHeading = 'Welcome to Attendict!';
+    let htmlIntro = 'Your verification code is:';
+    
+    if (context === 'password_reset') {
+      subject = 'Password Reset Request';
+      textBody = `You requested a password reset.\n\nYour reset code is: ${otp}\n\nThis code will expire in 10 minutes.\nIf you did not request this, please ignore this email.`;
+      htmlHeading = 'Password Reset Request';
+      htmlIntro = 'Your password reset code is:';
+    }
+
+    const info = await transporter.sendMail({
+      from: `"Attendict" <${process.env.SMTP_USER || 'no-reply@attendict.test'}>`,
+      to: email,
+      subject: subject,
+      text: textBody,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h2>${htmlHeading}</h2>
+          <p>${htmlIntro}</p>
+          <h1 style="color: #133e75; letter-spacing: 2px;">${otp}</h1>
+          <p>This code will expire in 10 minutes.</p>
+        </div>
+      `
+    });
+    console.log(`[OTP] Sent to ${email}`);
+    if (!process.env.SMTP_USER) {
+      console.log(`[OTP Test Mode] Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+    }
+  } catch (error) {
+    console.error(`[OTP] Email failed for ${email}:`, error);
+  }
+}
 
 // Make sure you create backend/serviceAccountKey.json from Firebase Console
 let credential;
@@ -38,6 +114,7 @@ admin.initializeApp({ credential });
 
 const db = admin.firestore();
 const app = express();
+let rfidRegisterMode = null;
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
@@ -295,6 +372,16 @@ app.get('/geo/reverse', async (req, res) => {
   }
 })();
 
+function getEffectiveDayTag({ tagging, tagAM, tagPM }) {
+  if (tagAM === 'Overtime' || tagPM === 'Overtime') {
+    return 'Overtime';
+  }
+  if (tagging === 'Overtime') {
+    return 'Overtime';
+  }
+  return 'Normal Hours';
+}
+
 function getTodayInfo() {
   const now = new Date();
   
@@ -414,9 +501,17 @@ async function loginWithRole(req, res, expectedRole) {
     }
 
     const usersRef = db.collection('users');
+    const usernameNormalized = String(username || '').trim();
+    const usernameCandidates = Array.from(
+      new Set([
+        usernameNormalized,
+        usernameNormalized.toLowerCase(),
+        usernameNormalized.toUpperCase(),
+      ])
+    ).slice(0, 10);
+
     const snapshot = await usersRef
-      .where('username', '==', username)
-      .where('password', '==', password)
+      .where('username', 'in', usernameCandidates)
       .limit(1)
       .get();
 
@@ -426,6 +521,12 @@ async function loginWithRole(req, res, expectedRole) {
 
     const userDoc = snapshot.docs[0];
     const user = userDoc.data();
+
+    // Verify hashed password
+    const isPasswordValid = await bcrypt.compare(password, user.password || '');
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid username or password' });
+    }
 
     if (user.role !== expectedRole) {
       return res.status(403).json({
@@ -486,9 +587,20 @@ app.post('/auth/login', async (req, res) => {
     const userDoc = snapshot.docs[0];
     const user = userDoc.data();
 
+    // Verify hashed password
     const storedPassword = String(user?.password || '').trim();
-    if (!storedPassword || storedPassword !== passwordNormalized) {
+    const isPasswordValid = await bcrypt.compare(passwordNormalized, storedPassword);
+    
+    if (!storedPassword || !isPasswordValid) {
       return res.status(401).json({ message: 'Invalid username or password' });
+    }
+
+    if (user.isVerified === false) {
+      return res.status(403).json({ 
+        errorCode: 'NOT_VERIFIED', 
+        message: 'Account not verified. Please check your email for the OTP.', 
+        email: user.email 
+      });
     }
 
     const normalizedRole = user.role === 'intern' ? 'student' : user.role;
@@ -932,6 +1044,12 @@ app.post('/auth/intern/register', async (req, res) => {
 
     const { dateString } = getTodayInfo();
 
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const otpCode = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 10 * 60000); // 10 minutes
+
     const docRef = await db.collection('users').add({
       username,
       firstName,
@@ -948,9 +1066,14 @@ app.post('/auth/intern/register', async (req, res) => {
       todayPmTag: 'Normal Hours',
       taggingLastResetDate: dateString,
 
-      password,
+      password: hashedPassword,
+      isVerified: false,
+      otpCode,
+      otpExpiresAt,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    await sendOtpEmail(email, otpCode);
 
     return res.status(201).json({
       message: 'Intern registered successfully',
@@ -958,6 +1081,208 @@ app.post('/auth/intern/register', async (req, res) => {
     });
   } catch (err) {
     console.error('Intern register error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Admin: register a new staff member securely
+app.post('/auth/staff/register', async (req, res) => {
+  try {
+    const {
+      username,
+      firstName,
+      lastName,
+      email,
+      password,
+      position,
+      assignedOffice,
+      phone,
+      gender,
+      dateOfBirth,
+      address,
+    } = req.body;
+
+    if (!username || !password || !firstName || !lastName || !email) {
+      return res.status(400).json({ message: 'Username, password, first name, last name, and email are required' });
+    }
+
+    const usersRef = db.collection('users');
+    const existingSnap = await usersRef.where('username', '==', username).limit(1).get();
+    if (!existingSnap.empty) {
+      return res.status(409).json({ message: 'Username already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const otpCode = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 10 * 60000); // 10 minutes
+
+    const docRef = await usersRef.add({
+      username,
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      role: 'staff',
+      position: position || '',
+      assignedOffice: assignedOffice || '',
+      phone: phone || '',
+      gender: gender || '',
+      dateOfBirth: dateOfBirth || '',
+      address: address || '',
+      isVerified: false,
+      otpCode,
+      otpExpiresAt,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await sendOtpEmail(email, otpCode);
+
+    return res.status(201).json({
+      message: 'Staff registered successfully',
+      userId: docRef.id,
+    });
+  } catch (err) {
+    console.error('Staff register error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.post('/auth/verify-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ message: 'Email and OTP are required' });
+
+    const snap = await db.collection('users').where('email', '==', email).limit(1).get();
+    if (snap.empty) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userDoc = snap.docs[0];
+    const user = userDoc.data();
+
+    if (user.isVerified) {
+      return res.json({ message: 'Account is already verified' });
+    }
+
+    if (user.otpCode !== otp.trim()) {
+      return res.status(400).json({ message: 'Invalid OTP code' });
+    }
+
+    const now = new Date();
+    const expiresAt = user.otpExpiresAt ? user.otpExpiresAt.toDate ? user.otpExpiresAt.toDate() : new Date(user.otpExpiresAt) : null;
+    if (!expiresAt || now > expiresAt) {
+      return res.status(400).json({ message: 'OTP has expired' });
+    }
+
+    await userDoc.ref.update({
+      isVerified: true,
+      otpCode: admin.firestore.FieldValue.delete(),
+      otpExpiresAt: admin.firestore.FieldValue.delete(),
+    });
+
+    return res.json({ message: 'Account verified successfully' });
+  } catch (err) {
+    console.error('Verify OTP error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.post('/auth/resend-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+
+    const snap = await db.collection('users').where('email', '==', email).limit(1).get();
+    if (snap.empty) return res.status(404).json({ message: 'User not found' });
+
+    const userDoc = snap.docs[0];
+    const user = userDoc.data();
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: 'Account is already verified' });
+    }
+
+    const otpCode = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 10 * 60000);
+
+    await userDoc.ref.update({
+      otpCode,
+      otpExpiresAt,
+    });
+
+    await sendOtpEmail(email, otpCode);
+
+    return res.json({ message: 'OTP resent successfully' });
+  } catch (err) {
+    console.error('Resend OTP error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.post('/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+
+    const snap = await db.collection('users').where('email', '==', email).limit(1).get();
+    if (snap.empty) {
+      // Default success to not leak emails
+      return res.json({ message: 'If that email exists, an OTP has been sent.' });
+    }
+
+    const userDoc = snap.docs[0];
+    
+    const otpCode = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 10 * 60000);
+
+    await userDoc.ref.update({
+      resetOtpCode: otpCode,
+      resetOtpExpiresAt: otpExpiresAt,
+    });
+
+    await sendOtpEmail(email, otpCode, 'password_reset');
+
+    return res.json({ message: 'If that email exists, an OTP has been sent.' });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.post('/auth/reset-password', async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) return res.status(400).json({ message: 'Required fields missing' });
+
+    const snap = await db.collection('users').where('email', '==', email).limit(1).get();
+    if (snap.empty) return res.status(404).json({ message: 'User not found' });
+
+    const userDoc = snap.docs[0];
+    const user = userDoc.data();
+
+    if (!user.resetOtpCode || user.resetOtpCode !== otp.trim()) {
+      return res.status(400).json({ message: 'Invalid OTP code' });
+    }
+
+    const now = new Date();
+    const expiresAt = user.resetOtpExpiresAt ? user.resetOtpExpiresAt.toDate ? user.resetOtpExpiresAt.toDate() : new Date(user.resetOtpExpiresAt) : null;
+    if (!expiresAt || now > expiresAt) {
+      return res.status(400).json({ message: 'OTP has expired' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await userDoc.ref.update({
+      password: hashedPassword,
+      resetOtpCode: admin.firestore.FieldValue.delete(),
+      resetOtpExpiresAt: admin.firestore.FieldValue.delete(),
+    });
+
+    return res.json({ message: 'Password reset successfully' });
+  } catch (err) {
+    console.error('Reset password error:', err);
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
@@ -1588,6 +1913,7 @@ app.get('/admin/attendance/today-interns', async (req, res) => {
         firstName: user.firstName || '',
         middleName: user.middleName || '',
         lastName: user.lastName || '',
+        photoURL: user.photoURL || user.photoUrl || user.avatarUrl || user.profilePicture || '',
         ojtRequiredHours: user.ojtRequiredHours ?? null,
         tagging: (attendance && attendance.tagging) || user.tagging || null,
         todayAmTag: (attendance && attendance.tagAM) || user.todayAmTag || null,
@@ -1630,6 +1956,9 @@ app.get('/admin/ojt-summary', async (req, res) => {
 
     for (const docSnap of usersSnap.docs) {
       const user = docSnap.data();
+      if (user.isArchived) {
+        continue;
+      }
       const position = (user.position || '').toLowerCase();
       if (position !== 'intern') {
         continue;
@@ -1822,9 +2151,9 @@ app.post('/admin/attendance/retag-session', async (req, res) => {
   }
 });
 
-const PORT = 3001;
-app.listen(PORT, () => {
-  console.log(`Backend server running on http://localhost:${PORT}`);
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Backend server running on port ${PORT}`);
 });
 
 // Update basic user info (school, phone, email, etc.)
@@ -1944,12 +2273,17 @@ app.post('/users/:id/change-password', async (req, res) => {
     }
 
     const user = snap.data();
-    if (user.password !== currentPassword) {
+    // Verify current hashed password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password || '');
+    if (!isPasswordValid) {
       return res.status(400).json({ message: 'Current password is incorrect' });
     }
 
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
     await userRef.update({
-      password: newPassword,
+      password: hashedNewPassword,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
@@ -2068,3 +2402,229 @@ app.get('/attendance/intern/history', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+/**
+ * NEW: RFID Scan Endpoint for ESP32 Hardware integration
+ * Handles both identification and attendance recording.
+ */
+app.post('/api/rfid/scan', async (req, res) => {
+  try {
+    const { uid } = req.body;
+    if (!uid) {
+      return res.status(400).json({ message: 'UID is required' });
+    }
+
+    const { dateString, timeString, now } = getTodayInfo();
+
+    // --- NEW: Registration Mode Logic ---
+    if (rfidRegisterMode) {
+      const targetUserId = rfidRegisterMode;
+      
+      // Check if this card is already registered to someone else
+      const existingQuery = await db.collection('users').where('rfid', '==', uid).limit(1).get();
+      if (!existingQuery.empty) {
+        const existingUser = existingQuery.docs[0];
+        if (existingUser.id !== targetUserId) {
+          const userData = existingUser.data();
+          const existingName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || userData.username || 'User';
+          return res.json({
+            status: 'error',
+            message: 'ALREADY USED',
+            name: existingName
+          });
+        }
+      }
+
+      const userRef = db.collection('users').doc(targetUserId);
+      const userSnap = await userRef.get();
+      
+      if (userSnap.exists) {
+        const userData = userSnap.data();
+        const userName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || userData.username || 'User';
+        
+        await userRef.update({
+          rfid: uid,
+          rfidUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Update system doc to notify frontend
+        try {
+          await db.collection('system').doc('rfid_scanner').set({
+            lastScannedUID: uid,
+            status: 'registered',
+            userName: userName,
+            scannedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+        } catch (e) {
+          console.error('Failed to update rfid_scanner for registration success:', e);
+        }
+        
+        // Clear mode after successful registration
+        const registeredFor = rfidRegisterMode;
+        rfidRegisterMode = null;
+        
+        console.log(`RFID: Automatically registered UID ${uid} for user ${registeredFor}`);
+        
+        return res.json({
+          status: 'success',
+          message: 'REGISTERED',
+          name: userName,
+          role: 'Success',
+          time: timeString
+        });
+      }
+    }
+    // --- End Registration Mode Logic ---
+
+    const usersRef = db.collection('users');
+    const q = usersRef.where('rfid', '==', uid).limit(1);
+    const snap = await q.get();
+
+    if (snap.empty) {
+      // Store the last scanned unknown UID for auto-fill in registration page
+      try {
+        await db.collection('system').doc('rfid_scanner').set({
+          lastScannedUID: uid,
+          scannedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (e) {
+        console.error('Failed to update rfid_scanner system state:', e);
+      }
+      
+      // Return 404 but with a helpful message for the hardware to display
+      return res.status(404).json({
+        status: 'error',
+        message: 'Unknown Tag',
+        uid: uid
+      });
+    }
+
+    const userDoc = snap.docs[0];
+    const user = userDoc.data();
+    const userId = userDoc.id;
+    const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'User';
+    const role = user.role || 'unknown';
+
+    // Simplified attendance logic for RFID terminal
+    // Determine target collection
+    const collectionName = (role === 'student' || role === 'intern') ? 'intern_attendance' : 'staff_attendance';
+    const docId = `${userId}_${dateString}`;
+    const attendanceRef = db.collection(collectionName).doc(docId);
+    const attSnap = await attendanceRef.get();
+
+    let action = 'Time In';
+    let session = now.getHours() < 12 ? 'AM' : 'PM';
+
+    if (!attSnap.exists) {
+      // First time in for today
+      const payload = {
+        userId: userId,
+        [role === 'staff' ? 'staffId' : 'internId']: userId,
+        date: dateString,
+        [`timeIn${session}`]: timeString,
+        [`status${session}`]: 'Present',
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+      await attendanceRef.set(payload);
+    } else {
+      const data = attSnap.data();
+      // Logic for toggling Time In / Time Out
+      // If timed in but not timed out for the current session, then time out
+      if (data[`timeIn${session}`] && !data[`timeOut${session}`]) {
+        action = 'Time Out';
+        await attendanceRef.update({
+          [`timeOut${session}`]: timeString,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } else if (!data[`timeIn${session}`]) {
+        // New session (e.g. was timed out for AM, now timing in for PM)
+        action = 'Time In';
+        await attendanceRef.update({
+          [`timeIn${session}`]: timeString,
+          [`status${session}`]: 'Present',
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Already timed in and out for this session? Maybe allow re-entry or just show status
+        return res.json({
+          status: 'info',
+          message: 'Already Recorded',
+          name: userName,
+          role: role,
+          action: 'Done'
+        });
+      }
+    }
+
+    // Success response for ESP32
+    return res.json({
+      status: 'success',
+      message: action,
+      name: userName,
+      role: role.charAt(0).toUpperCase() + role.slice(1),
+      time: timeString
+    });
+
+  } catch (err) {
+    console.error('RFID scan process error:', err);
+    return res.status(500).json({ status: 'error', message: 'Server Error' });
+  }
+});
+
+/**
+ * NEW: Toggle Registration Mode
+ * Tells the backend that the next RFID scan should be assigned to this userId.
+ */
+app.post('/api/rfid/register-mode', (req, res) => {
+  const { userId, enable } = req.body;
+  if (enable && userId) {
+    rfidRegisterMode = userId;
+    console.log(`RFID Register Mode: ON for user ${userId}`);
+  } else {
+    rfidRegisterMode = null;
+    console.log(`RFID Register Mode: OFF`);
+  }
+  res.json({ success: true, mode: rfidRegisterMode });
+});
+
+/**
+ * NEW: Manual Registration Endpoint
+ * Performs a uniqueness check before assigning an RFID to a staff member.
+ */
+app.post('/api/rfid/register-manual', async (req, res) => {
+  const { userId, uid } = req.body;
+
+  if (!userId || !uid) {
+    return res.status(400).json({ status: 'error', message: 'Missing userId or uid' });
+  }
+
+  try {
+    // Check for duplicates
+    const existingQuery = await db.collection('users').where('rfid', '==', uid).limit(1).get();
+    if (!existingQuery.empty) {
+      const existingUser = existingQuery.docs[0];
+      if (existingUser.id !== userId) {
+        const userData = existingUser.data();
+        const existingName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || userData.username || 'User';
+        return res.status(400).json({ 
+          status: 'error', 
+          message: `This tag is already registered to ${existingName}` 
+        });
+      }
+    }
+
+    // Perform Update
+    await db.collection('users').doc(userId).update({
+      rfid: uid,
+      rfidUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    res.json({ status: 'success', message: 'RFID Registered' });
+  } catch (err) {
+    console.error('Manual RFID registration error:', err);
+    res.status(500).json({ status: 'error', message: 'Internal Server Error' });
+  }
+});
+
+

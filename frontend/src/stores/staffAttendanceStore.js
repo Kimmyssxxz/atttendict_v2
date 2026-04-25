@@ -17,7 +17,8 @@ import {
   serverTimestamp,
   writeBatch,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
+  setDoc
 } from 'firebase/firestore'
 import { 
   ref as storageRef, 
@@ -462,7 +463,9 @@ export const useStaffAttendanceStore = defineStore('staffAttendance', {
 
         Object.assign(docData, optionalFields)
 
-        const docRef = await addDoc(collection(db, 'staff_attendance'), docData)
+        const docId = `${docData.staffId}_${docData.date}`
+        const docRef = doc(db, 'staff_attendance', docId)
+        await setDoc(docRef, docData)
 
         const newAttendance = { id: docRef.id, ...docData }
 
@@ -499,6 +502,13 @@ export const useStaffAttendanceStore = defineStore('staffAttendance', {
             ...this.staffAttendances[index],
             ...docData,
             id: attendanceId
+          }
+        }
+
+        if (this.currentStaffAttendance && this.currentStaffAttendance.id === attendanceId) {
+          this.currentStaffAttendance = {
+            ...this.currentStaffAttendance,
+            ...docData
           }
         }
 
@@ -1403,14 +1413,23 @@ export const useStaffAttendanceStore = defineStore('staffAttendance', {
         this.loading = true
         this.error = null
 
-        const docRef = await addDoc(collection(db, 'users'), {
-          ...userData,
-          role: 'staff',
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        })
+        const response = await fetch(`${API_BASE_URL}/auth/staff/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userData),
+        });
 
-        const newUser = { id: docRef.id, ...userData, role: 'staff' }
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.message || 'Failed to add staff member');
+        }
+
+        const data = await response.json();
+        const userId = data.userId;
+
+        const newUser = { id: userId, ...userData, role: 'staff' }
         this.staffUsers.push(newUser)
 
         this.loading = false

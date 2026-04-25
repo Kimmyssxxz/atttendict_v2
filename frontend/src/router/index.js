@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import RegisterView from '../views/RegisterView.vue';
 import LoginView from '../views/LoginView.vue';
+import OtpVerificationView from '../views/OtpVerificationView.vue';
+import ForgotPasswordView from '../views/ForgotPasswordView.vue';
+import ResetPasswordView from '../views/ResetPasswordView.vue';
 import AdminLoginView from '../views/admin/AdminLoginView.vue';
 import AdminStudentInternsView from '../views/admin/AdminStudentInternsView.vue';
 import AdminStudentTaggingView from '../views/admin/AdminStudentTaggingView.vue';
@@ -11,8 +14,11 @@ import AdminDashboardView from '../views/admin/AdminDashboardView.vue';
 import AdminStaffAttendanceView from '../views/admin/AdminStaffAttendanceView.vue';
 import AdminStaffAttendanceValidation from '../views/admin/AdminStaffAttendanceValidation.vue';
 import AdminStaffLeave from '../views/admin/AdminStaffLeave.vue';
+import AdminStaffRFIDView from '../views/admin/StaffRfidView.vue';
 import AdminArchive from '../views/admin/AdminArchive.vue';
 import AdminArchivedAttendanceView from '../views/admin/AdminArchivedAttendanceView.vue';
+import AdminArchivedStudentLogsView from '../views/admin/AdminArchivedStudentLogsView.vue';
+import AdminArchivedStaffView from '../views/admin/AdminArchivedStaffView.vue';
 import DashboardView from '../views/intern/DashboardView.vue';
 import TimeView from '../views/intern/TimeView.vue';
 import AttendanceView from '../views/intern/AttendanceView.vue';
@@ -21,7 +27,6 @@ import StaffDashboardView from '../views/staff/StaffDashboardView.vue';
 import NotificationsView from '../views/intern/NotificationsView.vue';
 import StaffStatusView from '../views/intern/StaffStatusView.vue';
 import ClientLogBook from '../views/client/ClientLogBook.vue';
-import ClientEvaluation from '../views/client/ClientEvaluation.vue';
 import staffRoutes from './staff.routes.js';
 import DtcTrainingEvaluation from '../views/client/DtcTrainingEvaluation.vue';
 import AdminClientLogBookView from '../views/admin/AdminClientLogBookView.vue';
@@ -111,6 +116,11 @@ const routes = [
     component: AdminStaffLeave,
   },
   {
+    path: '/admin/staff-rfid',
+    name: 'AdminStaffRFID',
+    component: AdminStaffRFIDView,
+  },
+  {
     path: '/admin/settings',
     name: 'AdminSettings',
     component: AdminSettingsView,
@@ -124,6 +134,16 @@ const routes = [
     path: '/admin/archive/attendance-logs',
     name: 'AdminArchivedAttendance',
     component: AdminArchivedAttendanceView,
+  },
+  {
+    path: '/admin/archive/student-logs',
+    name: 'AdminArchivedStudentLogs',
+    component: AdminArchivedStudentLogsView,
+  },
+  {
+    path: '/admin/archive/staff',
+    name: 'AdminArchivedStaff',
+    component: AdminArchivedStaffView,
   },
   {
     path: '/admin/client-logbook',
@@ -156,6 +176,21 @@ const routes = [
     component: RegisterView
   },
   {
+    path: '/auth/verify-otp',
+    name: 'OtpVerification',
+    component: OtpVerificationView
+  },
+  {
+    path: '/auth/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPasswordView
+  },
+  {
+    path: '/auth/reset-password',
+    name: 'ResetPassword',
+    component: ResetPasswordView
+  },
+  {
     path: '/client/logbook',
     name: 'ClientLogBook',
     component: ClientLogBook
@@ -177,38 +212,49 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
+  // Prefer unified storage key `user`, fall back to legacy keys where necessary
+  let unified = null
+  try {
+    unified = JSON.parse(localStorage.getItem('user') || 'null')
+  } catch {
+    unified = null
+  }
+
+  const resolved = unified?.user ? unified.user : unified
+  const role = resolved?.role || null
+
+  if (to.path.startsWith('/staff')) {
+    if (role !== 'staff') {
+      console.warn('Unauthorized access to staff route. Redirecting to login.');
+      return { name: 'Login' };
+    }
+  }
+
+  if (to.path.startsWith('/intern')) {
+    const isIntern = role === 'student' || role === 'intern';
+    if (!isIntern) {
+      console.warn('Unauthorized access to intern route. Redirecting to login.');
+      return { name: 'Login' };
+    }
+  }
+
   if (to.name === 'Login') {
-    // Prefer unified storage key `user`, fall back to legacy `staffUser` / `internUser`
-    let unified = null
-    try {
-      unified = JSON.parse(localStorage.getItem('user') || 'null')
-    } catch {
-      unified = null
-    }
-
-    const resolved = unified?.user ? unified.user : unified
-    const role = resolved?.role || null
-
     if (role === 'staff') {
-      return { name: 'StaffDashboard' }
-    }
-
-    if (role === 'admin') {
-      return { name: 'AdminDashboard' }
+      return { name: 'StaffDashboard' };
     }
 
     if (role === 'student' || role === 'intern') {
-      return { name: 'InternDashboard' }
+      return { name: 'InternDashboard' };
     }
 
-    const staffUser = localStorage.getItem('staffUser')
-    if (staffUser) return { name: 'StaffDashboard' }
+    const staffUser = localStorage.getItem('staffUser');
+    if (staffUser) return { name: 'StaffDashboard' };
 
-    const internUser = localStorage.getItem('internUser')
-    if (internUser) return { name: 'InternDashboard' }
+    const internUser = localStorage.getItem('internUser');
+    if (internUser) return { name: 'InternDashboard' };
   }
 
-  return true
+  return true;
 })
 
 export default router;

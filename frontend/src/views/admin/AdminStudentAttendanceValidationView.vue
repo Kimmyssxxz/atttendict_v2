@@ -1,50 +1,71 @@
 <template>
-  <div class="min-h-screen flex flex-col md:flex-row bg-gray-100">
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-50/50">
     <AdminSidebar />
 
     <div class="flex-1 flex flex-col">
-      <header class="px-8 py-6 bg-blue-600 text-white">
-        <h1 class="m-0 text-2xl font-bold">Student Attendance Validation</h1>
+      <header class="px-8 py-6 bg-white text-gray-900">
+        <h1 class="m-0 text-3xl font-semibold">Student Attendance Validation</h1>
       </header>
 
-      <main class="flex-1 px-8 py-6">
-        <section class="bg-white rounded-lg p-6 shadow-sm">
-          <div class="border border-gray-200 rounded-xl bg-white p-5 mb-5">
+      <main class="flex-1 px-6 py-6 font-sans">
+        <TableSkeleton v-if="loading && !selectedInternId" :rows="5" />
+        <div v-else>
+          <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <div class=" bg-white p-5 mb-5">
             <div class="mb-3">
-              <h3 class="m-0 text-base text-gray-900">Available Interns</h3>
+              <h3 class="m-0 text-2xl font-semibold text-gray-900">Available Interns</h3>
             </div>
 
-            <div class="grid grid-cols-[repeat(auto-fill,minmax(240px,240px))] justify-start gap-3">
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] justify-start gap-4">
               <button
                 v-for="intern in filteredInternCards"
                 :key="intern.id"
                 type="button"
                 :class="[
-                  'text-left bg-white border rounded-[10px] p-3.5 cursor-pointer transition-all',
+                  'flex flex-col items-center bg-white border rounded-lg p-6 cursor-pointer transition-all duration-300',
                   intern.id === selectedInternId 
-                    ? 'border-blue-400 shadow-[0_10px_24px_rgba(37,99,235,0.12)]' 
-                    : 'border-gray-200 hover:border-blue-200 hover:shadow-[0_8px_22px_rgba(15,23,42,0.08)] hover:-translate-y-[1px]'
+                    ? 'border-gray-100 ' 
+                    : 'border-gray-200'
                 ]"
                 @click="selectIntern(intern)"
               >
-                <div class="flex items-center justify-between gap-3 mb-2">
-                  <div class="font-bold text-gray-900">{{ intern.name || '-' }}</div>
-                  <div class="w-[30px] h-[30px] rounded-full bg-blue-50 flex items-center justify-center text-blue-600">▣</div>
-                </div>
-                <div class="text-gray-500 text-[0.85rem]">
-                  <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-                    <span>Review attendance</span>
+                <!-- Profile Image -->
+                <div class="relative mb-2">
+                  <div class="w-28 h-28 rounded-full overflow-hidden flex items-center justify-center border-4 border-slate-50 bg-blue-50 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                    <img v-if="intern.photoUrl" :src="intern.photoUrl" class="w-full h-full object-cover block" :alt="intern.name" />
+                    <span v-else class="text-2xl font-bold text-blue-600 uppercase tracking-tight">{{ getInitials(intern.name) }}</span>
                   </div>
+                </div>
+
+                <!-- Intern Name -->
+                <div class="mb-5">
+                  <div class="text-lg font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] flex items-center justify-center">{{ intern.name || '-' }}</div>
+                </div>
+
+                <!-- Action Button (Pill style) -->
+                <div 
+                  :class="[
+                    'px-6 py-2.5 rounded-full border text-sm font-semibold transition-all duration-200 whitespace-nowrap',
+                    intern.id === selectedInternId 
+                      ? 'bg-[#133e75] text-white  hover:bg-[#133e75]/80' 
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  ]"
+                >
+                  Review Attendance
                 </div>
               </button>
             </div>
           </div>
 
-          <div class="border border-gray-200 rounded-xl bg-white p-5">
+          <div v-if="loading && selectedInternId" class="mt-8">
+            <TableSkeleton :rows="5" />
+          </div>
+          <div v-else class="bg-white p-5">
             <div class="min-h-[180px]">
               <div v-if="!selectedInternId" class="min-h-[180px] flex flex-col items-center justify-center gap-1.5 text-center">
-                <div class="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center text-xl text-blue-700 mb-1">▣</div>
+                <div class="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center text-xl text-blue-700 mb-2">
+                  <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
                 <h3 class="m-0 text-[1.05rem] text-gray-900">Select an intern to review</h3>
                 <p class="mt-0.5 mb-0 text-[0.9rem] text-gray-500">Click any intern above to view attendance details</p>
               </div>
@@ -52,14 +73,14 @@
               <div v-else>
                 <div class="flex flex-col items-start justify-start gap-2 mb-4 md:mb-4">
                   <div>
-                    <h3 class="m-0 text-[1.05rem] text-gray-900">Attendance for {{ selectedInternName }}</h3>
-                    <p class="mt-0.5 mb-0 text-[0.9rem] text-gray-500">Review and validate student intern attendance.</p>
+                    <h3 class="m-0 text-2xl font-semibold text-gray-900">Attendance for {{ selectedInternName }}</h3>
+                    <p class="mt-0.5 mb-2 text-[0.9rem] text-gray-500">Review and validate student intern attendance.</p>
                   </div>
 
-                  <div class="flex items-center justify-between gap-3 w-full flex-wrap border border-gray-200 bg-slate-50 rounded-xl p-2.5">
+                  <div class="flex items-center justify-between gap-3 w-full flex-wrap">
                     <div class="flex-1 basis-[420px] min-w-[260px]">
                       <div class="flex items-center gap-2 w-full border border-gray-200 rounded-xl bg-white px-3 py-2">
-                        <span class="text-[0.95rem] text-slate-400 leading-none">🔍</span>
+                        <span class="val-icon icon-search"></span>
                         <input
                           v-model="search"
                           type="text"
@@ -68,23 +89,23 @@
                         />
                       </div>
                     </div>
-                    <div class="flex items-center justify-end gap-2 flex-none flex-nowrap">
+                    <div class="flex items-center justify-end flex-none flex-nowrap">
                       <div class="relative">
-                        <button type="button" class="flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] text-[0.9rem] font-semibold cursor-pointer bg-white text-slate-900 border border-gray-200 whitespace-nowrap transition-all hover:bg-slate-50 hover:border-slate-300 disabled:opacity-70 disabled:cursor-default" @click="toggleFilters">
-                          <span class="text-base">⚙️</span> Filters
+                        <button type="button" class="flex items-center justify-center p-2.5 rounded-xl text-[0.9rem] font-semibold cursor-pointer  text-gray-900 transition-all hover:bg-slate-50 hover:border-slate-300 disabled:opacity-70" @click="toggleFilters" title="Filters">
+                          <span class="val-icon icon-filter"></span>
                         </button>
                         
                         <!-- Filter Dropdown -->
                         <div v-if="showFilterMenu" class="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.1)] z-50 p-4">
                           <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
-                            <h4 class="m-0 text-sm font-bold text-gray-800">Filter Records</h4>
+                            <h4 class="m-0 text-sm font-semibold text-gray-900">Filter Records</h4>
                             <button @click="showFilterMenu = false" class="text-gray-400 hover:text-gray-600 cursor-pointer">
                               <span class="text-xl leading-none">&times;</span>
                             </button>
                           </div>
                           
                           <div class="mb-4">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Month</label>
+                            <label class="block text-xs  text-gray-400 mb-2">Month</label>
                             <select v-model="filterMonth" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors mb-3" @change="currentPage = 1">
                               <option value="All">All Months</option>
                               <option value="01">January</option>
@@ -101,7 +122,7 @@
                               <option value="12">December</option>
                             </select>
 
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Validation Status</label>
+                            <label class="block text-xs text-gray-400 mb-2">Validation Status</label>
                             <select v-model="filterValidationStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors" @change="currentPage = 1">
                               <option value="All">All Statuses</option>
                               <option value="Pending">Pending</option>
@@ -111,14 +132,14 @@
                           </div>
                           
                           <div class="flex justify-between items-center mt-2">
-                           <button class="text-xs text-blue-600 hover:text-blue-800 font-medium cursor-pointer" @click="resetFilters">Reset filters</button>
-                           <button class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 font-medium cursor-pointer transition-colors" @click="showFilterMenu = false">Done</button>
+                           <button class="text-xs text-red-600 hover:text-red-800 font-medium cursor-pointer" @click="resetFilters">Reset filters</button>
+                           <button class="text-xs bg-[#133e75] text-white px-3 py-1.5 rounded-lg hover:bg-[#133e75]/80  cursor-pointer transition-colors" @click="showFilterMenu = false">Done</button>
                           </div>
                         </div>
                       </div>
 
-                      <button type="button" class="flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] text-[0.9rem] font-semibold cursor-pointer bg-white text-slate-900 border border-gray-200 whitespace-nowrap transition-all hover:bg-slate-50 hover:border-slate-300 disabled:opacity-70 disabled:cursor-default" @click="fetchRecords" :disabled="loading">
-                        {{ loading ? 'Refreshing...' : 'Refresh' }}
+                      <button type="button" class="flex items-center justify-center p-2.5 rounded-xl text-[0.9rem] font-semibold cursor-pointer text-gray-900  transition-all hover:bg-slate-50 hover:border-slate-300 disabled:opacity-70" @click="fetchRecords" :disabled="loading" title="Refresh">
+                        <span class="val-icon icon-refresh" :class="{ 'animate-spin-slow': loading }"></span>
                       </button>
                     </div>
                   </div>
@@ -158,32 +179,36 @@
                   </div>
 
                   <!-- Pagination Controls -->
-                  <div class="flex flex-col sm:flex-row justify-between items-center p-4 bg-slate-50 border-t border-gray-200 rounded-b-xl gap-4" v-if="filteredRecords.length">
-                    <div class="text-[0.85rem] text-slate-500">
-                      Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, filteredRecords.length) }} of {{ filteredRecords.length }} entries
+                  <div class="flex flex-col sm:flex-row justify-between items-center p-4 bg-white  rounded-b-xl gap-4" v-if="filteredRecords.length">
+                    <div class="text-[0.8rem] font-medium text-gray-500">
+                      Showing <span class="text-gray-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to <span class="text-gray-900">{{ Math.min(currentPage * itemsPerPage, filteredRecords.length) }}</span> of <span class="text-gray-900">{{ filteredRecords.length }}</span> entries
                     </div>
                     <div class="flex items-center gap-6">
-                      <div class="flex items-center gap-2 text-[0.85rem] text-slate-500">
+                      <div class="flex items-center gap-2 text-[0.8rem] font-medium text-gray-500">
                         <label>Rows per page:</label>
-                        <select v-model="itemsPerPage" class="px-2 py-1 rounded-md border border-gray-200 bg-white text-[0.85rem] outline-none" @change="currentPage = 1">
+                        <select v-model="itemsPerPage" class="px-2 py-1 rounded-md border border-gray-200 bg-white text-[0.8rem] font-semibold text-gray-900 outline-none hover:border-gray-300 transition-colors cursor-pointer" @change="currentPage = 1">
                           <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
                         </select>
                       </div>
-                      <div class="flex items-center gap-3">
+                      <div class="flex items-center gap-1">
                         <button 
-                          class="px-3 py-1.5 text-[0.85rem] rounded-md border border-gray-200 bg-white text-slate-800 cursor-pointer transition-all hover:bg-slate-100 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed" 
+                          class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 cursor-pointer transition-all hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed" 
                           :disabled="currentPage === 1" 
                           @click="currentPage--"
+                          title="Previous Page"
                         >
-                          Previous
+                          <span class="val-icon icon-chevron-left scale-90"></span>
                         </button>
-                        <span class="text-[0.85rem] text-slate-800 font-medium">Page {{ currentPage }} of {{ totalPages }}</span>
+                        <div class="px-3 text-[0.8rem] font-semibold text-gray-900">
+                          {{ currentPage }} <span class="text-gray-400 font-normal ml-0.5">/</span> {{ totalPages }}
+                        </div>
                         <button 
-                          class="px-3 py-1.5 text-[0.85rem] rounded-md border border-gray-200 bg-white text-slate-800 cursor-pointer transition-all hover:bg-slate-100 hover:border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed" 
+                          class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 cursor-pointer transition-all hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed" 
                           :disabled="currentPage === totalPages" 
                           @click="currentPage++"
+                          title="Next Page"
                         >
-                          Next
+                          <span class="val-icon icon-chevron-right scale-90"></span>
                         </button>
                       </div>
                     </div>
@@ -194,10 +219,10 @@
               </div>
             </div>
           </div>
-
         </section>
-      </main>
-    </div>
+      </div>
+    </main>
+  </div>
 
     <!-- Reject Modal -->
     <div v-if="rejectReasonModalVisible" class="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -237,10 +262,10 @@
     </div>
 
     <!-- Details Modal -->
-    <div v-if="detailsModalVisible" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" @click.self="closeDetailsModal">
+    <div v-if="detailsModalVisible" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50  p-4" @click.self="closeDetailsModal">
       <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 class="m-0 text-lg font-bold text-gray-900">Attendance Details - {{ formatDate(selectedRecordDetails?.date) }}</h3>
+          <h3 class="m-0 text-2xl font-semibold text-gray-900">Attendance Details - {{ formatDate(selectedRecordDetails?.date) }}</h3>
           <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors" @click="closeDetailsModal">
             <span class="text-xl leading-none">&times;</span>
           </button>
@@ -249,11 +274,11 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             <!-- AM Details -->
-            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 flex flex-col h-full">
-              <h4 class="font-bold text-md mb-4 text-gray-800 border-b pb-2">AM Session</h4>
+            <div class=" rounded-lg p-4 bg-gray-50/50 flex flex-col h-full">
+              <h4 class="font-semibold text-lg mb-1 text-gray-900">AM Session</h4>
               
               <div class="mb-3">
-                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Validation Status</span>
+                <span class="text-xs font-medium text-gray-500 ">Validation Status</span>
                 <div class="mt-1">
                   <span v-if="selectedRecordDetails.timeInAM || selectedRecordDetails.timeOutAM" :class="[
                     'px-2.5 py-1 rounded-full text-xs font-semibold capitalize',
@@ -267,20 +292,20 @@
                 </div>
               </div>
 
-              <div class="mb-3">
-                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Location</span>
-                <div class="mt-1 text-sm text-gray-900 border bg-white p-2 rounded">
+              <div class="mb-0">
+                <span class="text-xs font-medium text-gray-500">Location</span>
+                <div class="mt-1 text-sm text-gray-900 ">
                   {{ extractLocationLabel(selectedRecordDetails.locationAM) || 'No location data' }}
                 </div>
               </div>
 
               <div class="mb-3 flex-1 flex flex-col justify-end">
-                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1">Actions</span>
+                <span class="text-xs font-medium text-gray-500 mb-1">Actions</span>
                 <div class="flex flex-wrap gap-2">
                   <div v-if="selectedRecordDetails.timeInAM || selectedRecordDetails.timeOutAM" class="flex flex-wrap gap-2 w-full">
                     <button 
                       type="button" 
-                      class="flex-1 px-3 py-2 text-sm font-medium rounded border border-gray-300 bg-white shadow-sm cursor-pointer hover:bg-gray-50 disabled:opacity-50 transition-colors" 
+                      class="flex-1 px-3 py-2 text-sm font-medium rounded-lg border border-green-300 bg-green-100 text-green-800 cursor-pointer hover:bg-green-200 disabled:opacity-50 transition-colors" 
                       :disabled="!!savingRowIds[selectedRecordDetails.id + '_AM']"
                       @click="approveRow(selectedRecordDetails, 'AM')"
                     >
@@ -288,7 +313,7 @@
                     </button>
                     <button 
                       type="button" 
-                      class="flex-1 px-3 py-2 text-sm font-medium rounded border border-red-300 text-red-700 bg-red-50 shadow-sm cursor-pointer hover:bg-red-100 disabled:opacity-50 transition-colors" 
+                      class="flex-1 px-3 py-2 text-sm font-medium rounded-lg border border-red-300 text-red-700 bg-red-50 cursor-pointer hover:bg-red-100 disabled:opacity-50 transition-colors" 
                       :disabled="!!savingRowIds[selectedRecordDetails.id + '_AM']"
                       @click="openRejectModal(selectedRecordDetails, 'AM')"
                     >
@@ -301,11 +326,11 @@
             </div>
 
             <!-- PM Details -->
-            <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 flex flex-col h-full">
-              <h4 class="font-bold text-md mb-4 text-gray-800 border-b pb-2">PM Session</h4>
+            <div class="rounded-lg p-4 bg-gray-50/50 flex flex-col h-full">
+              <h4 class="font-semibold text-lg mb-1 text-gray-900">PM Session</h4>
               
               <div class="mb-3">
-                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Validation Status</span>
+                <span class="text-xs font-medium text-gray-500 ">Validation Status</span>
                 <div class="mt-1">
                   <span v-if="selectedRecordDetails.timeInPM || selectedRecordDetails.timeOutPM" :class="[
                     'px-2.5 py-1 rounded-full text-xs font-semibold capitalize',
@@ -320,8 +345,8 @@
               </div>
 
               <div class="mb-3">
-                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Location</span>
-                <div class="mt-1 text-sm text-gray-900 border bg-white p-2 rounded">
+                <span class="text-xs font-medium text-gray-500">Location</span>
+                <div class="mt-1 text-sm text-gray-900 ">
                   {{ extractLocationLabel(selectedRecordDetails.locationPM) || 'No location data' }}
                 </div>
               </div>
@@ -332,7 +357,7 @@
                   <div v-if="selectedRecordDetails.timeInPM || selectedRecordDetails.timeOutPM" class="flex flex-wrap gap-2 w-full">
                     <button 
                       type="button" 
-                      class="flex-1 px-3 py-2 text-sm font-medium rounded border border-gray-300 bg-white shadow-sm cursor-pointer hover:bg-gray-50 disabled:opacity-50 transition-colors" 
+                      class="flex-1 px-3 py-2 text-sm font-medium rounded-lg border border-green-300 bg-green-100 text-green-800 cursor-pointer hover:bg-green-200 disabled:opacity-50 transition-colors" 
                       :disabled="!!savingRowIds[selectedRecordDetails.id + '_PM']"
                       @click="approveRow(selectedRecordDetails, 'PM')"
                     >
@@ -340,7 +365,7 @@
                     </button>
                     <button 
                       type="button" 
-                      class="flex-1 px-3 py-2 text-sm font-medium rounded border border-red-300 text-red-700 bg-red-50 shadow-sm cursor-pointer hover:bg-red-100 disabled:opacity-50 transition-colors" 
+                      class="flex-1 px-3 py-2 text-sm font-medium rounded-lg border border-red-300 text-red-700 bg-red-50 cursor-pointer hover:bg-red-100 disabled:opacity-50 transition-colors" 
                       :disabled="!!savingRowIds[selectedRecordDetails.id + '_PM']"
                       @click="openRejectModal(selectedRecordDetails, 'PM')"
                     >
@@ -353,11 +378,6 @@
             </div>
           </div>
         </div>
-        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end">
-          <button type="button" class="px-6 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer" @click="closeDetailsModal">
-            Close
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -365,6 +385,7 @@
 
 <script>
 import AdminSidebar from './AdminSidebar.vue'
+import TableSkeleton from '../../components/skeletons/TableSkeleton.vue'
 import { doc, serverTimestamp, updateDoc, collection, addDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 
@@ -374,6 +395,7 @@ export default {
   name: 'AdminStudentAttendanceValidationView',
   components: {
     AdminSidebar,
+    TableSkeleton
   },
   data() {
     return {
@@ -391,6 +413,7 @@ export default {
       pageSizeOptions: [10, 15, 20, 25],
       rejectReasonModalVisible: false,
       rejectingRow: null,
+      rejectingSession: null,
       selectedRejectReason: '',
       otherRejectReason: '',
       detailsModalVisible: false,
@@ -540,6 +563,13 @@ export default {
       hour = hour % 12
       if (hour === 0) hour = 12
       return `${hour}:${minute} ${suffix}`
+    },
+    getInitials(name) {
+      if (!name) return '?'
+      const parts = String(name).trim().split(/\s+/).filter(Boolean)
+      if (parts.length === 0) return '?'
+      if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase()
+      return (parts[0].slice(0, 1) + parts[parts.length - 1].slice(0, 1)).toUpperCase()
     },
     computeTotalHoursLabel(row) {
       const toMinutes = (t) => {
@@ -716,6 +746,7 @@ export default {
           .map((i) => ({
             id: i.id,
             name: this.formatName(i) || i.username || '',
+            photoUrl: i.photoURL || '',
           }))
           .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
 
@@ -850,4 +881,54 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.val-icon {
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  display: inline-block;
+}
+
+.icon-search {
+  background-color: #94a3b8;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 10a7 7 0 1 0 14 0a7 7 0 1 0-14 0m18 11l-6-6'/%3E%3C/svg%3E");
+}
+
+.icon-filter {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M22 18.605a.75.75 0 0 1-.75.75h-5.1a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h7.74a2.93 2.93 0 0 1  5.66 0h5.1a.75.75 0 0 1 .75.75m0-13.21a.75.75 0 0 1-.75.75H18.8a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h10.39a2.93 2.93 0 0 1 5.66 0h2.45a.74.74 0 0 1 .75.75m0 6.6a.74.74 0 0 1-.75.75H9.55a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h1.14a2.93 2.93 0 0 1 5.66 0h11.7a.75.75 0 0 1 .75.75'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M22 18.605a.75.75 0 0 1-.75.75h-5.1a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h7.74a2.93 2.93 0 0 1  5.66 0h5.1a.75.75 0 0 1 .75.75m0-13.21a.75.75 0 0 1-.75.75H18.8a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h10.39a2.93 2.93 0 0 1 5.66 0h2.45a.74.74 0 0 1 .75.75m0 6.6a.74.74 0 0 1-.75.75H9.55a2.93 2.93 0 0 1-5.66 0H2.75a.75.75 0 1 1 0-1.5h1.14a2.93 2.93 0 0 1 5.66 0h11.7a.75.75 0 0 1 .75.75'/%3E%3C/svg%3E");
+}
+
+.icon-refresh {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='-1.5 -2.5 24 24'%3E%3Cpath fill='%23000' d='m17.83 4.194l.42-1.377a1 1 0 1 1 1.913.585l-1.17 3.825a1 1 0 0 1-1.248.664l-3.825-1.17a1 1 0 1 1 .585-1.912l1.672.511A7.381 7.381 0 0 0 3.185 6.584l-.26.633a1 1 0 1 1-1.85-.758l.26-.633A9.381 9.381 0 0 1 17.83 4.194M2.308 14.807l-.327 1.311a1 1 0 1 1-1.94-.484l.967-3.88a1 1 0 0 1 1.265-.716l3.828.954a1 1 0 0 1-.484 1.941l-1.786-.445a7.384 7.384 0 0 0 13.216-1.792a1 1 0 1 1 1.906.608a9.38 9.38 0 0 1-5.38 5.831a9.386 9.386 0 0 1-11.265-3.328'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='-1.5 -2.5 24 24'%3E%3Cpath fill='%23000' d='m17.83 4.194l.42-1.377a1 1 0 1 1-1.913.585l-1.17 3.825a1 1 0 0 1-1.248.664l-3.825-1.17a1 1 0 1 1 .585-1.912l1.672.511A7.381 7.381 0 0 0 3.185 6.584l-.26.633a1 1 0 1 1-1.85-.758l.26-.633A9.381 9.381 0 0 1 17.83 4.194M2.308 14.807l-.327 1.311a1 1 0 1 1-1.94-.484l.967-3.88a1 1 0 0 1 1.265-.716l3.828.954a1 1 0 0 1-.484 1.941l-1.786-.445a7.384 7.384 0 0 0 13.216-1.792a1 1 0 1 1 1.906.608a9.38 9.38 0 0 1-5.38 5.831a9.386 9.386 0 0 1-11.265-3.328'/%3E%3C/svg%3E");
+}
+
+.icon-chevron-left {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m15 18l-6-6l6-6'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m15 18l-6-6l6-6'/%3E%3C/svg%3E");
+}
+
+.icon-chevron-right {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m9 18l6-6l-6-6'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m9 18l6-6l-6-6'/%3E%3C/svg%3E");
+}
+
+.animate-spin-slow {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>
 

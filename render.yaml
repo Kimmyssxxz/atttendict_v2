@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: attendict-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false

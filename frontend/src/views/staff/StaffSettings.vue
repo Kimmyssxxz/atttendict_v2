@@ -8,12 +8,24 @@
       
       <!-- Page Content -->
       <div class="flex-1 overflow-y-auto px-4 py-8 sm:px-8 pb-32 md:pb-8">
-        <div class="max-w-4xl mx-auto space-y-6 pb-20">
-          
-          <!-- Avatar Header Section -->
-          <div class="flex flex-col items-center justify-center pt-2 pb-4">
+        <div class="max-w-full mx-auto space-y-6 pb-20">
+          <SettingsSkeleton v-if="loading" />
+          <template v-else>
+            <!-- Back Button -->
+            <div class="flex items-center mb-1">
+              <button 
+                @click="navigateTo('StaffDashboard', 'dashboard')" 
+                class="p-2 -mt-4 rounded-full hover:bg-gray-100 transition-all active:scale-95 group"
+                title="Back to Dashboard"
+              >
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='24' viewBox='0 0 12 24'%3E%3Cpath fill='%23000' fill-rule='evenodd' d='m3.343 12l7.071 7.071L9 20.485l-7.778-7.778a1 1 0 0 1 0-1.414L9 3.515l1.414 1.414z'/%3E%3C/svg%3E" class="w-3 h-6 opacity-60 group-hover:opacity-100 transition-opacity" alt="Back" />
+              </button>
+            </div>
+
+            <!-- Avatar Header Section -->
+            <div class="flex flex-col items-center justify-center pb-4">
             <div class="relative mb-3">
-              <div class="w-16 h-16 rounded-full bg-blue-500 text-white flex items-center justify-center text-3xl font-bold shadow-md overflow-hidden ring-2 ring-white ring-offset-2 ring-offset-blue-50">
+              <div class="w-24 h-24 rounded-full text-white flex items-center justify-center text-3xl font-bold  overflow-hidden ring-2 ring-white ring-offset-2 ring-offset-blue-50">
                 <img v-if="userPhotoUrl" :src="userPhotoUrl" class="w-full h-full object-cover" alt="Profile" />
                 <span v-else>{{ userInitials || 'U' }}</span>
               </div>
@@ -24,109 +36,130 @@
 
           <!-- Tabs -->
           <div class="flex justify-center gap-8 border-b border-gray-100">
-            <button @click="activeTab = 'profile'" :class="['pb-3 px-4 text-xs font-semibold transition-colors', activeTab === 'profile' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/30 rounded-t-lg' : 'text-gray-500 hover:text-gray-900']">Profile Info</button>
-            <button @click="activeTab = 'security'" :class="['pb-3 px-4 text-xs font-semibold transition-colors', activeTab === 'security' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/30 rounded-t-lg' : 'text-gray-500 hover:text-gray-900']">Security</button>
+            <button @click="activeTab = 'profile'" :class="['pb-3 px-4 text-sm font-semibold transition-colors', activeTab === 'profile' ? 'text-[#eebb3b] border-b-2 border-[#eebb3b] rounded-t-lg' : 'text-gray-500 hover:text-gray-900']">Profile Info</button>
+            <button @click="activeTab = 'security'" :class="['pb-3 px-4 text-sm font-semibold transition-colors', activeTab === 'security' ? 'text-[#eebb3b] border-b-2 border-[#eebb3b]  rounded-t-lg' : 'text-gray-500 hover:text-gray-900']">Security</button>
           </div>
           
-          <!-- Settings Form -->
-          <div v-if="loading" class="flex justify-center py-10">
-             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
-          <div v-else class="space-y-6">
+          <div class="space-y-6">
             <div v-if="activeTab === 'profile'" class="space-y-6">
               <!-- Personal Information -->
-              <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-[11px] font-bold text-gray-700 flex items-center gap-2 mb-5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <section class="bg-white p-6 rounded-xl  border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-700 flex items-center gap-2 mb-5">
                   Personal Information
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">First Name</label>
+                    <label class="block text-xs text-gray-500 mb-1">First Name</label>
                     <input type="text" v-model="form.firstName" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Last Name</label>
+                    <label class="block text-xs text-gray-500 mb-1">Last Name</label>
                     <input type="text" v-model="form.lastName" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Username</label>
+                    <label class="block text-xs text-gray-500 mb-1">Username</label>
                     <input type="text" v-model="form.username" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Date of Birth</label>
+                    <label class="block text-xs text-gray-500 mb-1">Date of Birth</label>
                     <input type="date" v-model="form.dateOfBirth" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all text-gray-500">
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Age</label>
+                    <label class="block text-xs text-gray-500 mb-1">Age</label>
                     <input type="number" v-model="form.age" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
-                  <div>
+                  <div class="relative" ref="genderDropdownRef">
                     <label class="block text-[11px] text-gray-500 mb-1">Gender</label>
-                    <select v-model="form.gender" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white">
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
+                    <button 
+                      type="button"
+                      @click="isGenderDropdownOpen = !isGenderDropdownOpen"
+                      class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all bg-white flex items-center justify-between"
+                    >
+                      <span :class="form.gender ? 'text-gray-900' : 'text-gray-400'">{{ form.gender || 'Select Gender' }}</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" :class="['transition-transform duration-200', isGenderDropdownOpen ? 'rotate-180' : '']">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </button>
+
+                    <transition
+                      enter-active-class="transition ease-out duration-100"
+                      enter-from-class="transform opacity-0 scale-95"
+                      enter-to-class="transform opacity-100 scale-100"
+                      leave-active-class="transition ease-in duration-75"
+                      leave-from-class="transform opacity-100 scale-100"
+                      leave-to-class="transform opacity-0 scale-95"
+                    >
+                      <div v-if="isGenderDropdownOpen" class="absolute top-full left-0 z-[120] w-full mt-1 bg-white border border-gray-200 rounded-xl  max-h-48 overflow-y-auto shadow-lg">
+                        <div class="py-1">
+                          <button 
+                            v-for="g in ['Male', 'Female', 'Other']" 
+                            :key="g"
+                            type="button" 
+                            @click="form.gender = g; isGenderDropdownOpen = false" 
+                            class="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors duration-150 text-xs font-semibold"
+                            :class="form.gender === g ? 'bg-blue-50 text-blue-600' : 'text-gray-900'"
+                          >
+                            {{ g }}
+                          </button>
+                        </div>
+                      </div>
+                    </transition>
                   </div>
                 </div>
               </section>
 
               <!-- Contact Information -->
-              <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-[11px] font-bold text-gray-700 flex items-center gap-2 mb-5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-500"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <section class="bg-white p-6 rounded-xl  border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-700 flex items-center gap-2 mb-5">
                   Contact Information
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Email</label>
+                    <label class="block text-xs text-gray-500 mb-1">Email</label>
                     <input type="email" v-model="form.email" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-700 outline-none" disabled>
                   </div>
                   <div class="flex items-end gap-2">
                     <div class="flex-1">
-                      <label class="block text-[11px] text-gray-500 mb-1">Phone</label>
+                      <label class="block text-xs text-gray-500 mb-1">Phone</label>
                       <input type="tel" v-model="form.phone" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                     </div>
-                    <button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-medium rounded-lg transition-colors shadow-sm h-[38px]">Change</button>
+                    <button class="px-4 py-2 bg-[#eebb3b] text-white text-xs font-medium rounded-lg transition-colors  h-[38px]">Change</button>
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Alternative Email</label>
+                    <label class="block text-xs text-gray-500 mb-1">Alternative Email</label>
                     <input type="email" v-model="form.alternativeEmail" placeholder="Enter alternative email" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Position</label>
+                    <label class="block text-xs text-gray-500 mb-1">Position</label>
                     <input type="text" v-model="form.position" placeholder="Enter position" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                 </div>
               </section>
 
               <!-- Address -->
-              <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-[11px] font-bold text-gray-700 flex items-center gap-2 mb-5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-red-500"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <section class="bg-white p-6 rounded-xl  border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-700 flex items-center gap-2 mb-5">
                   Address
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                   <div class="col-span-1 md:col-span-2">
-                    <label class="block text-[11px] text-gray-500 mb-1">Street Address</label>
+                    <label class="block text-xs text-gray-500 mb-1">Street Address</label>
                     <input type="text" v-model="form.address.streetAddress" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">City</label>
+                    <label class="block text-xs text-gray-500 mb-1">City</label>
                     <input type="text" v-model="form.address.city" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Province</label>
+                    <label class="block text-xs text-gray-500 mb-1">Province</label>
                     <input type="text" v-model="form.address.province" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Postal Code</label>
+                    <label class="block text-xs text-gray-500 mb-1">Postal Code</label>
                     <input type="text" v-model="form.address.postalCode" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                   <div>
-                    <label class="block text-[11px] text-gray-500 mb-1">Country</label>
+                    <label class="block text-xs text-gray-500 mb-1">Country</label>
                     <input type="text" v-model="form.address.country" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 outline-none transition-all">
                   </div>
                 </div>
@@ -136,17 +169,16 @@
             <!-- Security Tab Content -->
             <div v-if="activeTab === 'security'" class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <!-- Change Profile Card -->
-              <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center">
+              <section class="bg-white p-6 rounded-xl border border-gray-100 flex flex-col items-center">
                 <div class="w-full flex items-center gap-3 mb-6">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-500"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                   <div>
-                    <h3 class="text-sm font-bold text-gray-900">Change Profile</h3>
-                    <p class="text-[11px] text-gray-500">Change your profile picture from here</p>
+                    <h3 class="text-lg font-bold text-gray-900">Change Profile</h3>
+                    <p class="text-xs text-gray-500">Change your profile picture from here</p>
                   </div>
                 </div>
 
                 <div class="flex flex-col items-center justify-center py-6 flex-1">
-                  <div class="w-32 h-32 rounded-full bg-[#0ea5e9] text-white flex items-center justify-center text-5xl font-bold shadow-sm overflow-hidden mb-6">
+                  <div class="w-32 h-32 rounded-full text-white flex items-center justify-center text-5xl font-bold shadow-sm overflow-hidden mb-6">
                     <img v-if="userPhotoUrl && !uploadingPhoto" :src="userPhotoUrl" class="w-full h-full object-cover" alt="Profile" />
                     <span v-else-if="!uploadingPhoto">{{ userInitials || 'U' }}</span>
                     <svg v-else class="animate-spin h-8 w-8 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -154,12 +186,10 @@
                   <input type="file" ref="fileInput" class="hidden" accept="image/*" @change="handlePhotoUpload" />
 
                   <div class="flex gap-3 mb-4">
-                    <button @click="triggerFileInput" :disabled="uploadingPhoto" class="px-5 py-2 bg-[#3b82f6] hover:bg-blue-600 text-white text-xs font-semibold rounded-full shadow-sm flex items-center gap-2 transition-colors disabled:opacity-70">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <button @click="triggerFileInput" :disabled="uploadingPhoto" class="px-5 py-2 bg-[#eebb3b] text-white text-xs font-semibold rounded-full  flex items-center gap-2 transition-colors disabled:opacity-70">
                       Upload
                     </button>
-                    <button @click="resetPhoto" :disabled="uploadingPhoto || !userPhotoUrl" class="px-5 py-2 bg-white hover:bg-gray-50 text-orange-400 border border-orange-200 text-xs font-semibold rounded-full flex items-center gap-2 transition-colors disabled:opacity-50">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9.9 9.9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9.9 9.9 0 0 1 3.51 15"></path></svg>
+                    <button @click="resetPhoto" :disabled="uploadingPhoto || !userPhotoUrl" class="px-5 py-2 bg-white  text-[#b92e2b] border border-[#b92e2b] text-xs font-semibold rounded-full flex items-center gap-2 transition-colors disabled:opacity-50">
                       Reset
                     </button>
                   </div>
@@ -168,18 +198,17 @@
               </section>
 
               <!-- Change Password Card -->
-              <section class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
+              <section class="bg-white p-6 rounded-xl  border border-gray-100 flex flex-col">
                 <div class="w-full flex items-center gap-3 mb-6">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-500"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
                   <div>
-                    <h3 class="text-sm font-bold text-gray-900">Change Password</h3>
-                    <p class="text-[11px] text-gray-500">Your password must meet the requirements below</p>
+                    <h3 class="text-lg font-bold text-gray-900">Change Password</h3>
+                    <p class="text-xs text-gray-500">Your password must meet the requirements below</p>
                   </div>
                 </div>
 
                 <div class="space-y-4 flex-1">
                   <div>
-                    <label class="block text-[11px] text-gray-600 font-semibold mb-1.5">Current Password</label>
+                    <label class="block text-xs text-gray-500 mb-1.5">Current Password</label>
                     <div class="relative">
                       <input :type="showCurrentPassword ? 'text' : 'password'" v-model="passwordForm.current" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                       <button @click="showCurrentPassword = !showCurrentPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -190,7 +219,7 @@
                   </div>
                   
                   <div>
-                    <label class="block text-[11px] text-gray-600 font-semibold mb-1.5">New Password</label>
+                    <label class="block text-xs text-gray-500 mb-1.5">New Password</label>
                     <div class="relative">
                       <input :type="showNewPassword ? 'text' : 'password'" v-model="passwordForm.new" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                       <button @click="showNewPassword = !showNewPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -201,7 +230,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-[11px] text-gray-600 font-semibold mb-1.5">Confirm Password</label>
+                    <label class="block text-xs text-gray-500 mb-1.5">Confirm Password</label>
                     <div class="relative mb-6">
                       <input :type="showConfirmPassword ? 'text' : 'password'" v-model="passwordForm.confirm" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
                       <button @click="showConfirmPassword = !showConfirmPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -211,7 +240,7 @@
                     </div>
                   </div>
                   
-                  <button @click="updatePassword" :disabled="updatingPassword" class="w-full py-2.5 bg-[#3b82f6] hover:bg-blue-600 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors mt-auto disabled:opacity-70 flex justify-center items-center h-[42px]">
+                  <button @click="updatePassword" :disabled="updatingPassword" class="w-full py-2.5 bg-[#133e75] text-white text-sm font-semibold rounded-lg  transition-colors mt-auto disabled:opacity-70 flex justify-center items-center h-[42px]">
                     <svg v-if="updatingPassword" class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     <span v-else>Update Password</span>
                   </button>
@@ -219,11 +248,12 @@
               </section>
             </div>
           </div>
+          </template>
         </div>
 
         <!-- Fixed Bottom Action Bar -->
-        <div class="fixed bottom-0 right-0 left-0 md:left-[260px] bg-white border-t border-gray-200 p-4 flex justify-end gap-3 z-30 opacity-95">
-          <button @click="navigateTo('StaffDashboard', 'dashboard')" class="px-5 py-2 text-xs font-medium text-red-400 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">Close</button>
+        <div class="fixed bottom-[96px] md:bottom-0 right-0 left-0 md:left-[260px] bg-white border-t border-gray-200 p-4 flex justify-end gap-3 z-50 opacity-95 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:shadow-none">
+          <button @click="navigateTo('StaffDashboard', 'dashboard')" class="px-5 py-2 text-xs font-medium text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">Close</button>
           <button @click="saveChanges" :disabled="saving" class="px-5 py-2 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2 min-w-[120px]">
              <svg v-if="saving" class="animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
              <span v-else>Save Changes</span>
@@ -237,6 +267,7 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
 import StaffSidebar from './StaffSidebar.vue'
+import SettingsSkeleton from '../../components/skeletons/SettingsSkeleton.vue'
 import { useRouter } from 'vue-router'
 import { db, storage } from '../../firebase.js'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
@@ -257,6 +288,8 @@ const updatingPassword = ref(false)
 const showCurrentPassword = ref(false)
 const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)
+const isGenderDropdownOpen = ref(false)
+const genderDropdownRef = ref(null)
 
 const passwordForm = ref({
   current: '',
@@ -400,29 +433,21 @@ const updatePassword = async () => {
   try {
     updatingPassword.value = true
     
-    // Check current password from Firestore
-    const userRef = doc(db, 'users', String(id))
-    const userSnap = await getDoc(userRef)
-    
-    if (!userSnap.exists()) {
-      alert('User document not found.')
-      return
-    }
-    
-    const userData = userSnap.data()
-    
-    // Note: In a production app, passwords should NEVER be stored as plain text.
-    // They should be hashed (e.g., using bcrypt) on the server side.
-    // Since this project seems to store them directly based on the context:
-    if (userData.password !== passwordForm.value.current) {
-      alert('Current password is incorrect.')
-      return
-    }
-    
-    // Update the password in Firestore
-    await updateDoc(userRef, {
-      password: passwordForm.value.new
+    const response = await fetch(`http://localhost:3001/users/${id}/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        currentPassword: passwordForm.value.current,
+        newPassword: passwordForm.value.new,
+      }),
     })
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || 'Failed to update password');
+    }
     
     alert('Password updated successfully!')
     
@@ -431,7 +456,7 @@ const updatePassword = async () => {
     passwordForm.value.confirm = ''
   } catch (error) {
     console.error('Error updating password:', error)
-    alert('Failed to update password. Please check your connection and try again.')
+    alert(error.message || 'Failed to update password. Please check your connection and try again.')
   } finally {
     updatingPassword.value = false
   }
@@ -554,7 +579,20 @@ const navigateTo = (routeName, navItem) => {
   router.push({ name: routeName })
 }
 
+const onDocumentClick = (e) => {
+  if (isGenderDropdownOpen.value && genderDropdownRef.value) {
+    if (!genderDropdownRef.value.contains(e.target)) {
+      isGenderDropdownOpen.value = false
+    }
+  }
+}
+
 onMounted(() => {
   fetchUserProfile()
+  document.addEventListener('click', onDocumentClick)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocumentClick)
 })
 </script>

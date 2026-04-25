@@ -2,6 +2,11 @@
   <!-- Mobile View -->
   <div v-if="isMobile" class="min-h-screen flex items-center justify-center bg-white p-6 font-sans">
     <div class="w-full max-w-[480px] bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+      <div class="flex flex-row items-center justify-center gap-3 mb-6 w-full">
+        <img src="/dictlogo2.png" alt="DICT Logo" class="h-10 sm:h-12 w-auto object-contain"/>
+        <img src="/Bagongpilipinas.png" alt="Bagong Pilipinas Logo" class="h-10 sm:h-12 w-auto object-contain"/>
+        <img src="/3.png" alt="Attendict Logo" class="h-10 sm:h-12 w-auto object-contain"/>
+      </div>
       <h1 class="text-3xl font-bold text-gray-900 mb-1 text-center">Let's Get Started</h1>
       <p class="text-gray-500 text-base mb-8 text-center">Join DICT and be part of our community.</p>
 
@@ -95,7 +100,9 @@
           v-model="form.position"
           type="text"
           required
+          :readonly="form.role === 'student'"
           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-blue-500 focus:outline-none transition-colors"
+          :class="form.role === 'student' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white'"
           placeholder="Position"
         />
 
@@ -171,8 +178,12 @@
           </div>
         </div>
 
-        <button type="submit" class="w-full px-8 py-3.5 mt-4 bg-[#133e75] text-white font-semibold rounded-xl cursor-pointer transition-colors duration-300 hover:bg-[#133e75]/80">
-          Create Account
+        <button type="submit" :disabled="isLoading" class="w-full px-8 py-3.5 mt-4 bg-[#133e75] text-white font-semibold rounded-xl cursor-pointer transition-colors duration-300 hover:bg-[#133e75]/80 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center">
+          <svg v-if="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isLoading ? 'Creating Account...' : 'Create Account' }}
         </button>
       </form>
 
@@ -188,23 +199,25 @@
       
       <!-- Header links (Top right) & Logo (Top left) -->
       <div class="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-20">
-        <div class="flex items-center gap-2 font-bold text-xl text-blue-600">
+        <div class="flex flex-row items-center gap-3 font-bold text-xl text-blue-600">
+          <img src="/dictlogo2.png" alt="DICT Logo" class="h-12 w-auto object-contain lg:block hidden"/>
+          <img src="/Bagongpilipinas.png" alt="Bagong Pilipinas Logo" class="h-12 w-auto object-contain lg:block hidden"/>
           <img src="/3.png" alt="Logo" class="h-12 w-auto object-contain hidden sm:block"/>
           <span class="text-gray-900 text-3xl">ATTENDICT</span>
         </div>
       </div>
 
       <!-- Left Side Illustration -->
-      <div class="hidden lg:flex lg:w-1/2 relative items-center justify-center bg-gray-50 p-12 overflow-hidden">
+      <div class="hidden lg:flex lg:w-1/2 relative items-center justify-center bg-white p-12 overflow-hidden">
         <!-- Decorative background blur/shapes -->
         <div class="absolute inset-0 overflow-hidden">
-          <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
-          <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-red-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+          <div class="absolute top-[-10%] left-[-10%] w-96 h-96  rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+          <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96  rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
         </div>
         
         <!-- Central Circular Graphic area -->
-        <div class="relative w-[28rem] h-[28rem] bg-orange-50 rounded-full flex items-center justify-center shadow-sm border border-orange-100 z-10">
-          <DotLottieVue style="height: 500px; width: 500px" autoplay loop src="https://lottie.host/6ad83ae1-839d-473d-98ae-3918a1a36e92/vId07eA74k.json" />
+        <div class="relative w-[28rem] h-[28rem]  flex items-center justify-center  z-10">
+          <DotLottieVue style="height: 500px; width: 500px" autoplay loop src="https://lottie.host/eb77402f-d9a7-478c-9ac5-026aa8b6b889/iaB5skKvtQ.lottie" />
         </div>
       </div>
 
@@ -324,7 +337,9 @@
                   v-model="form.position"
                   type="text"
                   required
+                  :readonly="form.role === 'student'"
                   class="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
+                  :class="form.role === 'student' ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white'"
                   placeholder="Position"
                 />
               </div>
@@ -414,8 +429,12 @@
             </div>
 
             <div>
-               <button type="submit" class="w-full px-8 py-3 mt-4 bg-[#133e75] text-white font-medium rounded-lg cursor-pointer transition-colors duration-300 hover:bg-[#133e75]/80">
-                 Create Account
+               <button type="submit" :disabled="isLoading" class="w-full px-8 py-3 mt-4 bg-[#133e75] text-white font-medium rounded-lg cursor-pointer transition-colors duration-300 hover:bg-[#133e75]/80 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center">
+                 <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                 </svg>
+                 {{ isLoading ? 'Creating Account...' : 'Create Account' }}
                </button>
             </div>
           </form>
@@ -427,6 +446,40 @@
       </div>
     </div>
   </div>
+
+  <!-- Success/Error Modal -->
+  <transition
+    enter-active-class="transition ease-out duration-300"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition ease-in duration-200"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all">
+        <!-- Success Icon -->
+        <div v-if="modalType === 'success'" class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <!-- Error Icon -->
+        <div v-else class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+          <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+        
+        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ modalTitle }}</h3>
+        <p class="text-sm text-gray-500 mb-6 px-2">{{ modalMessage }}</p>
+        
+        <button @click="closeModal" class="w-full inline-flex justify-center items-center rounded-xl px-4 py-3 bg-[#133e75] text-sm font-semibold text-white hover:bg-[#133e75]/90 focus:outline-none transition-colors">
+          {{ modalType === 'success' ? 'Continue' : 'Try Again' }}
+        </button>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script>
@@ -441,6 +494,11 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
+      showModal: false,
+      modalType: 'error',
+      modalTitle: '',
+      modalMessage: '',
       showRoleDropdown: false,
       showPassword: false,
       showConfirmPassword: false,
@@ -468,46 +526,74 @@ export default {
     window.removeEventListener('resize', this.handleResize);
   },
   methods: {
+    closeModal() {
+      this.showModal = false;
+      if (this.modalType === 'success') {
+        this.$router.push({ name: 'OtpVerification', query: { email: this.form.email } });
+      }
+    },
+    showCustomModal(type, title, message) {
+      this.modalType = type;
+      this.modalTitle = title;
+      this.modalMessage = message;
+      this.showModal = true;
+    },
     selectRole(role) {
       this.form.role = role;
+      if (role === 'student') {
+        this.form.position = 'Intern';
+      } else if (role === 'staff' && this.form.position === 'Intern') {
+        this.form.position = '';
+      }
       this.showRoleDropdown = false;
     },
     async handleRegister() {
       if (!this.form.role) {
-        alert('Please select a role.');
+        this.showCustomModal('error', 'Role Required', 'Please select a role.');
         return;
       }
 
       if (this.form.password !== this.form.confirmPassword) {
-        alert('Passwords do not match.');
+        this.showCustomModal('error', 'Password Mismatch', 'Passwords do not match.');
         return;
       }
 
+      this.isLoading = true;
+
       try {
-        const docRef = await addDoc(collection(db, 'users'), {
-          username: this.form.username,
-          firstName: this.form.firstName,
-          email: this.form.email,
-          middleName: this.form.middleName,
-          lastName: this.form.lastName,
-          role: this.form.role,
-          position: this.form.position,
-          assignedOffice: this.form.assignedOffice,
-          schoolOrUniversity: this.form.schoolOrUniversity || '',
-          ojtRequiredHours: this.form.ojtRequiredHours ?? null,
-          // Default attendance tagging fields so admin table shows Normal Hours
-          tagging: 'Normal Hours',
-          todayAmTag: 'Normal Hours',
-          todayPmTag: 'Normal Hours',
-          password: this.form.password
+        const endpoint = this.form.role === 'staff' ? '/auth/staff/register' : '/auth/intern/register';
+        const response = await fetch(`http://localhost:3001${endpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: this.form.username,
+            firstName: this.form.firstName,
+            middleName: this.form.middleName || '',
+            lastName: this.form.lastName,
+            email: this.form.email,
+            password: this.form.password,
+            position: this.form.position,
+            assignedOffice: this.form.assignedOffice,
+            schoolOrUniversity: this.form.schoolOrUniversity || '',
+            ojtRequiredHours: this.form.ojtRequiredHours ?? null,
+          }),
         });
 
-        console.log('Registration saved with ID:', docRef.id);
-        alert('Registration successful!');
-        this.$router.push({ name: 'Login' });
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.message || 'Registration failed');
+        }
+
+        const data = await response.json();
+        console.log('Registration successful, userId:', data.userId);
+        this.showCustomModal('success', 'Registration Successful', 'Please check your email for the verification code.');
       } catch (error) {
         console.error('Registration error:', error);
-        alert('Registration failed. Please check your inputs.');
+        this.showCustomModal('error', 'Registration Failed', error.message || 'Please check your inputs.');
+      } finally {
+        this.isLoading = false;
       }
     },
     handleResize() {

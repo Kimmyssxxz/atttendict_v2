@@ -1,128 +1,157 @@
 <template>
-  <div class="flex h-screen bg-[#f5f5f5] font-sans antialiased text-gray-900">
+  <div class="flex h-screen bg-white font-sans antialiased text-gray-900">
     <StaffSidebar activeNav="monthly-summary" />
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col relative min-w-0 overflow-hidden z-0">
       <!-- Top Header -->
-      <header class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center z-20 sticky top-0">
-        <div class="flex flex-col">
-          <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Calendar</h1>
-          <p class="text-sm text-gray-500 mt-1">Review your monthly attendance records</p>
+      <header class="bg-[#133e75] md:bg-white md:border-b md:border-gray-200 px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-5 flex justify-between items-center relative z-20">
+        <!-- Mobile Header (Back Button + Centered Title) -->
+        <div v-if="isMobile" class="w-full flex items-center justify-center relative py-1">
+          <button @click="router.back()" class="absolute left-0 p-1 text-white rounded-full transition-colors" aria-label="Go back">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <h1 class="text-xl font-semibold text-white">Calendar</h1>
         </div>
-        <div class="flex items-center gap-6">
-          <div class="flex items-center gap-3 pl-6 border-l border-gray-200">
-            <div ref="avatarWrapEl" class="relative">
-              <button class="w-10 h-10 rounded-full bg-blue-100 border-2 border-white shadow-sm flex items-center justify-center text-blue-700 font-bold overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all hover:scale-105" type="button" @click.stop="toggleAvatarTooltip">
-                <img v-if="avatarTooltipImage" :src="avatarTooltipImage" class="w-full h-full object-cover" alt="Profile" />
-                <span v-else class="text-sm tracking-wider">{{ avatarInitial }}</span>
+
+        <!-- Desktop Header Layout -->
+        <template v-else>
+          <h1 class="text-base text-gray-800 font-medium"></h1>
+          <div class="flex items-center gap-4">
+            <div ref="avatarWrapEl" class="relative flex items-center">
+              <button class="w-9 h-9 rounded-full bg-gray-800 text-white border-none cursor-pointer text-sm hover:bg-gray-900 transition-colors duration-200" type="button" @click="toggleAvatarMenu" aria-haspopup="true" :aria-expanded="avatarMenuOpen">
+                <img v-if="userPhotoUrl" :src="userPhotoUrl" class="w-full h-full rounded-full object-cover block" alt="Profile" />
+                <span v-else class="inline-flex w-full h-full items-center justify-center">{{ userInitials || 'U' }}</span>
               </button>
-              
-              <transition enter-active-class="transition duration-200 ease-out" enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in" leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
-                <div v-if="showAvatarTooltip" class="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 origin-top-right" role="tooltip">
-                  <div class="p-4 border-b border-gray-50 flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
-                      <img v-if="avatarTooltipImage" :src="avatarTooltipImage" class="w-full h-full object-cover" alt="Profile" />
-                      <div v-else class="text-lg font-bold text-gray-500">{{ avatarInitial }}</div>
-                    </div>
-                    <div class="overflow-hidden">
-                      <div class="text-[15px] font-bold text-gray-900 truncate">{{ avatarTooltipName }}</div>
-                      <div class="text-xs text-gray-500 truncate">{{ avatarTooltipEmail }}</div>
-                    </div>
+
+              <div v-if="avatarMenuOpen" class="absolute top-[calc(100%+10px)] right-0 w-[300px] bg-white border border-slate-900/5 rounded-xl shadow-[0_14px_30px_rgba(0,0,0,0.12)] overflow-hidden z-50 origin-top-right transition-all" role="menu">
+                <div class="flex gap-3 p-3.5 border-b border-slate-900/5">
+                  <div class="w-11 h-11 rounded-full overflow-hidden shrink-0 bg-gray-900">
+                    <img v-if="userPhotoUrl" class="w-full h-full object-cover block" :src="userPhotoUrl" alt="Profile" />
+                    <div v-else class="w-full h-full flex items-center justify-center text-white font-bold">{{ userInitials || 'U' }}</div>
                   </div>
-                  <div class="py-2">
-                    <div class="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors" @click="navigateTo('StaffSettings', 'settings')">
-                      <div class="flex items-center gap-3 text-sm font-medium text-gray-700">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
-                          <circle cx="12" cy="12" r="3"></circle>
-                          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                        </svg>
-                        Settings
-                      </div>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-400"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </div>
-                    <div class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors text-sm font-medium text-gray-700" @click="handleLogout">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                      </svg>
-                      Log Out
-                    </div>
+                  <div class="flex flex-col justify-center min-w-0">
+                    <div class="font-bold text-slate-900 text-sm truncate">{{ userDisplayName || 'User' }}</div>
+                    <div class="text-xs text-slate-500 truncate">{{ userEmail || '' }}</div>
                   </div>
                 </div>
-              </transition>
+
+                <button class="w-full flex items-center gap-2.5 px-3.5 py-3 border-none bg-transparent cursor-pointer text-slate-900 font-medium text-sm text-left hover:bg-slate-900/5 transition-colors" type="button" @click="navigateTo('StaffSettings', 'settings')" role="menuitem">
+                  <svg class="text-slate-700 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                  <span>Settings</span>
+                  <span class="ml-auto text-slate-400 text-lg font-bold">›</span>
+                </button>
+
+                <button class="w-full flex items-center gap-2.5 px-3.5 py-3 border-none bg-transparent cursor-pointer text-slate-900 font-medium text-sm text-left hover:bg-slate-900/5 transition-colors" type="button" @click="handleLogout" role="menuitem">
+                  <svg class="text-slate-700 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                  <span>Log Out</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </template>
       </header>
 
       <!-- Page Content -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-8 pb-24 md:pb-8">
-        <div class="max-w-4xl mx-auto">
-          <!-- Calendar Panel -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 sm:p-8 border-b border-gray-100 gap-4">
-              <div>
-                <h2 class="text-2xl font-bold text-gray-900">{{ monthYearLabel }}</h2>
-                <p class="text-sm text-gray-500 mt-1">Monthly Attendance Record</p>
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 md:pb-8 flex flex-col items-center justify-center">
+        <div class="max-w-full mx-auto">
+          <div class="mb-8 hidden md:block">
+            <h2 class="text-3xl text-gray-900 font-bold">Calendar</h2>
+            <p class="text-sm text-gray-500 mt-1">Review your monthly attendance records</p>
+          </div>
+        </div>
+
+        <div class="w-full max-w-3xl mx-auto">
+          <CalendarSkeleton v-if="loading" />
+          <template v-else>
+            <div class="bg-white rounded-3xl  border border-gray-100 overflow-hidden">
+            <div class="flex flex-row justify-between items-center p-4 border-b border-gray-50 bg-white sticky top-0 z-10">
+              <button aria-label="Previous month" @click="prevMonth" class="p-2 hover:bg-gray-50 rounded-xl transition-all text-[#133e75] active:scale-95">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              
+              <div class="text-center">
+                <h2 class="text-xl font-bold text-[#133e75] tracking-tight">{{ monthYearLabel }}</h2>
               </div>
 
-              <div class="flex items-center gap-2 bg-gray-50 p-1 rounded-xl border border-gray-200">
-                <button type="button" aria-label="Previous month" @click="prevMonth" class="p-2 hover:bg-white rounded-lg transition-colors text-gray-600 hover:text-gray-900 hover:shadow-sm">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                  </svg>
-                </button>
-                <button type="button" @click="goToday" class="px-4 py-1.5 text-sm font-semibold text-gray-700 hover:bg-white rounded-lg transition-all hover:shadow-sm">Today</button>
-                <button type="button" aria-label="Next month" @click="nextMonth" class="p-2 hover:bg-white rounded-lg transition-colors text-gray-600 hover:text-gray-900 hover:shadow-sm">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                  </svg>
-                </button>
-              </div>
+              <button aria-label="Next month" @click="nextMonth" class="p-2 hover:bg-gray-50 rounded-xl transition-all text-[#133e75] active:scale-95">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
             </div>
 
-            <div class="p-6 sm:p-8">
-              <div class="grid grid-cols-7 gap-px mb-4">
-                <div class="text-center text-xs font-bold text-gray-500 uppercase tracking-wider pb-4">Sun</div>
-                <div class="text-center text-xs font-bold text-gray-500 uppercase tracking-wider pb-4">Mon</div>
-                <div class="text-center text-xs font-bold text-gray-500 uppercase tracking-wider pb-4">Tue</div>
-                <div class="text-center text-xs font-bold text-gray-500 uppercase tracking-wider pb-4">Wed</div>
-                <div class="text-center text-xs font-bold text-gray-500 uppercase tracking-wider pb-4">Thu</div>
-                <div class="text-center text-xs font-bold text-gray-500 uppercase tracking-wider pb-4">Fri</div>
-                <div class="text-center text-xs font-bold text-gray-500 uppercase tracking-wider pb-4">Sat</div>
+            <div class="p-3 sm:p-4">
+              <div class="grid grid-cols-7 gap-1 mb-2">
+                <div v-for="day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" :key="day" class="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest pb-2">
+                  {{ day }}
+                </div>
               </div>
 
-              <div class="grid grid-cols-7 gap-2 sm:gap-4">
+              <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
                 <div
                   v-for="cell in calendarCells"
                   :key="cell.key"
-                  class="aspect-square flex flex-col items-center justify-center relative rounded-xl transition-all"
+                  class="aspect-square flex flex-col items-center justify-center relative rounded-xl transition-all overflow-hidden border border-gray-100/50"
                   :class="[
-                    !cell.inCurrentMonth ? 'opacity-30' : 'bg-gray-50/50 hover:bg-blue-50/50 border border-gray-100 hover:border-blue-100 cursor-pointer',
-                    cell.status ? 'shadow-sm' : ''
+                    !cell.inCurrentMonth ? 'opacity-20 pointer-events-none' : (cell.isToday ? 'bg-[#133e75]' : 'bg-white hover:bg-gray-50 cursor-pointer'),
                   ]"
                 >
-                  <span class="text-sm sm:text-base font-semibold text-gray-700 z-10" :class="{'text-blue-600': cell.isToday}">{{ cell.day }}</span>
-                  <span v-if="cell.isToday" class="absolute top-1 sm:top-2 text-[10px] font-bold text-blue-600 uppercase tracking-wider">Today</span>
-                  <span 
-                    v-if="cell.status" 
-                    class="absolute bottom-2 sm:bottom-3 w-3 sm:w-4 h-3 sm:h-4 rounded-full shadow-sm ring-2 ring-white" 
-                    :style="getDotStyle(cell.status)" 
-                    :aria-label="`AM: ${cell.status.am}, PM: ${cell.status.pm}`"
-                  ></span>
+                  <!-- Background Layers for Sessions -->
+                  <div class="absolute inset-x-0 top-0 h-1/2 transition-colors duration-300" :style="getSessionBg(cell.status?.am)"></div>
+                  <div class="absolute inset-x-0 bottom-0 h-1/2 transition-colors duration-300" :style="getSessionBg(cell.status?.pm)"></div>
+                  
+                  <!-- Cell Content -->
+                  <div class="relative z-10 flex flex-col items-center justify-center w-full h-full gap-0.5">
+                    <span class="text-xs sm:text-sm font-bold" 
+                          :class="[
+                            cell.isToday ? 'text-white' : (cell.status ? 'text-gray-900' : 'text-gray-700')
+                          ]">
+                      {{ cell.day }}
+                    </span>
+                    
+                    <!-- Status Label -->
+                    <div v-if="cell.status && cell.inCurrentMonth" class="flex flex-col items-center" :class="{'text-white/90': cell.isToday}">
+                      <span v-if="isFullDay(cell.status)" class="text-[7px] leading-none font-black uppercase tracking-tighter opacity-70">
+                        {{ getStatusLabel(cell.status.am) }}
+                      </span>
+                      <div v-else class="flex flex-col items-center gap-0">
+                        <span v-if="cell.status.am !== 'none'" class="text-[6px] leading-none font-black uppercase tracking-tighter opacity-60">AM</span>
+                        <span v-if="cell.status.pm !== 'none'" class="text-[6px] leading-none font-black uppercase tracking-tighter opacity-60">PM</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Today indicator label (subtle) -->
+                  <div v-if="cell.isToday" class="absolute top-1 left-2 text-[6px] font-bold text-white uppercase tracking-widest">Today</div>
                 </div>
               </div>
             </div>
 
-            <div class="bg-gray-50 border-t border-gray-100 p-4 sm:p-6 flex flex-wrap justify-center gap-4 sm:gap-8" aria-label="Attendance legend">
-              <div class="flex items-center gap-2 text-sm font-medium text-gray-600"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-100" aria-hidden="true"></span><span>At Office</span></div>
-              <div class="flex items-center gap-2 text-sm font-medium text-gray-600"><span class="w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-blue-100" aria-hidden="true"></span><span>On Field</span></div>
-              <div class="flex items-center gap-2 text-sm font-medium text-gray-600"><span class="w-2.5 h-2.5 rounded-full bg-purple-500 ring-2 ring-purple-100" aria-hidden="true"></span><span>Travel</span></div>
-              <div class="flex items-center gap-2 text-sm font-medium text-gray-600"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 ring-2 ring-orange-100" aria-hidden="true"></span><span>Leave</span></div>
+            <!-- Modern Pill Legend -->
+            <div class="px-4 py-4 border-t border-gray-50 bg-gray-50/30">
+              <div class="flex flex-nowrap justify-start sm:justify-center gap-2 overflow-x-auto no-scrollbar pb1">
+                <div v-for="item in legendItems" :key="item.label" 
+                     class="flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all text-[9px] font-semibold"
+                     :class="item.bgClass">
+                  <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                  {{ item.label }}
+                </div>
+              </div>
             </div>
           </div>
+          </template>
         </div>
       </div>
     </main>
@@ -136,10 +165,17 @@ import { useRouter } from 'vue-router'
 import { collection, doc, getDoc, onSnapshot, orderBy, query, where } from 'firebase/firestore'
 import { db } from '../../firebase'
 import StaffSidebar from './StaffSidebar.vue'
+import CalendarSkeleton from '../../components/skeletons/CalendarSkeleton.vue'
 
 const router = useRouter()
 const activeTab = ref('current')
 const activeNav = ref('monthly-summary')
+const loading = ref(true)
+
+const isMobile = ref(false)
+const handleResize = () => {
+  isMobile.value = window.innerWidth < 768
+}
 
 const today = () => {
   const d = new Date()
@@ -192,43 +228,35 @@ const staffId = computed(() => {
 
 const staffProfile = ref(null)
 
-const showAvatarTooltip = ref(false)
+const avatarMenuOpen = ref(false)
 const avatarWrapEl = ref(null)
 
-const avatarInitial = computed(() => {
+const userDisplayName = computed(() => {
   const p = staffProfile.value || currentStaff.value || null
   const firstName = typeof p?.firstName === 'string' ? p.firstName.trim() : ''
   const lastName = typeof p?.lastName === 'string' ? p.lastName.trim() : ''
-  const username = typeof p?.username === 'string' ? p.username.trim() : ''
-  const email = typeof p?.email === 'string' ? p.email.trim() : ''
-
-  const basis = firstName || lastName || username || email
-  const letter = basis ? String(basis).trim().charAt(0) : 'U'
-  return letter ? letter.toUpperCase() : 'U'
-})
-
-const avatarTooltipName = computed(() => {
-  const p = staffProfile.value || currentStaff.value || null
-  const firstName = typeof p?.firstName === 'string' ? p.firstName.trim() : ''
-  const lastName = typeof p?.lastName === 'string' ? p.lastName.trim() : ''
-
   const full = `${firstName} ${lastName}`.trim()
   return full || 'Unknown User'
 })
 
-const avatarTooltipEmail = computed(() => {
+const userEmail = computed(() => {
   const p = staffProfile.value || currentStaff.value || null
-  const email = typeof p?.email === 'string' ? p.email.trim() : ''
-  return email || ''
+  return (typeof p?.email === 'string' ? p.email.trim() : '') || ''
 })
 
-const avatarTooltipImage = computed(() => {
+const userPhotoUrl = computed(() => {
   const p = staffProfile.value || currentStaff.value || null
   return p?.photoUrl || p?.photoURL || p?.avatarUrl || p?.profilePicture || p?.profileImage || null
 })
 
-const toggleAvatarTooltip = () => {
-  showAvatarTooltip.value = !showAvatarTooltip.value
+const userInitials = computed(() => {
+  const name = userDisplayName.value || userEmail.value
+  if (!name) return 'U'
+  return name.trim().charAt(0).toUpperCase()
+})
+
+const toggleAvatarMenu = () => {
+  avatarMenuOpen.value = !avatarMenuOpen.value
 }
 
 const handleLogout = () => {
@@ -238,11 +266,11 @@ const handleLogout = () => {
 }
 
 const onDocumentClick = (e) => {
-  if (!showAvatarTooltip.value) return
+  if (!avatarMenuOpen.value) return
   const el = avatarWrapEl.value
   if (!el) return
   if (el.contains(e.target)) return
-  showAvatarTooltip.value = false
+  avatarMenuOpen.value = false
 }
 
 const loadStaffProfile = async () => {
@@ -324,7 +352,7 @@ const resolveDayStatus = (docData) => {
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'office': return '#10b981' // Green
+    case 'office': return '#10b981' // Emerald
     case 'field': return '#3b82f6'  // Blue
     case 'travel': return '#a855f7' // Purple
     case 'leave': return '#f97316'  // Orange
@@ -332,14 +360,36 @@ const getStatusColor = (status) => {
   }
 }
 
-const getDotStyle = (statusObj) => {
-  if (!statusObj) return {}
-  const colorAm = getStatusColor(statusObj.am)
-  const colorPm = getStatusColor(statusObj.pm)
+const getSessionBg = (status) => {
+  if (!status || status === 'none') return {}
+  const color = getStatusColor(status)
+  // Use a softer opacity for AM/PM indicators to keep it modern
   return {
-    background: `linear-gradient(to right, ${colorAm} 50%, ${colorPm} 50%)`
+    backgroundColor: color,
+    opacity: 0.25
   }
 }
+
+const isFullDay = (statusObj) => {
+  return statusObj && statusObj.am !== 'none' && statusObj.am === statusObj.pm
+}
+
+const getStatusLabel = (status) => {
+  switch (status) {
+    case 'office': return 'Office'
+    case 'field': return 'Field'
+    case 'travel': return 'Travel'
+    case 'leave': return 'Leave'
+    default: return ''
+  }
+}
+
+const legendItems = [
+  { label: 'At Office', bgClass: 'bg-emerald-50 text-emerald-700 border-emerald-100' },
+  { label: 'On Field', bgClass: 'bg-blue-50 text-blue-700 border-blue-100' },
+  { label: 'Travel', bgClass: 'bg-purple-50 text-purple-700 border-purple-100' },
+  { label: 'Leave', bgClass: 'bg-orange-50 text-orange-700 border-orange-100' }
+]
 
 const subscribeToMonthAttendance = () => {
   if (unsubscribeAttendance) {
@@ -348,6 +398,7 @@ const subscribeToMonthAttendance = () => {
   }
 
   attendanceByDate.value = {}
+  loading.value = true
 
   if (!staffId.value) return
 
@@ -394,6 +445,7 @@ const subscribeToMonthAttendance = () => {
       }
     })
     attendanceByDate.value = map
+    loading.value = false
   })
 }
 
@@ -466,6 +518,9 @@ onMounted(() => {
   subscribeToMonthAttendance()
   loadStaffProfile()
   document.addEventListener('click', onDocumentClick)
+  
+  handleResize()
+  window.addEventListener('resize', handleResize)
 })
 
 watch([monthStartKey, monthEndKey, staffId], () => {
@@ -479,5 +534,6 @@ watch(staffId, () => {
 onUnmounted(() => {
   if (unsubscribeAttendance) unsubscribeAttendance()
   document.removeEventListener('click', onDocumentClick)
+  window.removeEventListener('resize', handleResize)
 })
 </script>

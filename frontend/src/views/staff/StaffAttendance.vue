@@ -1,138 +1,128 @@
 <template>
-  <div class="flex h-screen bg-[#f5f5f5] font-sans antialiased text-gray-900">
+  <div class="flex h-screen bg-white font-sans antialiased text-gray-900">
     <!-- Sidebar -->
     <StaffSidebar activeNav="attendance" />
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col relative min-w-0 overflow-hidden z-0">
-      <!-- Top Header -->
-      <header class="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center z-20 sticky top-0">
-        <div class="flex flex-col">
-          <h1 class="text-2xl font-bold text-gray-900 tracking-tight">My Attendance</h1>
-          <p class="text-sm text-gray-500 mt-1">Mark your attendance and track your work hours</p>
+      <header class="bg-[#133e75] md:bg-white md:border-b md:border-gray-200 px-4 py-3 sm:px-6 sm:py-4 md:px-8 md:py-5 flex justify-between items-center relative z-20">
+        <!-- Mobile Header (Back Button + Centered Title) -->
+        <div v-if="isMobile" class="w-full flex items-center justify-center relative py-1">
+          <button @click="router.back()" class="absolute left-0 p-1 text-white rounded-full transition-colors" aria-label="Go back">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <h1 class="text-xl font-semibold text-white">Attendance</h1>
         </div>
-        <div class="flex items-center gap-6">
-          <div class="text-right hidden sm:block">
-            <div class="text-2xl font-bold text-gray-900 tabular-nums">{{ currentTime }}</div>
-            <div class="text-xs text-gray-500 font-medium mt-0.5">{{ currentDate }}</div>
-          </div>
-          <div class="flex items-center gap-3 pl-6 border-l border-gray-200">
-            <div ref="avatarWrapEl" class="relative">
-              <button class="w-10 h-10 rounded-full bg-blue-100 border-2 border-white shadow-sm flex items-center justify-center text-blue-700 font-bold overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all hover:scale-105" type="button" @click="toggleAvatarMenu" aria-haspopup="true" :aria-expanded="avatarMenuOpen">
-                <img v-if="userPhotoUrl" :src="userPhotoUrl" class="w-full h-full object-cover" alt="Profile" />
-                <span v-else class="text-sm tracking-wider">{{ userInitials || 'U' }}</span>
+
+        <!-- Desktop Header Layout -->
+        <template v-else>
+          <h1 class="text-base text-gray-800 font-medium"></h1>
+          <div class="flex items-center gap-4">
+            <div ref="avatarWrapEl" class="relative flex items-center">
+              <button class="w-9 h-9 rounded-full bg-gray-800 text-white border-none cursor-pointer text-sm hover:bg-gray-900 transition-colors duration-200" type="button" @click="toggleAvatarMenu" aria-haspopup="true" :aria-expanded="avatarMenuOpen">
+                <img v-if="userPhotoUrl" :src="userPhotoUrl" class="w-full h-full rounded-full object-cover block" alt="Profile" />
+                <span v-else class="inline-flex w-full h-full items-center justify-center">{{ userInitials || 'U' }}</span>
               </button>
 
-              <!-- Dropdown Menu -->
-              <div v-if="avatarMenuOpen" class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50 transform origin-top-right transition-all">
-                <div class="p-4 border-b border-gray-100 bg-gray-50/50">
-                  <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold overflow-hidden shrink-0">
-                      <img v-if="userPhotoUrl" :src="userPhotoUrl" class="w-full h-full object-cover" alt="Profile" />
-                      <span v-else class="text-base tracking-wider">{{ userInitials || 'U' }}</span>
-                    </div>
-                    <div class="min-w-0">
-                      <p class="text-sm font-bold text-gray-900 truncate">{{ userDisplayName || 'User' }}</p>
-                      <p class="text-xs text-gray-500 truncate mt-0.5">{{ userEmail || '' }}</p>
-                    </div>
+              <div v-if="avatarMenuOpen" class="absolute top-[calc(100%+10px)] right-0 w-[300px] bg-white border border-slate-900/5 rounded-xl shadow-[0_14px_30px_rgba(0,0,0,0.12)] overflow-hidden z-50 origin-top-right transition-all" role="menu">
+                <div class="flex gap-3 p-3.5 border-b border-slate-900/5">
+                  <div class="w-11 h-11 rounded-full overflow-hidden shrink-0 bg-gray-900">
+                    <img v-if="userPhotoUrl" class="w-full h-full object-cover block" :src="userPhotoUrl" alt="Profile" />
+                    <div v-else class="w-full h-full flex items-center justify-center text-white font-bold">{{ userInitials || 'U' }}</div>
+                  </div>
+                  <div class="flex flex-col justify-center min-w-0">
+                    <div class="font-bold text-slate-900 text-sm truncate">{{ userDisplayName || 'User' }}</div>
+                    <div class="text-xs text-slate-500 truncate">{{ userEmail || '' }}</div>
                   </div>
                 </div>
-                <div class="p-2">
-                  <button @click="goToSettings" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-700 rounded-xl hover:bg-gray-100 hover:text-gray-900 transition-colors">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
-                      <circle cx="12" cy="12" r="3"></circle>
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                    Settings
-                  </button>
-                  <button @click="logout" class="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-colors mt-1">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-500">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                      <polyline points="16 17 21 12 16 7"></polyline>
-                      <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Log Out
-                  </button>
-                </div>
+
+                <button class="w-full flex items-center gap-2.5 px-3.5 py-3 border-none bg-transparent cursor-pointer text-slate-900 font-medium text-sm text-left hover:bg-slate-900/5 transition-colors" type="button" @click="goToSettings" role="menuitem">
+                  <svg class="text-slate-700 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                  <span>Settings</span>
+                  <span class="ml-auto text-slate-400 text-lg font-bold">›</span>
+                </button>
+
+                <button class="w-full flex items-center gap-2.5 px-3.5 py-3 border-none bg-transparent cursor-pointer text-slate-900 font-medium text-sm text-left hover:bg-slate-900/5 transition-colors" type="button" @click="logout" role="menuitem">
+                  <svg class="text-slate-700 shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                  <span>Log Out</span>
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        </template>
       </header>
 
       <!-- Page Content -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-8 pb-24 md:pb-8">
-        <div class="max-w-[1400px] mx-auto space-y-8">
-          
-          <!-- Status and Actions Grid -->
-          <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            <!-- Status Selection Panel -->
-            <div class="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col relative overflow-hidden">
-              <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full opacity-50 -z-0"></div>
-              
-              <div class="flex justify-between items-start mb-8 relative z-10">
-                <div>
-                  <h3 class="text-xl font-bold text-gray-900">Current Status</h3>
-                  <p class="text-sm text-gray-500 mt-1">Select your working location</p>
-                </div>
-                <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg relative"
-                     :class="{
-                       'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30': selectedStatus === 'At Office',
-                       'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30': selectedStatus === 'On Field',
-                       'bg-gradient-to-br from-purple-400 to-purple-600 shadow-purple-500/30': selectedStatus === 'Travel',
-                       'bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-500/30': selectedStatus === 'Leave'
-                     }">
-                  <div class="absolute inset-0 rounded-2xl animate-ping opacity-20 bg-white"></div>
-                  <span class="relative z-10 filter drop-shadow-md">{{ getStatusEmoji(selectedStatus) }}</span>
-                </div>
-              </div>
-              
-              <div class="bg-gray-50/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100/50 mt-auto relative z-10">
-                <div class="flex items-center justify-between mb-5">
-                  <span class="text-sm font-semibold text-gray-500 uppercase tracking-wider">You are currently</span>
-                  <span class="px-4 py-1.5 bg-white rounded-full text-sm font-bold text-gray-900 shadow-sm border border-gray-100 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full"
-                          :class="{
-                            'bg-emerald-500': selectedStatus === 'At Office',
-                            'bg-blue-500': selectedStatus === 'On Field',
-                            'bg-purple-500': selectedStatus === 'Travel',
-                            'bg-orange-500': selectedStatus === 'Leave'
-                          }"></span>
+      <div class="bg-white flex-1 overflow-y-auto">
+        <AttendanceSkeleton v-if="staffAttendanceStore.loading" />
+        
+        <template v-else>
+          <!-- MOBILE VIEW (Fully Optimized) -->
+          <div v-if="isMobile" class="p-4 pb-36 space-y-6">
+              <div class="bg-gray-50/80 rounded-xl p-4 border border-gray-100/50 mt-auto relative z-[60]">
+                <div class="flex items-center justify-between mb-4">
+                  <span class="text-xl font-semibold text-black">Current status</span>
+                  <span class="px-3 py-1 bg-white rounded-full text-xs font-semibold text-gray-900 border border-gray-100  flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full" :class="{'bg-emerald-500': selectedStatus === 'At Office','bg-blue-500': selectedStatus === 'On Field','bg-purple-500': selectedStatus === 'Travel','bg-orange-500': selectedStatus === 'Leave'}"></span>
                     {{ selectedStatus }}
                   </span>
                 </div>
-                
-                <div class="space-y-2">
-                  <label for="status-select" class="block text-sm font-medium text-gray-700 ml-1">Change Status</label>
-                  <div class="relative">
-                    <select id="status-select" v-model="selectedStatus" @change="onStatusChange" 
-                            class="block w-full rounded-xl border-gray-200 bg-white px-4 py-3.5 text-gray-900 font-medium shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all appearance-none cursor-pointer hover:border-blue-300">
-                      <option value="At Office">🏢 At Office</option>
-                      <option value="On Field">📍 On Field</option>
-                      <option value="Travel">✈️ Travel</option>
-                      <option value="Leave">🏖️ Leave</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                      <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                      </svg>
+                <div class="space-y-1 relative" ref="mobileStatusDropdownEl">
+                  <label class="block text-sm font-semibold text-gray-500 ml-1 mb-1">Update Status</label>
+                  <button 
+                    type="button"
+                    @click="toggleStatusDropdown"
+                    class="flex items-center justify-between w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-900 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                  >
+                    <span>{{ selectedStatus }}</span>
+                    <svg class="h-5 w-5 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': statusDropdownOpen }" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+
+                  <transition
+                    enter-active-class="transition ease-out duration-100"
+                    enter-from-class="transform opacity-0 scale-95"
+                    enter-to-class="transform opacity-100 scale-100"
+                    leave-active-class="transition ease-in duration-75"
+                    leave-from-class="transform opacity-100 scale-100"
+                    leave-to-class="transform opacity-0 scale-95"
+                  >
+                    <div v-if="statusDropdownOpen" class="absolute top-full left-0 z-[120] w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                      <div class="py-1">
+                        <button 
+                          v-for="status in availableStatuses" 
+                          :key="status.value"
+                          type="button" 
+                          @click="selectStatus(status.value)" 
+                          class="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 text-sm font-semibold"
+                          :class="selectedStatus === status.value ? 'bg-blue-50 text-blue-600' : 'text-gray-900'"
+                        >
+                          {{ status.label }}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  </transition>
                 </div>
               </div>
-            </div>
+  
 
-            <!-- Attendance Actions Panel -->
-            <div class="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col relative overflow-hidden">
-              <div class="flex justify-between items-start mb-6">
-                <div>
-                  <h3 class="text-xl font-bold text-gray-900">Quick Actions</h3>
-                  <p class="text-sm text-gray-500 mt-1">Record your attendance</p>
-                </div>
-                <!-- Clock Status Badge -->
-                <div class="flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm shadow-sm border transition-all duration-300"
+            <!-- Actions Panel -->
+            <div class="bg-white rounded-xl p-6 border border-gray-200 flex flex-col relative">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-black">Quick Actions</h3>
+                <div class="flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold text-xs border"
                      :class="isClockedIn ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-gray-50 text-gray-600 border-gray-200'">
-                  <div class="w-2.5 h-2.5 rounded-full relative">
+                  <div class="w-2 h-2 rounded-full relative">
                     <div class="absolute inset-0 rounded-full" :class="isClockedIn ? 'bg-emerald-500 animate-ping opacity-75' : 'bg-gray-400'"></div>
                     <div class="relative w-full h-full rounded-full" :class="isClockedIn ? 'bg-emerald-500' : 'bg-gray-400'"></div>
                   </div>
@@ -140,376 +130,283 @@
                 </div>
               </div>
 
-              <!-- RFID Section -->
-              <div v-if="selectedStatus === 'At Office'" class="flex-1 flex flex-col bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                <div class="flex flex-col items-center flex-1 justify-center relative py-6">
-                  
-                  <!-- Scanner Visual -->
-                  <div class="relative w-32 h-32 mb-6 user-select-none touch-none">
-                    <!-- Scanner Background -->
-                    <div class="absolute inset-0 rounded-3xl bg-white shadow-xl border border-blue-50 flex items-center justify-center transform transition-transform duration-300"
-                         :class="{ 'scale-95 shadow-inner': isScanning }">
-                      
-                      <!-- RFID Icon -->
-                      <div class="w-full h-full p-2 flex items-center justify-center transition-all duration-300"
-                           :class="isScanning ? 'scale-110 opacity-50' : 'opacity-100 hover:scale-105'">
-                        <iframe src="https://lottie.host/embed/06249617-eef8-4e7e-8296-a5e249383bca/GVeOismIuA.lottie" style="pointer-events: none; border: none;" width="100%" height="100%"></iframe>
-                      </div>
+              <!-- RFID (Office) -->
+              <div v-if="selectedStatus === 'At Office'" class="flex flex-col items-center py-4">
+                <div class="relative w-32 h-32 mb-6 flex items-center justify-center">
+                   <iframe src="https://lottie.host/embed/06249617-eef8-4e7e-8296-a5e249383bca/GVeOismIuA.lottie" style="pointer-events: none; border: none; width:120%; height:120%;"></iframe>
+                   <div v-if="isScanning" class="absolute left-0 right-0 h-1 bg-blue-500 shadow-[0_0_15px_3px_rgba(59,130,246,0.6)] animate-[scan_2s_ease-in-out_infinite]"></div>
+                </div>
+                <div class="w-full text-center">
+                   <h3 class="font-semibold text-gray-900">RFID Access</h3>
+                   <p class="text-sm text-gray-500 mb-3">{{ getBiometricMessage() }}</p>
+                   <input type="password" id="rfid-attendance-input" placeholder="Waiting for scan..." 
+                          class="w-full text-center px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-blue-500 outline-none mb-2 font-mono tracking-widest" 
+                          @keyup.enter="checkRfidAndAction" />
+                   <button @click="checkRfidAndAction" :disabled="isScanning || staffAttendanceStore.loading" 
+                           class="w-full h-12 rounded-xl bg-[#eebb3b] text-white font-medium mt-4">
+                     <span v-if="isScanning" class="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></span>
+                     <span class="tracking-wide">{{ isScanning ? 'Verifying...' : getBiometricButtonText() }}</span>
+                   </button>
+                </div>
+              </div>
 
-                      <!-- Scanning Line Animation -->
-                      <div v-if="isScanning" class="absolute left-0 right-0 h-1 bg-blue-500 shadow-[0_0_15px_3px_rgba(59,130,246,0.6)] animate-[scan_2s_ease-in-out_infinite]"></div>
-                      
-                      <!-- Scanning Glow -->
-                      <div v-if="isScanning" class="absolute inset-0 rounded-3xl box-shadow-[inset_0_0_20px_rgba(59,130,246,0.3)] animate-pulse border-blue-400"></div>
-                    </div>
+              <!-- GPS + Photo (Field/Travel) -->
+              <div v-else-if="selectedStatus === 'On Field' || selectedStatus === 'Travel'" class="space-y-6">
+                <!-- Map -->
+                <div class="rounded-2xl overflow-hidden border border-gray-100 bg-gray-50 h-44 relative shadow-inner">
+                  <div v-if="!userLocation" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50/90 z-10">
+                    <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-200 border-t-blue-600 mb-3"></div>
                   </div>
-
-                  <!-- Device Connected Indicator -->
-                  <div class="mb-4 flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100 shadow-sm">
-                    <span class="flex h-2 w-2 relative">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                    </span>
-                    Waiting for RFID scan...
+                  <div ref="leafletMapEl" class="w-full h-full z-0"></div>
+                  <div v-if="userLocation" class="absolute bottom-2 inset-x-2 bg-white/90 backdrop-blur-md rounded-lg p-2.5 shadow-sm border border-gray-100 z-20 text-[10px] font-medium text-gray-600 truncate">
+                    {{ userLocation.address || 'Location Identified' }}
                   </div>
-
-                  <div class="text-center w-full max-w-sm mb-6">
-                    <h4 class="text-lg font-bold text-gray-900 mb-2">RFID Verification</h4>
-                    <p class="text-sm text-gray-600 min-h-[40px] px-4">{{ getBiometricMessage() }}</p>
-                    
-                    <div class="mt-4 w-full">
-                      <input type="password" id="rfid-attendance-input" placeholder="" 
-                             class="w-full text-center px-4 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-inner transition-all" 
-                             @keyup.enter="checkRfidAndAction" autofocus />
-                    </div>
-                    
-                    <div v-if="todayLogs.length > 0" class="mt-4 inline-flex flex-col items-center bg-white px-5 py-2.5 rounded-xl text-sm font-medium text-gray-700 shadow-sm border border-gray-100">
-                      <span class="text-blue-700 font-bold mb-0.5">{{ getCurrentAttendanceStatus() }}</span>
-                      <span class="text-xs text-gray-500 font-mono">{{ getLastCheckInTime() }}</span>
-                    </div>
+                </div>
+                <!-- Camera -->
+                <div class="relative rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50 aspect-video flex items-center justify-center cursor-pointer group"
+                     @click="!capturedPhoto && !cameraActive && startCamera()">
+                  <video ref="videoElement" class="absolute inset-0 w-full h-full object-cover z-10" v-show="cameraActive && !capturedPhoto" autoplay playsinline></video>
+                  <img v-if="capturedPhoto" :src="capturedPhoto" class="absolute inset-0 w-full h-full object-cover z-30" />
+                  <div v-if="!cameraActive && !capturedPhoto" class="text-center p-4">
+                    <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center mx-auto mb-3 text-blue-500 shadow-sm"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
+                    <p class="font-semibold text-gray-600">Take Verification Photo</p>
                   </div>
-
-                  <button @click="checkRfidAndAction" 
-                          :disabled="isScanning || staffAttendanceStore.loading" 
-                          class="w-full sm:w-auto min-w-[200px] h-14 rounded-2xl flex items-center justify-center gap-3 px-8 text-base font-bold text-white shadow-lg shadow-blue-500/30 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed group relative overflow-hidden"
-                          :class="isScanning ? 'bg-blue-400' : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-500/40'">
-                    
-                    <!-- Shine effect on hover -->
-                    <div class="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-                    
-                    <div v-if="staffAttendanceStore.loading" class="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
-                    <svg v-else width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                      <rect x="3" y="5" width="18" height="14" rx="2" ry="2"></rect>
-                      <line x1="7" y1="15" x2="7.01" y2="15"></line>
-                      <line x1="7" y1="9" x2="7.01" y2="9"></line>
-                      <line x1="11" y1="15" x2="11.01" y2="15"></line>
-                      <line x1="11" y1="9" x2="11.01" y2="9"></line>
-                      <line x1="15" y1="15" x2="15.01" y2="15"></line>
-                      <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                    </svg>
-                    <span class="relative z-10 tracking-wide">{{ isScanning ? 'Scanning...' : (staffAttendanceStore.loading ? 'Loading...' : getBiometricButtonText()) }}</span>
+                  <div v-if="cameraActive && !capturedPhoto" class="absolute bottom-4 inset-x-0 flex justify-center z-20">
+                    <button @click.stop="capturePhoto" class="bg-white text-gray-900 rounded-full px-6 py-2.5 font-bold shadow-2xl flex items-center gap-2 active:scale-95 transition-all">
+                      <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div> Capture
+                    </button>
+                  </div>
+                  <button v-if="capturedPhoto" @click.stop="retakePhoto" class="absolute top-3 right-3 z-40 bg-black/60 text-white p-2.5 rounded-full backdrop-blur-sm"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></button>
+                </div>
+                <div class="flex gap-4">
+                  <button @click="timeInWithPhoto" :disabled="!capturedPhoto || isClockedIn || staffAttendanceStore.loading || isTimingIn" 
+                          class="flex-1 h-12 rounded-xl bg-[#eebb3b] text-white font-semibold flex items-center justify-center gap-2">
+                    <span v-if="isTimingIn" class="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></span>
+                    <span>{{ isTimingIn ? 'Processing...' : 'Time In' }}</span>
+                  </button>
+                  <button @click="timeOutWithPhoto" :disabled="!capturedPhoto || !isClockedIn || staffAttendanceStore.loading || isTimingOut" 
+                          class="flex-1 h-12 rounded-xl bg-[#b92e2b] text-white font-semibold flex items-center justify-center gap-2">
+                    <span v-if="isTimingOut" class="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></span>
+                    <span>{{ isTimingOut ? 'Processing...' : 'Time Out' }}</span>
                   </button>
                 </div>
               </div>
 
-              <!-- Field/Travel Section -->
-              <div v-else-if="selectedStatus === 'On Field' || selectedStatus === 'Travel'" class="flex-1 flex flex-col gap-5 overflow-y-auto pr-2 custom-scrollbar">
-                
-                <!-- Location Panel -->
-                <div class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100">
-                  <div class="flex items-center gap-2 mb-3">
-                    <span class="text-xl">📍</span>
-                    <h4 class="font-bold text-gray-900">Location Tracking</h4>
-                  </div>
-                  
-                  <div class="rounded-xl overflow-hidden border border-blue-200 bg-white relative h-48 shadow-sm">
-                    <div v-if="!userLocation" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50/90 z-10">
-                      <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-200 border-t-blue-600 mb-3"></div>
-                      <p class="text-sm font-medium text-gray-600">Detecting location...</p>
-                    </div>
-                    
-                    <div ref="leafletMapEl" class="w-full h-full z-0 relative"></div>
-                    
-                    <div v-if="userLocation" class="absolute bottom-2 inset-x-2 bg-white/95 backdrop-blur-md rounded-lg p-3 shadow-lg border border-gray-100 z-20 text-xs text-gray-700 animate-[fadeIn_0.5s_ease-out]">
-                      <div class="flex justify-between items-center mb-1 text-[10px] font-mono font-bold text-blue-600">
-                        <span>LAT: {{ userLocation.lat }}</span>
-                        <span>LNG: {{ userLocation.lng }}</span>
-                      </div>
-                      <p class="font-medium truncate" :title="userLocation.address">{{ userLocation.address || 'Location identified' }}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Photo Panel -->
-                <div class="bg-gray-50 rounded-2xl p-5 border border-gray-200">
-                  <div class="flex items-center gap-2 mb-3">
-                    <span class="text-xl">📷</span>
-                    <h4 class="font-bold text-gray-900">Photo Verification</h4>
-                  </div>
-                  
-                  <div class="relative rounded-xl overflow-hidden border-2 border-dashed border-gray-300 bg-white aspect-video flex flex-col items-center justify-center cursor-pointer transition-all hover:border-blue-400 group"
-                       :class="{ 'border-solid border-transparent shadow-md': capturedPhoto || cameraActive }"
-                       @click="!capturedPhoto && !cameraActive && startCamera()">
-                    
-                    <video ref="videoElement" class="absolute inset-0 w-full h-full object-cover z-10" v-show="!capturedPhoto && cameraActive" autoplay playsinline></video>
-                    <canvas ref="canvasElement" class="hidden"></canvas>
-                    
-                    <!-- Placeholder -->
-                    <div v-if="!capturedPhoto && !cameraActive" class="text-center p-6 transition-transform group-hover:scale-105">
-                      <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                          <circle cx="12" cy="13" r="4"></circle>
-                        </svg>
-                      </div>
-                      <p class="font-bold text-gray-700 mb-1">Click to start camera</p>
-                      <p class="text-xs text-gray-500">Required for field attendance</p>
-                    </div>
-                    
-                    <!-- Camera Controls -->
-                    <div v-if="!capturedPhoto && cameraActive" class="absolute bottom-4 inset-x-0 flex justify-center z-20">
-                      <button @click.stop="capturePhoto" class="bg-white/90 backdrop-blur-sm text-gray-900 rounded-full px-5 py-2.5 font-bold shadow-lg flex items-center gap-2 hover:bg-white transition-colors transform hover:scale-105 active:scale-95">
-                        <div class="w-4 h-4 rounded-full bg-red-500 animate-pulse"></div>
-                        Capture Photo
-                      </button>
-                    </div>
-                    
-                    <!-- Preview -->
-                    <div v-if="capturedPhoto" class="absolute inset-0 w-full h-full z-30 group/preview">
-                      <img :src="capturedPhoto" alt="Attendance photo" class="w-full h-full object-cover" />
-                      <div class="absolute inset-0 bg-black/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center">
-                        <button @click.stop="retakePhoto" class="bg-white text-gray-900 rounded-full px-5 py-2.5 font-bold shadow-xl flex items-center gap-2 hover:bg-gray-50 transform hover:scale-105 transition-all">
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="23 4 23 10 17 10"></polyline>
-                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                          </svg>
-                          Retake Photo
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- Action Buttons -->
-                  <div class="flex gap-3 mt-4">
-                    <button @click="timeInWithPhoto" :disabled="!capturedPhoto || isClockedIn || staffAttendanceStore.loading" 
-                            class="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 font-bold text-white shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            :class="(!capturedPhoto || isClockedIn) ? 'bg-gray-300' : 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 hover:shadow-emerald-500/30 hover:-translate-y-0.5'">
-                      <div v-if="staffAttendanceStore.loading && !isClockedIn" class="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
-                      <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                      </svg>
-                      Time In
-                    </button>
-                    
-                    <button @click="timeOutWithPhoto" :disabled="!capturedPhoto || !isClockedIn || staffAttendanceStore.loading" 
-                            class="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 font-bold text-white shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            :class="(!capturedPhoto || !isClockedIn) ? 'bg-gray-300' : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 hover:shadow-orange-500/30 hover:-translate-y-0.5'">
-                      <div v-if="staffAttendanceStore.loading && isClockedIn" class="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
-                      <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 12 8 16 16 8"></polyline>
-                      </svg>
-                      Time Out
-                    </button>
-                  </div>
+              <!-- Leave -->
+              <div v-else class="flex flex-col items-center py-6 text-center">
+                <h4 class="text-xl font-semibold text-gray-900 ">Leave Request</h4>
+                <p class="text-sm text-gray-500 mb-6 max-w-[300px]">Specify your leave dates below to submit your request.</p>
+                <div class="w-full space-y-3 bg-purple-50/50 p-5 rounded-2xl border border-purple-100">
+                   <div class="text-left"><label class="text-xs font-medium   ml-1">Start Date</label><input type="date" v-model="leaveStartDate" class="w-full bg-white border border-purple-100 rounded-xl px-4 py-3 text-sm font-medium mt-1" /></div>
+                   <div class="text-left"><label class="text-xs font-medium   ml-1">End Date</label><input type="date" v-model="leaveEndDate" class="w-full bg-white border border-purple-100 rounded-xl px-4 py-3 text-sm font-medium mt-1" /></div>
+                   <button @click="submitLeaveDetails" :disabled="!leaveStartDate || !leaveEndDate || submittingLeave" 
+                           class="w-full h-12 rounded-xl bg-[#eebb3b] text-white font-medium mt-4">
+                     {{ submittingLeave ? 'Submitting...' : 'Submit Request' }}
+                   </button>
                 </div>
               </div>
+            </div>
 
-              <!-- Leave Section -->
-              <div v-else class="flex-1 flex flex-col bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                <div class="flex flex-col items-center justify-center flex-1 text-center py-8">
-                  <div class="text-7xl mb-6 filter drop-shadow-md opacity-90 animate-[bounce_3s_ease-in-out_infinite]">
-                    🏖️
-                  </div>
-                  <h4 class="text-2xl font-bold text-gray-900 mb-2">Leave Mode</h4>
-                  <p class="text-gray-500 max-w-[250px] mx-auto mb-8">
-                    Enjoy your time off! Your status has been noted.
-                  </p>
-                  
-                  <!-- Leave Duration Section -->
-                  <div v-if="selectedStatus === 'Leave'" class="w-full max-w-sm mt-2 p-4 bg-purple-50/50 rounded-2xl border border-purple-100/50">
-                    <div class="flex items-center gap-2 mb-3">
-                      <span class="text-xl">📅</span>
-                      <h4 class="font-bold text-gray-900 text-sm">Duration of Leave</h4>
+            <!-- Logs Panel -->
+            <div class="bg-white rounded-xl p-6 border border-gray-200 ">
+               <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-50">
+                 <h3 class="text-lg font-semibold text-black">Today's Records</h3>
+                 <span class="text-sm text-gray-400 font-medium">{{ todayLogs.length }} Log(s)</span>
+               </div>
+               <div v-if="todayLogs.length === 0" class="py-10 text-center flex flex-col items-center">
+                 <p class="text-sm font-MEDIUM text-gray-400">No attendance data for today</p>
+               </div>
+               <div v-else class="space-y-4">
+                 <div v-for="log in getDisplayLogs()" :key="log.id || log.tempId" class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 group">
+                    <div class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center font-bold text-sm text-gray-900">{{ getLogTime(log) }}</div>
+                    <div class="flex-1 min-w-0">
+                       <div class="flex items-center gap-2 mb-0.5">
+                          <span class="text-[10px] font-black uppercase" :class="getLogType(log) === 'time-in' ? 'text-emerald-600' : 'text-orange-600'">{{ getLogType(log).replace('time-', '') }}</span>
+                          <span class="text-[9px] font-bold text-gray-300">|</span>
+                          <span class="text-[10px] font-bold text-gray-400">{{ log.status }}</span>
+                       </div>
+                       <p class="text-[10px] text-gray-500 truncate" v-if="getLogAddress(log)">{{ getLogAddress(log) }}</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
-                      <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Start Date</label>
-                        <input type="date" v-model="leaveStartDate" 
-                               class="w-full bg-white border border-purple-100 rounded-xl px-3 py-2 text-xs font-bold text-gray-900 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 outline-none transition-all" />
-                      </div>
-                      <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">End Date</label>
-                        <input type="date" v-model="leaveEndDate" 
-                               class="w-full bg-white border border-purple-100 rounded-xl px-3 py-2 text-xs font-bold text-gray-900 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400 outline-none transition-all" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Leave Document Upload Section -->
-                  <div v-if="selectedStatus === 'Leave'" class="w-full max-w-sm mt-2 p-4 bg-blue-50/50 rounded-2xl border border-blue-100/50">
-                    <div class="flex items-center gap-2 mb-3">
-                      <span class="text-xl">📄</span>
-                      <h4 class="font-bold text-gray-900 text-sm">Supporting Document</h4>
-                    </div>
-                    
-                    <div v-if="leaveDocumentUrls.length === 0" class="relative group">
-                      <input type="file" @change="handleLeaveFileUpload" class="hidden" id="leave-doc-input" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple />
-                      <label for="leave-doc-input" class="flex flex-col items-center justify-center py-6 px-4 border-2 border-dashed border-blue-200 rounded-xl bg-white cursor-pointer hover:border-blue-400 group-hover:bg-blue-50/30 transition-all">
-                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-2">
-                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                        </div>
-                        <p class="text-xs font-bold text-gray-700">Upload Leave Documents</p>
-                        <p class="text-[10px] text-gray-500 mt-1">PDF, DOC, JPG or PNG (Max 5MB each)</p>
-                      </label>
-                    </div>
-
-                    <div v-else class="space-y-2 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
-                      <div v-for="(url, index) in leaveDocumentUrls" :key="index" class="flex items-center justify-between p-3 bg-white rounded-xl border border-blue-100 shadow-sm animate-[fadeIn_0.3s_ease-out]">
-                        <div class="flex items-center gap-3 min-w-0">
-                          <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center shrink-0">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                          </div>
-                          <div class="min-w-0">
-                            <p class="text-[10px] font-bold text-gray-900 truncate">Doc {{ index + 1 }}</p>
-                            <a :href="url" target="_blank" class="text-[9px] text-blue-600 font-medium hover:underline flex items-center gap-1">
-                              View File
-                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                            </a>
-                          </div>
-                        </div>
-                        <button @click="removeLeaveDocument(index)" class="p-1.5 text-gray-400 hover:text-red-500 transition-colors">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                      </div>
-                      
-                      <button @click.stop 
-                              class="w-full relative py-2 px-4 border border-dashed border-blue-200 rounded-lg bg-blue-50/30 text-[10px] font-bold text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2">
-                        <input type="file" @change="handleLeaveFileUpload" class="absolute inset-0 opacity-0 cursor-pointer" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple />
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        Add more files
-                      </button>
-                    </div>
-
-                    <!-- Submit Leave Button -->
-                    <div v-if="selectedStatus === 'Leave'" class="w-full max-w-sm mt-6">
-                      <button @click="submitLeaveDetails" 
-                              :disabled="submittingLeave || !leaveStartDate || !leaveEndDate"
-                              class="w-full h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold shadow-lg shadow-blue-900/20 hover:shadow-blue-900/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none">
-                        <svg v-if="submittingLeave" class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span>{{ submittingLeave ? 'Submitting...' : 'Submit Leave Request' }}</span>
-                      </button>
-                    </div>
-                </div>
-              </div>
-              </div>
-
+                    <div class="w-2 h-2 rounded-full shadow-inner" :class="getLogType(log) === 'time-in' ? 'bg-emerald-500' : 'bg-orange-500'"></div>
+                 </div>
+               </div>
             </div>
           </div>
 
-          <!-- Visual Separator -->
-          <div class="flex items-center justify-center py-4">
-            <div class="h-px bg-gray-200 flex-1"></div>
-            <div class="px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Today's Activity</div>
-            <div class="h-px bg-gray-200 flex-1"></div>
-          </div>
-
-          <!-- Today's Log Panel -->
-          <div class="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100">
-            <div class="flex items-center gap-3 mb-8 pb-4 border-b border-gray-100">
-              <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14,2 14,8 20,8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                </svg>
-              </div>
+          <!-- DESKTOP VIEW (Refined Original) -->
+          <div v-else class="p-8 pb-8 max-w-full mx-auto space-y-8">
+            <div class="mb-8 hidden md:flex justify-between items-end">
               <div>
-                <h3 class="text-xl font-bold text-gray-900">Attendance Log</h3>
-                <p class="text-sm text-gray-500 mt-0.5">Your punches for today</p>
+                <h2 class="text-3xl text-gray-900 font-bold">My Attendance</h2>
+                <p class="text-sm text-gray-500 mt-1">Mark your attendance and track your work hours</p>
+              </div>
+              <div class="text-right">
+                <div class="text-3xl font-bold text-gray-900 tabular-nums">{{ currentTime }}</div>
+                <div class="text-xs text-gray-500 font-medium mt-0.5 uppercase tracking-wider">{{ currentDate }}</div>
               </div>
             </div>
 
-            <div v-if="todayLogs.length === 0" class="py-12 flex flex-col items-center justify-center text-center">
-              <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4 text-gray-300">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-              </div>
-              <h4 class="text-lg font-bold text-gray-800 mb-1">No attendance records</h4>
-              <p class="text-gray-500">You haven't marked any attendance today</p>
-            </div>
-
-            <div v-else class="relative before:absolute before:inset-y-0 before:left-[110px] sm:before:left-[140px] before:w-[2px] before:bg-gray-100 pl-2">
-              <div v-for="log in getDisplayLogs()" :key="log.id || log.tempId" class="relative flex items-start mb-8 last:mb-0 group">
-                
-                <!-- Time Badge -->
-                <div class="w-[90px] sm:w-[120px] shrink-0 pt-1 text-right pr-6 sm:pr-8">
-                  <div class="inline-block px-3 py-1 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-sm group-hover:border-blue-300 transition-colors">
-                    {{ getLogTime(log) }}
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+              <!-- Status Selection Panel -->
+              <div class="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col relative">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full opacity-50 -z-0"></div>
+                <div class="flex justify-between items-start mb-8 relative z-10">
+                  <div>
+                    <h3 class="text-xl font-bold text-gray-900">Current Status</h3>
+                    <p class="text-sm text-gray-500 mt-1">Select your working location</p>
+                  </div>
+                  <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg relative"
+                       :class="{
+                         'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30': selectedStatus === 'At Office',
+                         'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30': selectedStatus === 'On Field',
+                         'bg-gradient-to-br from-purple-400 to-purple-600 shadow-purple-500/30': selectedStatus === 'Travel',
+                         'bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-500/30': selectedStatus === 'Leave'
+                       }">
+                    <div class="absolute inset-0 rounded-2xl animate-ping opacity-20 bg-white"></div>
+                    <span class="relative z-10 filter drop-shadow-md"></span>
                   </div>
                 </div>
-
-                <!-- Timeline Dot -->
-                <div class="absolute left-[111px] sm:left-[141px] -ml-[7px] mt-[10px] w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm z-10 transition-transform group-hover:scale-125"
-                     :class="getLogType(log) === 'time-in' ? 'bg-emerald-500' : 'bg-orange-500'">
-                </div>
-
-                <!-- Log Content -->
-                <div class="flex-1 ml-10 sm:ml-12 bg-gray-50 hover:bg-white rounded-2xl p-5 border border-gray-100 hover:border-blue-100 hover:shadow-md transition-all duration-300">
-                  <div class="flex items-center gap-3 mb-4">
-                    <span class="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider"
-                          :class="getLogType(log) === 'time-in' ? 'bg-emerald-100 text-emerald-800' : 'bg-orange-100 text-orange-800'">
-                      {{ getLogType(log) === 'time-in' ? 'Time In' : 'Time Out' }}
-                    </span>
-                    <span class="text-xs font-medium text-gray-500 flex items-center gap-1.5">
-                      <div class="w-1.5 h-1.5 rounded-full" :class="{
-                        'bg-emerald-500': log.status === 'At Office',
-                        'bg-blue-500': log.status === 'On Field',
-                        'bg-purple-500': log.status === 'Travel'
-                      }"></div>
-                      {{ log.status }}
+                <div class="bg-gray-50/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100/50 mt-auto relative z-[60]">
+                  <div class="flex items-center justify-between mb-5">
+                    <span class="text-sm font-semibold text-gray-500 uppercase tracking-wider">You are currently</span>
+                    <span class="px-4 py-1.5 bg-white rounded-full text-sm font-bold text-gray-900 shadow-sm border border-gray-100 flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full" :class="{'bg-emerald-500': selectedStatus === 'At Office','bg-blue-500': selectedStatus === 'On Field','bg-purple-500': selectedStatus === 'Travel','bg-orange-500': selectedStatus === 'Leave'}"></span>
+                      {{ selectedStatus }}
                     </span>
                   </div>
+                  <div class="space-y-2 relative" ref="desktopStatusDropdownEl">
+                    <label class="block text-sm font-medium text-gray-700 ml-1">Change Status</label>
+                    <button 
+                      type="button"
+                      @click="toggleStatusDropdown"
+                      class="flex items-center justify-between w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-gray-900 font-medium shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all hover:border-blue-300"
+                    >
+                      <span>{{ selectedStatus }}</span>
+                      <svg class="h-5 w-5 text-gray-500 transition-transform duration-200" :class="{ 'rotate-180': statusDropdownOpen }" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
 
-                  <div class="space-y-4">
-                    <!-- Location Text -->
-                    <div v-if="getLogAddress(log)" class="flex items-start gap-3 text-sm">
-                      <div class="text-blue-500 mt-0.5">📍</div>
-                      <div>
-                        <span class="font-bold text-gray-900 block mb-0.5">Location</span>
-                        <span class="text-gray-600 leading-snug">{{ getLogAddress(log) }}</span>
-                      </div>
-                    </div>
-
-                    <!-- Location Map & Photo Layout -->
-                    <div class="flex flex-col sm:flex-row gap-4" v-if="(log.latitude && log.longitude) || getLogPhoto(log)">
-                      
-                      <!-- Map Embed -->
-                      <div v-if="log.latitude && log.longitude" class="flex-1 rounded-xl overflow-hidden border border-gray-200 h-32 shadow-sm bg-gray-100">
-                        <iframe 
-                          :src="getOsmEmbedUrl(log.latitude, log.longitude)" 
-                          class="w-full h-full border-0 pointer-events-none" 
-                          loading="lazy"
-                          referrerpolicy="no-referrer-when-downgrade">
-                        </iframe>
-                      </div>
-
-                      <!-- Photo -->
-                      <div v-if="getLogPhoto(log)" class="w-full sm:w-32 lg:w-40 shrink-0 rounded-xl overflow-hidden border border-gray-200 h-32 shadow-sm bg-gray-100 cursor-pointer group/img relative" @click="openModal('Photo Verification', '', 'image', getLogPhoto(log))">
-                        <img :src="getLogPhoto(log)" alt="Attendance Photo" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500" />
-                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
-                          </svg>
+                    <transition
+                      enter-active-class="transition ease-out duration-100"
+                      enter-from-class="transform opacity-0 scale-95"
+                      enter-to-class="transform opacity-100 scale-100"
+                      leave-active-class="transition ease-in duration-75"
+                      leave-from-class="transform opacity-100 scale-100"
+                      leave-to-class="transform opacity-0 scale-95"
+                    >
+                      <div v-if="statusDropdownOpen" class="absolute top-full left-0 z-[120] w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                        <div class="py-1">
+                          <button 
+                            v-for="status in availableStatuses" 
+                            :key="status.value"
+                            type="button" 
+                            @click="selectStatus(status.value)" 
+                            class="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 text-sm font-medium"
+                            :class="selectedStatus === status.value ? 'bg-blue-50 text-blue-600' : 'text-gray-900'"
+                          >
+                            {{ status.label }}
+                          </button>
                         </div>
+                      </div>
+                    </transition>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Attendance Actions Panel (Desktop) -->
+              <div class="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 flex flex-col relative">
+                <div class="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 class="text-xl font-bold text-gray-900">Quick Actions</h3>
+                    <p class="text-sm text-gray-500 mt-1">Record your attendance</p>
+                  </div>
+                  <div class="flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm  border transition-all duration-300"
+                       :class="isClockedIn ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-gray-50 text-gray-600 border-gray-200'">
+                    <div class="w-2.5 h-2.5 rounded-full relative">
+                      <div class="absolute inset-0 rounded-full" :class="isClockedIn ? 'bg-emerald-500 animate-ping opacity-75' : 'bg-gray-400'"></div>
+                      <div class="relative w-full h-full rounded-full" :class="isClockedIn ? 'bg-emerald-500' : 'bg-gray-400'"></div>
+                    </div>
+                    {{ isClockedIn ? 'Clocked In' : 'Clocked Out' }}
+                  </div>
+                </div>
+
+                <!-- RFID Section -->
+                <div v-if="selectedStatus === 'At Office'" class="flex-1 flex flex-col bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                  <div class="flex flex-col items-center flex-1 justify-center relative py-6">
+                    <div class="relative w-32 h-32 mb-6"><div class="absolute inset-0 rounded-3xl bg-white shadow-xl border border-blue-50 flex items-center justify-center transform transition-transform duration-300" :class="{ 'scale-95 shadow-inner': isScanning }"><iframe src="https://lottie.host/embed/06249617-eef8-4e7e-8296-a5e249383bca/GVeOismIuA.lottie" style="pointer-events: none; border: none;" width="100%" height="100%"></iframe><div v-if="isScanning" class="absolute left-0 right-0 h-1 bg-blue-500 shadow-[0_0_15px_3px_rgba(59,130,246,0.6)] animate-[scan_2s_ease-in-out_infinite]"></div></div></div>
+                    <div class="mb-4 flex items-center gap-2 text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100 shadow-sm"><span class="flex h-2 w-2 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span>Waiting for RFID scan...</div>
+                    <div class="text-center w-full max-w-sm mb-6"><h4 class="text-lg font-bold text-gray-900 mb-2">RFID Verification</h4><p class="text-sm text-gray-600 min-h-[40px] px-4">{{ getBiometricMessage() }}</p><div class="mt-4 w-full"><input type="password" id="rfid-attendance-input" placeholder="" class="w-full text-center px-4 py-3 bg-white border border-gray-300 rounded-xl outline-none shadow-inner transition-all" @keyup.enter="checkRfidAndAction" autofocus /></div></div>
+                    <button @click="checkRfidAndAction" :disabled="isScanning || staffAttendanceStore.loading" class="w-full sm:w-auto min-w-[200px] h-14 rounded-2xl bg-gray-900 text-white font-bold shadow-lg shadow-blue-500/30 transition-all duration-300 group relative overflow-hidden">
+                      <div class="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                      <div v-if="staffAttendanceStore.loading" class="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></div>
+                      <span class="relative z-10 tracking-wide">{{ isScanning ? 'Scanning...' : getBiometricButtonText() }}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Field/Travel Section -->
+                <div v-else-if="selectedStatus === 'On Field' || selectedStatus === 'Travel'" class="flex-1 flex flex-col gap-5 overflow-y-auto pr-2 custom-scrollbar">
+                  <div class="bg-blue-50/50 rounded-2xl p-5 border border-blue-100">
+                    <div class="flex items-center gap-2 mb-3"><h4 class="font-bold text-gray-900">Location tracking</h4></div>
+                    <div class="rounded-xl overflow-hidden border border-blue-200 bg-white relative h-48 shadow-sm">
+                      <div v-if="!userLocation" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50/90 z-10"><div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-200 border-t-blue-600 mb-3"></div></div>
+                      <div ref="leafletMapEl" class="w-full h-full z-0 relative"></div>
+                      <div v-if="userLocation" class="absolute bottom-2 inset-x-2 bg-white/95 backdrop-blur-md rounded-lg p-3 shadow-lg border border-gray-100 z-20 text-xs text-gray-700 font-medium truncate">{{ userLocation.address || 'Location identified' }}</div>
+                    </div>
+                  </div>
+                  <div class="bg-gray-50 rounded-2xl p-5">
+                    <div class="relative rounded-xl overflow-hidden border-2 border-dashed border-gray-300 bg-white aspect-video flex flex-col items-center justify-center cursor-pointer transition-all" @click="!capturedPhoto && !cameraActive && startCamera()">
+                      <video ref="videoElement" class="absolute inset-0 w-full h-full object-cover z-10" v-show="!capturedPhoto && cameraActive" autoplay playsinline></video>
+                      <div v-if="!capturedPhoto && !cameraActive" class="text-center p-6"><p class="font-bold text-gray-700 mb-1">Click to start camera</p></div>
+                      <div v-if="!capturedPhoto && cameraActive" class="absolute bottom-4 inset-x-0 flex justify-center z-20"><button @click.stop="capturePhoto" class="bg-white text-gray-900 rounded-full px-5 py-2.5 font-bold shadow-lg">Capture Photo</button></div>
+                      <div v-if="capturedPhoto" class="absolute inset-0 w-full h-full z-30"><img :src="capturedPhoto" class="w-full h-full object-cover" /><button @click.stop="retakePhoto" class="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></button></div>
+                    </div>
+                    <div class="flex gap-3 mt-4">
+                      <button @click="timeInWithPhoto" :disabled="!capturedPhoto || isClockedIn || staffAttendanceStore.loading || isTimingIn" class="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 font-bold text-white bg-emerald-600 disabled:opacity-50">
+                        <span v-if="isTimingIn" class="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></span>
+                        <span>{{ isTimingIn ? 'Processing...' : 'Time In' }}</span>
+                      </button>
+                      <button @click="timeOutWithPhoto" :disabled="!capturedPhoto || !isClockedIn || staffAttendanceStore.loading || isTimingOut" class="flex-1 h-12 rounded-xl flex items-center justify-center gap-2 font-bold text-white bg-orange-600 disabled:opacity-50">
+                        <span v-if="isTimingOut" class="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white"></span>
+                        <span>{{ isTimingOut ? 'Processing...' : 'Time Out' }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Leave Section -->
+                <div v-else class="flex-1 flex flex-col bg-gray-50 rounded-2xl p-6 border border-gray-200 text-center py-8">
+
+                  <h4 class="text-2xl font-bold text-gray-900 mb-2">Leave Mode</h4>
+                  <p class="text-gray-500 mb-8">Enjoy your time off! Your status has been noted.</p>
+                  <div class="grid grid-cols-2 gap-3 mb-4 max-w-sm mx-auto">
+                    <input type="date" v-model="leaveStartDate" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm font-bold" />
+                    <input type="date" v-model="leaveEndDate" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm font-bold" />
+                  </div>
+                  <button @click="submitLeaveDetails" :disabled="!leaveStartDate || !leaveEndDate" class="max-w-sm mx-auto w-full h-12 rounded-xl bg-blue-600 text-white font-bold shadow-md hover:-translate-y-0.5 transition-all">Submit Request</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visual Separator -->
+            <div class="flex items-center justify-center py-4"><div class="h-px bg-gray-200 flex-1"></div><div class="px-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Today's Activity</div><div class="h-px bg-gray-200 flex-1"></div></div>
+
+            <!-- Today's Log Panel (Desktop) -->
+            <div class="bg-white rounded-3xl p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100">
+              <div class="flex items-center gap-3 mb-8 pb-4 border-b border-gray-100"><div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div><h3 class="text-xl font-bold text-gray-900">Attendance Log</h3></div>
+              <div v-if="todayLogs.length === 0" class="py-12 flex flex-col items-center justify-center text-center"><h4 class="text-lg font-bold text-gray-800 mb-1">No attendance records</h4><p class="text-gray-500">You haven't marked any attendance today</p></div>
+              <div v-else class="relative before:absolute before:inset-y-0 before:left-[140px] before:w-[2px] before:bg-gray-100 pl-2">
+                <div v-for="log in getDisplayLogs()" :key="log.id || log.tempId" class="relative flex items-start mb-8 last:mb-0 group">
+                  <div class="w-[120px] shrink-0 pt-1 text-right pr-8"><div class="inline-block px-3 py-1 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-sm">{{ getLogTime(log) }}</div></div>
+                  <div class="absolute left-[141px] -ml-[7px] mt-[10px] w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm z-10" :class="getLogType(log) === 'time-in' ? 'bg-emerald-500' : 'bg-orange-500'"></div>
+                  <div class="flex-1 ml-12 bg-gray-50 p-5 rounded-2xl border border-gray-100 hover:bg-white hover:border-blue-100 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><span class="px-3 py-1 rounded-md text-xs font-bold uppercase" :class="getLogType(log) === 'time-in' ? 'bg-emerald-100 text-emerald-800' : 'bg-orange-100 text-orange-800'">{{ getLogType(log) === 'time-in' ? 'Time In' : 'Time Out' }}</span><span class="text-xs text-gray-500 font-medium">{{ log.status }}</span></div>
+                    <div v-if="getLogAddress(log)" class="text-sm text-gray-600 mb-4">{{ getLogAddress(log) }}</div>
+                    <div class="flex gap-4" v-if="(log.latitude && log.longitude) || getLogPhoto(log)">
+                      <div v-if="log.latitude && log.longitude" class="flex-1 rounded-xl overflow-hidden border border-gray-200 h-32 bg-gray-100 shadow-inner"><iframe :src="getOsmEmbedUrl(log.latitude, log.longitude)" class="w-full h-full border-0"></iframe></div>
+                      <div v-if="getLogPhoto(log)" class="w-40 rounded-xl overflow-hidden border border-gray-200 h-32 cursor-pointer relative group-img" @click="openModal('Photo Preview', '', 'image', getLogPhoto(log))">
+                         <img :src="getLogPhoto(log)" class="w-full h-full object-cover transition-transform group-img:scale-105" />
                       </div>
                     </div>
                   </div>
@@ -517,101 +414,39 @@
               </div>
             </div>
           </div>
-
-        </div>
+        </template>
       </div>
     </main>
 
-    <!-- Loading Spinner Modal Overlay -->
-    <div v-if="staffAttendanceStore.loading" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-[110] animate-[fadeIn_0.2s_ease-out]">
-      <div class="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center justify-center min-w-[120px] min-h-[120px] animate-[modalSlideUp_0.3s_ease-out]">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="60" height="60" style="shape-rendering: auto; display: block; background: transparent;">
-          <g transform="translate(50,50)">
-            <g transform="rotate(0) translate(34,0)">
-              <circle cx="0" cy="0" r="8" fill="#a3a3a3">
-                <animate attributeName="opacity" keyTimes="0;1" values="1;0" dur="1s" begin="-0.875s" repeatCount="indefinite"></animate>
-              </circle>
-            </g>
-            <g transform="rotate(45) translate(34,0)">
-              <circle cx="0" cy="0" r="8" fill="#a3a3a3">
-                <animate attributeName="opacity" keyTimes="0;1" values="1;0" dur="1s" begin="-0.75s" repeatCount="indefinite"></animate>
-              </circle>
-            </g>
-            <g transform="rotate(90) translate(34,0)">
-              <circle cx="0" cy="0" r="8" fill="#a3a3a3">
-                <animate attributeName="opacity" keyTimes="0;1" values="1;0" dur="1s" begin="-0.625s" repeatCount="indefinite"></animate>
-              </circle>
-            </g>
-            <g transform="rotate(135) translate(34,0)">
-              <circle cx="0" cy="0" r="8" fill="#a3a3a3">
-                <animate attributeName="opacity" keyTimes="0;1" values="1;0" dur="1s" begin="-0.5s" repeatCount="indefinite"></animate>
-              </circle>
-            </g>
-            <g transform="rotate(180) translate(34,0)">
-              <circle cx="0" cy="0" r="8" fill="#a3a3a3">
-                <animate attributeName="opacity" keyTimes="0;1" values="1;0" dur="1s" begin="-0.375s" repeatCount="indefinite"></animate>
-              </circle>
-            </g>
-            <g transform="rotate(225) translate(34,0)">
-              <circle cx="0" cy="0" r="8" fill="#a3a3a3">
-                <animate attributeName="opacity" keyTimes="0;1" values="1;0" dur="1s" begin="-0.25s" repeatCount="indefinite"></animate>
-              </circle>
-            </g>
-            <g transform="rotate(270) translate(34,0)">
-              <circle cx="0" cy="0" r="8" fill="#a3a3a3">
-                <animate attributeName="opacity" keyTimes="0;1" values="1;0" dur="1s" begin="-0.125s" repeatCount="indefinite"></animate>
-              </circle>
-            </g>
-            <g transform="rotate(315) translate(34,0)">
-              <circle cx="0" cy="0" r="8" fill="#a3a3a3">
-                <animate attributeName="opacity" keyTimes="0;1" values="1;0" dur="1s" begin="0s" repeatCount="indefinite"></animate>
-              </circle>
-            </g>
-          </g>
-        </svg>
-      </div>
-    </div>
 
     <!-- Modal Overlay -->
-    <div v-if="modalVisible" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-[100] px-4 animate-[fadeIn_0.2s_ease-out]" @click.self="closeModal">
+    <div v-if="modalVisible" class="fixed inset-0 bg-gray-900/60  flex items-center justify-center z-[100] px-4 animate-[fadeIn_0.2s_ease-out]" @click.self="closeModal">
       <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden animate-[modalSlideUp_0.3s_ease-out]" role="dialog" aria-modal="true">
         <!-- Modal Header -->
-        <div class="px-6 py-6 border-b border-gray-100" 
+        <div class="px-6 py-4 text-white border-b border-gray-100" 
              :class="{
-               'bg-blue-50/50': modalType === 'info',
-               'bg-emerald-50/50': modalType === 'success',
-               'bg-amber-50/50': modalType === 'warning',
-               'bg-red-50/50': modalType === 'error'
+               'bg-blue-900': modalType === 'info',
+               'bg-emerald-900': modalType === 'success',
+               'bg-amber-900': modalType === 'warning',
+               'bg-red-900': modalType === 'error'
              }">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                 :class="{
-                   'bg-blue-100 text-blue-600': modalType === 'info',
-                   'bg-emerald-100 text-emerald-600': modalType === 'success',
-                   'bg-amber-100 text-amber-600': modalType === 'warning',
-                   'bg-red-100 text-red-600': modalType === 'error'
-                 }">
-              <!-- Icons based on type -->
-              <svg v-if="modalType === 'success'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <svg v-else-if="modalType === 'warning'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-              <svg v-else-if="modalType === 'error'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-              <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900">{{ modalTitle }}</h3>
+            
+            <h3 class="text-xl font-semibold text-white">{{ modalTitle }}</h3>
           </div>
         </div>
         
         <!-- Modal Body -->
-        <div class="px-6 py-6 border-b border-gray-100">
-          <p class="text-gray-600 text-[15px] leading-relaxed">{{ modalMessage }}</p>
+        <div class="px-6 py-6 ">
+          <p class="text-gray-900 text-SM leading-relaxed">{{ modalMessage }}</p>
           <div v-if="modalType === 'image'" class="mt-4 rounded-xl overflow-hidden border border-gray-200">
             <img :src="modalMessage" alt="Full Preview" class="w-full h-auto max-h-[60vh] object-contain bg-gray-900" />
           </div>
         </div>
         
         <!-- Modal Footer -->
-        <div class="px-6 py-4 bg-gray-50 flex justify-end">
-          <button class="px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 focus:ring-4 focus:ring-gray-200 transition-all shadow-sm" @click="closeModal">OK, got it</button>
+        <div class="px-6 py-4  flex justify-end">
+          <button class="px-6 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-800 focus:ring-4 focus:ring-gray-200 transition-all" @click="closeModal">OK</button>
         </div>
       </div>
     </div>
@@ -622,6 +457,7 @@
 <script setup>
   import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
   import StaffSidebar from './StaffSidebar.vue'
+  import AttendanceSkeleton from '../../components/skeletons/AttendanceSkeleton.vue'
   import { useRouter } from 'vue-router'
   import { useStaffAttendanceStore } from '../../stores/staffAttendanceStore.js'
   import { db } from '../../firebase.js'
@@ -644,6 +480,21 @@
 
   const avatarWrapEl = ref(null)
   const avatarMenuOpen = ref(false)
+  const mobileStatusDropdownEl = ref(null)
+  const desktopStatusDropdownEl = ref(null)
+  const statusDropdownOpen = ref(false)
+  const isMobile = ref(false)
+
+  const availableStatuses = [
+    { value: 'At Office', label: 'At Office', emoji: '' },
+    { value: 'On Field', label: 'On Field', emoji: '' },
+    { value: 'Travel', label: 'Travel', emoji: '' },
+    { value: 'Leave', label: 'Leave', emoji: '' }
+  ]
+
+  const handleResize = () => {
+    isMobile.value = window.innerWidth < 768
+  }
   const userProfile = ref(null)
 
   const userDisplayName = computed(() => {
@@ -718,11 +569,21 @@
   }
 
   const onDocClick = (e) => {
-    if (!avatarMenuOpen.value) return
-    const root = avatarWrapEl.value
-    if (!root) return
-    if (root.contains(e.target)) return
-    closeAvatarMenu()
+    // Handle Avatar Menu click outside
+    if (avatarMenuOpen.value) {
+      const root = avatarWrapEl.value
+      if (root && !root.contains(e.target)) {
+        closeAvatarMenu()
+      }
+    }
+
+    // Handle Status Dropdown click outside
+    if (statusDropdownOpen.value) {
+      const root = isMobile.value ? mobileStatusDropdownEl.value : desktopStatusDropdownEl.value
+      if (root && !root.contains(e.target)) {
+        statusDropdownOpen.value = false
+      }
+    }
   }
 
   const goToSettings = () => {
@@ -737,6 +598,16 @@
     router.push({ name: 'Login' })
   }
 
+  const toggleStatusDropdown = () => {
+    statusDropdownOpen.value = !statusDropdownOpen.value
+  }
+
+  const selectStatus = (status) => {
+    selectedStatus.value = status
+    statusDropdownOpen.value = false
+    onStatusChange()
+  }
+
   // Attendance state
   const selectedStatus = ref('At Office')
   const capturedPhoto = ref(null)
@@ -747,6 +618,8 @@
   const currentAttendanceId = ref(null)
   const isScanning = ref(false)
   const submittingLeave = ref(false)
+  const isTimingIn = ref(false)
+  const isTimingOut = ref(false)
   const videoElement = ref(null)
   const canvasElement = ref(null)
 
@@ -868,13 +741,7 @@
   })
 
   const getStatusEmoji = (status) => {
-    const emojis = {
-      'At Office': '🏢',
-      'On Field': '📍',
-      'Travel': '✈️',
-      'Leave': '🏖️'
-    }
-    return emojis[status] || '🏢'
+    return ''
   }
 
   // Initialize time display
@@ -972,7 +839,7 @@
         })
 
         if (url) {
-          uploadedUrls.push(url)
+          uploadedUrls.push({ url: url, name: file.name })
         }
       }
 
@@ -1331,19 +1198,44 @@
   // Camera functions - explicitly defined to resolve HMR issues
   const startCamera = async () => {
     try {
-      console.log('Starting camera...')
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' },
-        audio: false 
-      })
-      if (videoElement.value) {
+      console.log('Starting camera... Step 1: Requesting user-facing camera')
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'user' },
+          audio: false 
+        })
+        console.log('Step 2: User-facing camera obtained!', stream)
+      } catch (err) {
+        console.log('Step 2: Failed user-facing camera, falling back to any camera.', err)
+        // Fallback to any available camera if 'user' facing mode fails (e.g. desktop without default user facing camera)
+        stream = await navigator.mediaDevices.getUserMedia({ 
+          video: true,
+          audio: false 
+        })
+        console.log('Step 3: Fallback camera obtained!', stream)
+      }
+
+      console.log('Step 4: Checking videoElement.value:', videoElement.value)
+      if (videoElement.value && stream) {
         videoElement.value.srcObject = stream
         cameraActive.value = true
         showNotification('Camera started successfully!', 'success')
+        console.log('Step 5: Camera active!')
+      } else if (!stream) {
+        showNotification('Camera stream is not available. Please allow permissions.', 'error')
+        console.log('Step 5: Stream is falsy')
+      } else {
+        console.error('Video element not found in DOM.')
       }
     } catch (error) {
-      showNotification('Failed to access camera. Please check permissions.', 'error')
-      console.error('Camera error:', error)
+      console.log('Camera error caught:', error)
+      if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        showNotification('No camera found on this device.', 'error')
+      } else {
+        showNotification('Failed to access camera. Please check permissions.', 'error')
+        console.error('Camera error details:', error)
+      }
     }
   }
 
@@ -1358,13 +1250,14 @@
   }
 
   const capturePhoto = () => {
-    if (videoElement.value && canvasElement.value) {
-      const context = canvasElement.value.getContext('2d')
-      canvasElement.value.width = videoElement.value.videoWidth
-      canvasElement.value.height = videoElement.value.videoHeight
+    if (videoElement.value) {
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
+      canvas.width = videoElement.value.videoWidth
+      canvas.height = videoElement.value.videoHeight
       context.drawImage(videoElement.value, 0, 0)
       
-      capturedPhoto.value = canvasElement.value.toDataURL('image/jpeg')
+      capturedPhoto.value = canvas.toDataURL('image/jpeg')
       stopCamera()
       showNotification('Photo captured successfully!', 'success')
     }
@@ -1653,13 +1546,23 @@
 
   const timeInWithPhoto = async () => {
     if (capturedPhoto.value && !isClockedIn.value) {
-      await performTimeIn()
+      isTimingIn.value = true
+      try {
+        await performTimeIn()
+      } finally {
+        isTimingIn.value = false
+      }
     }
   }
 
   const timeOutWithPhoto = async () => {
     if (capturedPhoto.value && isClockedIn.value) {
-      await performTimeOut()
+      isTimingOut.value = true
+      try {
+        await performTimeOut()
+      } finally {
+        isTimingOut.value = false
+      }
     }
   }
 
@@ -1719,15 +1622,6 @@
     const lon = Number(longitude)
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return { json: null, addressLine: null }
 
-    const url = `${GEO_API_BASE_URL}/geo/reverse?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
-    if (!res.ok) {
-      return { json: null, addressLine: null, status: res.status }
-    }
-
-    const json = await res.json().catch(() => null)
-    if (!json) return { json: null, addressLine: null }
-
     const addressFromObject = (obj) => {
       if (!obj || typeof obj !== 'object') return null
       const parts = [
@@ -1746,21 +1640,70 @@
       return uniqueParts.length ? uniqueParts.join(', ') : null
     }
 
-    const addressLine = (
-      (typeof json?.display_name === 'string' && json.display_name.trim() !== '' ? json.display_name : null) ||
-      addressFromObject(json?.address) ||
-      addressFromObject(json?.raw?.address) ||
-      addressFromObject(json?.raw?.properties) ||
-      (typeof json?.address === 'string' ? json.address : null) ||
-      (typeof json?.addressLine === 'string' ? json.addressLine : null) ||
-      null
-    )
+    const extractAddress = (json) => {
+      if (!json) return null;
+      return (
+        (typeof json?.display_name === 'string' && json.display_name.trim() !== '' ? json.display_name : null) ||
+        addressFromObject(json?.address) ||
+        addressFromObject(json?.raw?.address) ||
+        addressFromObject(json?.raw?.properties) ||
+        (typeof json?.address === 'string' ? json.address : null) ||
+        (typeof json?.addressLine === 'string' ? json.addressLine : null) ||
+        null
+      )
+    }
 
-    return { json, addressLine: addressLine ? addressLine.trim() : null }
+    let jsonResult = null;
+    let addressLineResult = null;
+
+    // 1. Try backend proxy first
+    try {
+      const url = `${GEO_API_BASE_URL}/geo/reverse?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
+      if (res.ok) {
+        const json = await res.json().catch(() => null)
+        const addr = extractAddress(json)
+        if (addr) {
+          jsonResult = json;
+          addressLineResult = addr;
+        }
+      }
+    } catch (e) {
+      // Backend failed (e.g. 500 error or network issue)
+      console.warn('Backend reverse search failed, using client fallback...');
+    }
+
+    // 2. Client side fallback to photon if backend failed or returned null address
+    if (!addressLineResult) {
+      try {
+        const pUrl = `https://photon.komoot.io/reverse?lat=${lat}&lon=${lon}`
+        const pRes = await fetch(pUrl)
+        if (pRes.ok) {
+          const pJson = await pRes.json()
+          const feature = pJson?.features?.[0]?.properties
+          const pAddr = addressFromObject(feature) || (feature?.name ? feature.name : null)
+          if (pAddr) {
+            jsonResult = pJson
+            addressLineResult = pAddr
+          }
+        }
+      } catch (e) {
+        // ignore fallback error
+      }
+    }
+
+    return { 
+      json: jsonResult, 
+      addressLine: addressLineResult ? addressLineResult.trim() : null 
+    }
   }
 
+  let attendanceUnsub = null
+  
   onMounted(() => {
     document.addEventListener('click', onDocClick)
+    window.addEventListener('resize', handleResize)
+    handleResize()
     fetchUserProfile()
     updateTime()
     timeInterval = setInterval(updateTime, 1000)
@@ -1771,6 +1714,15 @@
         const res = await staffAttendanceStore.createOrGetDailyAttendance(staffId.value)
         if (res.success && res.data?.staffStatus) {
           selectedStatus.value = res.data.staffStatus
+        }
+        if (res.success && res.data?.id) {
+          import('firebase/firestore').then(({ onSnapshot }) => {
+             attendanceUnsub = onSnapshot(doc(db, 'staff_attendance', res.data.id), (docSnap) => {
+               if (docSnap.exists()) {
+                 staffAttendanceStore.currentStaffAttendance = { id: docSnap.id, ...docSnap.data() }
+               }
+             })
+          })
         }
       }
     })()
@@ -1786,6 +1738,7 @@
 
   onUnmounted(() => {
     document.removeEventListener('click', onDocClick)
+    window.removeEventListener('resize', handleResize)
     if (timeInterval) {
       clearInterval(timeInterval)
     }
@@ -1800,15 +1753,33 @@
 
     // Stop camera if active
     stopCamera()
+    if (attendanceUnsub) { attendanceUnsub() }
   })
 
   const checkRfidAndAction = () => {
     const el = document.getElementById('rfid-attendance-input')
-    if (el && el.value) {
-      handleBiometricAction()
-      el.value = ''
-    } else {
+    const scannedRfid = el ? el.value.trim() : ''
+    
+    if (!scannedRfid) {
       openModal('RFID Not Detected', 'Please tap your RFID card on the scanner before clocking in.', 'error')
+      return
     }
+
+    if (!userProfile.value || !userProfile.value.rfid) {
+      openModal('No RFID Registered', 'Your account does not have a registered RFID card. Please contact the administrator.', 'error')
+      if (el) el.value = ''
+      return
+    }
+
+    if (scannedRfid !== userProfile.value.rfid) {
+      openModal('Invalid RFID', 'The scanned RFID card does not match your registered account. Please use your own RFID card.', 'error')
+      if (el) el.value = ''
+      return
+    }
+
+    handleBiometricAction()
+    if (el) el.value = ''
   }
 </script>
+
+

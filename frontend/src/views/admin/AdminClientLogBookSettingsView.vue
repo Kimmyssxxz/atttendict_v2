@@ -1,29 +1,30 @@
 <template>
-  <div class="min-h-screen flex flex-col md:flex-row bg-gray-50">
+  <div class="min-h-screen flex flex-col md:flex-row bg-gray-50/50">
     <AdminSidebar />
     
     <div class="flex-1 flex flex-col">
-      <header class="px-8 py-6 bg-blue-600 text-white shadow-sm">
-        <h1 class="m-0 text-2xl font-bold">Client Logbook Settings</h1>
+      <header class="px-8 py-6 bg-white text-gray-900">
+        <h1 class="m-0 text-3xl font-semibold">Client Logbook Settings</h1>
       </header>
       
-      <main class="flex-1 px-8 py-8">
-        <div class="p-8 bg-white rounded-xl shadow-sm">
+      <main class="flex-1 px-6 py-6 font-sans">
+        <TableSkeleton v-if="loading" :rows="10" />
+        <div v-else class="p-8 bg-white rounded-xl shadow-sm border border-gray-100">
           <!-- Header Section -->
-          <div class="mb-8 pb-8 border-b border-gray-100">
-            <h1 class="text-3xl font-bold text-gray-900 mb-3">Logbook Settings</h1>
-            <p class="text-gray-600 leading-relaxed">Manage the options presented to users when filling out the client logbook.</p>
+          <div class="mb-4 pb-6 border-b border-gray-100">
+            <h1 class="text-2xl font-medium text-gray-900">Logbook Settings</h1>
+            <p class="text-gray-500">Manage the options presented to users when filling out the client logbook.</p>
           </div>
 
           <!-- Navigation Tabs -->
-          <div class="mb-8 pb-6 border-b border-gray-100">
+          <div class=" pb-6">
             <nav class="flex gap-1 overflow-x-auto">
               <button
                 @click="switchTab('services')"
                 :class="[
-                  'flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all whitespace-nowrap border-b-2',
+                  'flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all whitespace-nowrap border-b-2',
                   activeTab === 'services'
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-[#eebb3b] border-[#eebb3b]'
                     : 'text-gray-600 border-transparent hover:text-gray-900'
                 ]"
               >
@@ -32,9 +33,9 @@
               <button
                 @click="switchTab('sectors')"
                 :class="[
-                  'flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all whitespace-nowrap border-b-2',
+                  'flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all whitespace-nowrap border-b-2',
                   activeTab === 'sectors'
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-[#eebb3b] border-[#eebb3b]'
                     : 'text-gray-600 border-transparent hover:text-gray-900'
                 ]"
               >
@@ -43,9 +44,9 @@
               <button
                 @click="switchTab('geography')"
                 :class="[
-                  'flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all whitespace-nowrap border-b-2',
+                  'flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all whitespace-nowrap border-b-2',
                   activeTab === 'geography'
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-[#eebb3b] border-[#eebb3b]'
                     : 'text-gray-600 border-transparent hover:text-gray-900'
                 ]"
               >
@@ -54,9 +55,9 @@
               <button
                 @click="switchTab('privacy')"
                 :class="[
-                  'flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-all whitespace-nowrap border-b-2',
+                  'flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all whitespace-nowrap border-b-2',
                   activeTab === 'privacy'
-                    ? 'text-blue-600 border-blue-600'
+                    ? 'text-[#eebb3b] border-[#eebb3b]'
                     : 'text-gray-600 border-transparent hover:text-gray-900'
                 ]"
               >
@@ -73,14 +74,14 @@
                 <h2 class="text-lg font-semibold text-gray-900">Available Services</h2>
                 <button
                   @click="addDynamicItem('services')"
-                  class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors text-sm font-medium"
+                  class="flex items-center gap-2 px-4 py-2 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 transition-colors text-sm font-medium"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                   Add Service
                 </button>
               </div>
               <div class="space-y-4">
-                <div v-for="(item, index) in formConfig.services" :key="index" class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-all flex items-center justify-between">
+                <div v-for="(item, index) in formConfig.services" :key="index" class="border border-gray-200 rounded-lg p-4 transition-all flex items-center justify-between">
                   <div class="flex-1 mr-4">
                     <input
                       v-model="item.value"
@@ -90,7 +91,7 @@
                   </div>
                   <button
                     @click="removeDynamicItem('services', index)"
-                    class="p-2 text-gray-400 hover:text-red-600 rounded-lg transition-colors"
+                    class="p-2 text-red-400 hover:text-red-600 rounded-lg transition-colors"
                   >
                     Delete
                   </button>
@@ -104,14 +105,14 @@
                 <h2 class="text-lg font-semibold text-gray-900">Available Sectors</h2>
                 <button
                   @click="addDynamicItem('sectors')"
-                  class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  class="flex items-center gap-2 px-4 py-2 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 transition-colors text-sm font-medium"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                   Add Sector
                 </button>
               </div>
               <div class="space-y-4">
-                <div v-for="(item, index) in formConfig.sectors" :key="index" class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-all flex items-center justify-between">
+                <div v-for="(item, index) in formConfig.sectors" :key="index" class="border border-gray-200 rounded-lg p-4 transition-all flex items-center justify-between">
                   <div class="flex-1 mr-4">
                     <input
                       v-model="item.value"
@@ -121,7 +122,7 @@
                   </div>
                   <button
                     @click="removeDynamicItem('sectors', index)"
-                    class="p-2 text-gray-400 hover:text-red-600 rounded-lg transition-colors"
+                    class="p-2 text-red-400 hover:text-red-600 rounded-lg transition-colors"
                   >
                     Delete
                   </button>
@@ -136,7 +137,7 @@
                 <div class="w-full lg:w-1/3 border border-gray-200 rounded-lg overflow-hidden flex flex-col max-h-[600px]">
                   <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                     <h3 class="font-semibold text-gray-900">Cities/Municipalities</h3>
-                  <button @click="addCity" class="px-3 py-1 bg-white border border-blue-600 text-blue-600 rounded-full hover:bg-blue-50 text-sm font-medium">+ Add City</button>
+                  <button @click="addCity" class="px-3 py-1 bg-[#133e75] border border-[#133e75] hover:text-[#133e75] text-[#133e75] rounded-full hover:bg-white text-white text-sm font-medium">+ Add City</button>
                   </div>
                   <div class="overflow-y-auto flex-1">
                     <div 
@@ -167,7 +168,7 @@
                   <template v-if="selectedCity">
                     <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                       <h3 class="font-semibold text-gray-900">Barangays in {{ selectedCity.name || 'Unnamed City' }}</h3>
-                      <button @click="addBarangay" class="px-3 py-1 bg-white border border-blue-600 text-blue-600 rounded-full hover:bg-blue-50 text-sm font-medium">+ Add Barangay</button>
+                      <button @click="addBarangay" class="px-3 py-1 bg-[#133e75] border border-[#133e75] text-white rounded-full hover:bg-white hover:text-[#133e75] text-sm font-medium">+ Add Barangay</button>
                     </div>
                     <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-[500px]">
                       <div v-for="(b, bIndex) in selectedCity.barangays" :key="bIndex" class="flex items-center gap-2">
@@ -218,7 +219,7 @@
             <button
               @click="saveChanges"
               :disabled="saving"
-              class="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-400 transition-colors font-medium text-sm"
+              class="px-6 py-3 bg-[#133e75] text-white rounded-full hover:bg-[#133e75]/80 disabled:bg-gray-400 transition-colors font-medium text-sm"
             >
               {{ saving ? 'Saving...' : 'Save' }}
             </button>
@@ -227,14 +228,52 @@
       </main>
     </div>
   </div>
+
+  <!-- Success Modal -->
+  <Transition
+    enter-active-class="transition duration-300 ease-out"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition duration-200 ease-in"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div v-if="showSuccessModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50">
+      <div 
+        class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all"
+        @click.stop
+      >
+        <div class="p-8 text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          
+          <h3 class="text-xl font-bold text-gray-900 mb-2">Save Successful</h3>
+          <p class="text-gray-600 mb-8">Client Logbook configuration has been updated successfully.</p>
+          
+          <button
+            @click="showSuccessModal = false"
+            class="w-full py-3 px-4 bg-[#133e75] text-white font-semibold rounded-xl hover:bg-[#133e75]/90 transition-allactive:scale-[0.98]"
+          >
+            Great, thanks!
+          </button>
+        </div>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { getFormSettings, updateFormSettings } from '../../services/clientFormSettings'
 import AdminSidebar from './AdminSidebar.vue'
+import TableSkeleton from '../../components/skeletons/TableSkeleton.vue'
 
+const loading = ref(false)
 const saving = ref(false)
+const showSuccessModal = ref(false)
 const lastUpdated = ref('Never')
 const activeTab = ref('services')
 const selectedCityIndex = ref(0)
@@ -355,6 +394,7 @@ const removeBarangay = (bIndex) => {
 }
 
 const loadConfiguration = async () => {
+  loading.value = true
   try {
     const config = await getFormSettings('clientLogbook')
     
@@ -398,6 +438,8 @@ const loadConfiguration = async () => {
     }
   } catch (error) {
     console.error('Error loading client logbook configuration:', error)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -427,7 +469,7 @@ const saveChanges = async () => {
     
     if (success) {
       lastUpdated.value = new Date().toLocaleString()
-      alert('Client Logbook configuration saved successfully!')
+      showSuccessModal.value = true
     } else {
       alert('Error saving configuration. Please try again.')
     }
