@@ -172,12 +172,20 @@
             </div>
 
             <ul v-if="notifications.length" class="list-none m-0 p-0 pl-1 text-[0.9rem] text-slate-900 flex flex-col gap-2">
-              <li v-for="(n, idx) in notifications" :key="idx" class="bg-slate-50 rounded-lg p-3 border border-slate-100">
-                <label class="flex items-start justify-between gap-3 cursor-pointer w-full">
-                  <div class="flex items-start gap-3 w-full">
-                    <input type="checkbox" v-model="selectedIndexes" :value="idx" class="mt-1 w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer" />
-                    <div class="flex flex-col gap-1.5 w-full">
-                      <span class="font-medium text-slate-800 whitespace-pre-wrap" v-html="formatNotification(n)"></span>
+              <li v-for="(n, idx) in notifications" :key="idx" 
+                class="bg-slate-50 rounded-lg p-3 border border-slate-100 transition-all hover:shadow-sm"
+                :class="{'opacity-70': n.isRead}"
+              >
+                <div class="flex items-start justify-between gap-3 w-full">
+                  <div class="flex items-start gap-3 flex-1 min-w-0">
+                    <div class="flex flex-col gap-1 mt-1 shrink-0">
+                      <input type="checkbox" v-model="selectedIndexes" :value="idx" class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer" />
+                    </div>
+                    <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span v-if="!n.isRead" class="w-2 h-2 rounded-full bg-blue-600 shrink-0" title="Unread"></span>
+                        <span class="font-medium text-slate-800 whitespace-pre-wrap" v-html="formatNotification(n)"></span>
+                      </div>
                       <div
                         v-if="n.metadata && (n.metadata.timeInLocation || n.metadata.timeOutLocation || n.metadata.location)"
                         class="flex flex-col gap-1 text-[0.8rem] text-slate-500 bg-white p-2 rounded-md border border-slate-200/60"
@@ -188,7 +196,25 @@
                       </div>
                     </div>
                   </div>
-                </label>
+                  
+                  <div class="flex items-center gap-2 shrink-0">
+                    <button 
+                      v-if="!n.isRead" 
+                      @click="markAsRead(idx)"
+                      class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                      title="Mark as read"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>
+                    <button 
+                      @click="deleteSingle(idx)"
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                      title="Delete"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
+                  </div>
+                </div>
               </li>
             </ul>
             <p v-else class="text-[0.85rem] text-slate-500 italic m-0 pt-2 text-center">No notifications yet.</p>
@@ -214,12 +240,21 @@
 
             <!-- List Card -->
             <div v-if="notifications.length" class="bg-white rounded-lg shadow-sm overflow-hidden  mb-4">
-              <div v-for="(n, idx) in notifications" :key="idx" class="mx-4 py-4" :class="{'border-b border-gray-200': idx !== notifications.length - 1}">
-                <label class="flex items-start gap-3 cursor-pointer w-full">
+              <div v-for="(n, idx) in notifications" :key="idx" 
+                class="mx-4 py-4 transition-colors" 
+                :class="[
+                  {'border-b border-gray-200': idx !== notifications.length - 1},
+                  {'opacity-70': n.isRead}
+                ]"
+              >
+                <div class="flex items-start gap-3 w-full">
                   <input type="checkbox" v-model="selectedIndexes" :value="idx" class="mt-[0.2rem] w-5 h-5 rounded-[0.2rem] border-2 border-gray-400 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0 appearance-none bg-transparent checked:bg-blue-600 checked:border-transparent relative before:content-[''] checked:before:absolute checked:before:w-[5px] checked:before:h-[10px] checked:before:border-r-2 checked:before:border-b-2 checked:before:border-white checked:before:rotate-45 checked:before:left-[6px] checked:before:top-[3px]" />
                   
                   <div class="flex flex-col min-w-0 flex-1 gap-1">
-                    <span class="text-sm text-black leading-snug whitespace-pre-wrap font-normal" v-html="formatNotification(n)"></span>
+                    <div class="flex items-center gap-2 mb-0.5">
+                      <span v-if="!n.isRead" class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
+                      <span class="text-sm text-black leading-snug whitespace-pre-wrap font-normal" v-html="formatNotification(n)"></span>
+                    </div>
                     
                     <div v-if="n.metadata && (n.metadata.timeInLocation || n.metadata.timeOutLocation || n.metadata.location)" class="flex items-center gap-1.5 mt-1 text-[0.8rem] text-slate-700">
                       <svg class="w-3.5 h-3.5 shrink-0 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -230,8 +265,13 @@
                       <span class="truncate" v-else-if="n.metadata.timeOutLocation">{{ formatLocation(n.metadata.timeOutLocation) }}</span>
                       <span class="truncate" v-else-if="n.metadata.location">{{ n.metadata.location }}</span>
                     </div>
+
+                    <div class="flex items-center gap-3 mt-2">
+                      <button v-if="!n.isRead" @click="markAsRead(idx)" class="text-[0.7rem] font-bold text-blue-600 px-0 bg-transparent border-none">Mark as read</button>
+                      <button @click="deleteSingle(idx)" class="text-[0.7rem] font-bold text-red-500 px-0 bg-transparent border-none">Delete</button>
+                    </div>
                   </div>
-                </label>
+                </div>
               </div>
             </div>
             
@@ -327,7 +367,11 @@ export default {
         .then((res) => res.json())
         .then((data) => {
           if (data && Array.isArray(data.notifications)) {
-            this.notifications = data.notifications;
+            this.notifications = data.notifications.map(n => ({
+              ...n,
+              isRead: n.isRead || false
+            }));
+            this.syncUnreadCount();
           }
         })
         .catch(() => {
@@ -339,11 +383,11 @@ export default {
             const list = JSON.parse(raw);
             if (Array.isArray(list)) {
               // Support old string-only format from localStorage
-              this.notifications = list.map((item) => (
-                typeof item === 'string'
-                  ? { message: item }
-                  : item
-              ));
+              this.notifications = list.map((item) => {
+                const n = typeof item === 'string' ? { message: item } : item;
+                return { ...n, isRead: n.isRead || false };
+              });
+              this.syncUnreadCount();
             }
           } catch (e) {}
         })
@@ -433,14 +477,38 @@ export default {
     toggleNotifications() {
       this.showNotifications = !this.showNotifications
     },
+    markAsRead(index) {
+      if (this.notifications[index]) {
+        this.notifications[index].isRead = true;
+        this.syncUnreadCount();
+        this.saveNotificationsToLocal();
+      }
+    },
     markAllAsRead() {
       if (!this.internId) return
-      this.unreadCount = 0
-      try {
+      this.notifications.forEach(n => {
+        n.isRead = true;
+      });
+      this.syncUnreadCount();
+      this.saveNotificationsToLocal();
+    },
+    syncUnreadCount() {
+      const count = this.notifications.filter(n => !n.isRead).length;
+      this.unreadCount = count;
+      if (this.internId) {
         const unreadKey = `internNotificationsUnread_${this.internId}`;
-        localStorage.setItem(unreadKey, '0');
-      } catch (e) {
+        localStorage.setItem(unreadKey, String(count));
       }
+    },
+    saveNotificationsToLocal() {
+      if (this.internId) {
+        const key = `internNotifications_${this.internId}`;
+        localStorage.setItem(key, JSON.stringify(this.notifications));
+      }
+    },
+    deleteSingle(idx) {
+      this.selectedIndexes = [idx];
+      this.deleteSelected();
     },
     deleteAll() {
       if (!this.internId) return
