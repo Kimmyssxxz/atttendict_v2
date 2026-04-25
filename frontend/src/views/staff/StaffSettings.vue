@@ -260,8 +260,41 @@
           </button>
         </div>
       </div>
-    </main>
   </div>
+
+  <!-- Success/Error Modal -->
+  <transition
+    enter-active-class="transition ease-out duration-300"
+    enter-from-class="opacity-0"
+    enter-to-class="opacity-100"
+    leave-active-class="transition ease-in duration-200"
+    leave-from-class="opacity-100"
+    leave-to-class="opacity-0"
+  >
+    <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all animate-in fade-in zoom-in-95 duration-300">
+        <!-- Success Icon -->
+        <div v-if="modalType === 'success'" class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <!-- Error Icon -->
+        <div v-else class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+          <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+        
+        <h3 class="text-xl font-bold text-gray-900 mb-2">{{ modalTitle }}</h3>
+        <p class="text-sm text-gray-500 mb-6 px-2">{{ modalMessage }}</p>
+        
+        <button @click="showModal = false" class="w-full inline-flex justify-center items-center rounded-xl px-4 py-3 bg-[#133e75] text-sm font-semibold text-white hover:bg-[#133e75]/90 focus:outline-none transition-colors shadow-lg active:scale-[0.98]">
+          {{ modalType === 'success' ? 'Continue' : 'Try Again' }}
+        </button>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script setup>
@@ -296,6 +329,19 @@ const passwordForm = ref({
   new: '',
   confirm: ''
 })
+
+// Modal State
+const showModal = ref(false)
+const modalType = ref('success')
+const modalTitle = ref('')
+const modalMessage = ref('')
+
+const showCustomModal = (type, title, message) => {
+  modalType.value = type
+  modalTitle.value = title
+  modalMessage.value = message
+  showModal.value = true
+}
 
 const form = ref({
   firstName: '',
@@ -376,10 +422,10 @@ const handlePhotoUpload = async (event) => {
       userProfile.value.photoUrl = downloadURL
     }
     
-    // alert('Profile picture updated successfully!')
+    showCustomModal('success', 'Update Successful', 'Profile picture updated successfully!')
   } catch (error) {
     console.error('Error uploading profile picture:', error)
-    alert('Failed to upload profile picture. Please try again.')
+    showCustomModal('error', 'Update Failed', 'Failed to upload profile picture. Please try again.')
   } finally {
     uploadingPhoto.value = false
     if (fileInput.value) {
@@ -405,9 +451,10 @@ const resetPhoto = async () => {
     if (userProfile.value) {
       userProfile.value.photoUrl = ''
     }
+    showCustomModal('success', 'Photo Reset', 'Profile picture has been reset.')
   } catch (error) {
     console.error('Error resetting profile picture:', error)
-    alert('Failed to reset profile picture. Please try again.')
+    showCustomModal('error', 'Reset Failed', 'Failed to reset profile picture. Please try again.')
   } finally {
     uploadingPhoto.value = false
   }
@@ -415,18 +462,18 @@ const resetPhoto = async () => {
 
 const updatePassword = async () => {
   if (!passwordForm.value.current || !passwordForm.value.new || !passwordForm.value.confirm) {
-    alert('Please fill in all password fields.')
+    showCustomModal('error', 'Incomplete Fields', 'Please fill in all password fields.')
     return
   }
   
   if (passwordForm.value.new !== passwordForm.value.confirm) {
-    alert('New password and confirm password do not match.')
+    showCustomModal('error', 'Mismatch', 'New password and confirm password do not match.')
     return
   }
 
   const id = getCurrentUserId()
   if (!id) {
-    alert('Unable to identify user ID.')
+    showCustomModal('error', 'Error', 'Unable to identify user ID.')
     return
   }
 
@@ -449,14 +496,14 @@ const updatePassword = async () => {
       throw new Error(errData.message || 'Failed to update password');
     }
     
-    alert('Password updated successfully!')
+    showCustomModal('success', 'Password Updated', 'Your password has been changed successfully!')
     
     passwordForm.value.current = ''
     passwordForm.value.new = ''
     passwordForm.value.confirm = ''
   } catch (error) {
     console.error('Error updating password:', error)
-    alert(error.message || 'Failed to update password. Please check your connection and try again.')
+    showCustomModal('error', 'Update Failed', error.message || 'Failed to update password. Please check your connection and try again.')
   } finally {
     updatingPassword.value = false
   }
@@ -565,10 +612,10 @@ const saveChanges = async () => {
     
     await updateDoc(userRef, updateData)
     await fetchUserProfile()
-    // Optional: show a small toast or visually confirm saving here.
+    showCustomModal('success', 'Changes Saved', 'Your profile information has been updated.')
   } catch (error) {
     console.error('Error saving profile changes:', error)
-    alert('Failed to save changes. Please try again.')
+    showCustomModal('error', 'Save Failed', 'Failed to save changes. Please try again.')
   } finally {
     saving.value = false
   }
