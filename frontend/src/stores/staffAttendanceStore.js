@@ -856,7 +856,7 @@ export const useStaffAttendanceStore = defineStore('staffAttendance', {
 
         if (locationData?.staffStatus) {
           updateData.staffStatus = locationData.staffStatus
-          updateData.staffStatusAM = locationData.staffStatus
+          updateData.staffStatusOutAM = locationData.staffStatus
         }
 
         const timeOutLatitude = this.normalizeNumber(locationData?.latitude)
@@ -1003,7 +1003,7 @@ export const useStaffAttendanceStore = defineStore('staffAttendance', {
 
         if (locationData?.staffStatus) {
           updateData.staffStatus = locationData.staffStatus
-          updateData.staffStatusPM = locationData.staffStatus
+          updateData.staffStatusOutPM = locationData.staffStatus
         }
 
         const timeOutLatitude = this.normalizeNumber(locationData?.latitude)

@@ -431,7 +431,10 @@
                                'bg-amber-500': typeof attendance.status === 'string' && attendance.status.includes('Pending'),
                                'bg-red-500': getStatusClass(attendance) === 'absent' && !attendance.status.includes('Pending') && attendance.status !== 'Leave'
                              }"></div>
-                        {{ attendance.status || 'At Office' }}
+                        <span v-if="attendance.statusIn && attendance.statusOut && attendance.statusIn !== attendance.statusOut" class="flex items-center gap-1">
+                           {{ attendance.statusIn }} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> {{ attendance.statusOut }}
+                        </span>
+                        <span v-else>{{ attendance.status || 'At Office' }}</span>
                       </span>
                     </td>
                     <td class="px-6 py-4">
@@ -523,7 +526,17 @@
                         'bg-amber-100 text-amber-800': typeof selectedAttendance.status === 'string' && selectedAttendance.status.includes('Pending'),
                         'bg-red-100 text-red-800': getStatusClass(selectedAttendance) === 'absent' && !(typeof selectedAttendance.status === 'string' && selectedAttendance.status.includes('Pending')) && selectedAttendance.status !== 'Leave'
                       }">
-                  {{ selectedAttendance.status || 'At Office' }}
+                  <div v-if="selectedAttendance.statusIn && selectedAttendance.statusOut && selectedAttendance.statusIn !== selectedAttendance.statusOut" class="flex flex-col gap-1 mt-1">
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] text-gray-400 uppercase font-bold">In:</span>
+                      <span class="text-xs font-bold">{{ selectedAttendance.statusIn }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] text-gray-400 uppercase font-bold">Out:</span>
+                      <span class="text-xs font-bold">{{ selectedAttendance.statusOut }}</span>
+                    </div>
+                  </div>
+                  <span v-else>{{ selectedAttendance.status || 'At Office' }}</span>
                 </span>
               </div>
 
@@ -800,6 +813,8 @@ const attendances = computed(() => {
         date: staffAttendance.date,
         timeIn: staffAttendance.timeInAM,
         timeOut: staffAttendance.timeOutAM,
+        statusIn: staffAttendance.staffStatusAM || staffAttendance.statusAM || (staffAttendance.staffStatus === 'Leave' ? 'Leave' : null),
+        statusOut: staffAttendance.staffStatusOutAM || staffAttendance.staffStatusAM || staffAttendance.statusAM || (staffAttendance.staffStatus === 'Leave' ? 'Leave' : null),
         status: staffAttendance.staffStatusAM || staffAttendance.statusAM || (staffAttendance.staffStatus === 'Leave' ? 'Leave' : null),
         location: staffAttendance.LocAM || staffAttendance.locationAM,
         address: staffAttendance.LocAM?.address,
@@ -818,6 +833,8 @@ const attendances = computed(() => {
         date: staffAttendance.date,
         timeIn: staffAttendance.timeInPM,
         timeOut: staffAttendance.timeOutPM,
+        statusIn: staffAttendance.staffStatusPM || staffAttendance.statusPM || (staffAttendance.staffStatus === 'Leave' ? 'Leave' : null),
+        statusOut: staffAttendance.staffStatusOutPM || staffAttendance.staffStatusPM || staffAttendance.statusPM || (staffAttendance.staffStatus === 'Leave' ? 'Leave' : null),
         status: staffAttendance.staffStatusPM || staffAttendance.statusPM || (staffAttendance.staffStatus === 'Leave' ? 'Leave' : null),
         location: staffAttendance.LocPM || staffAttendance.locationPM,
         address: staffAttendance.LocPM?.address || staffAttendance.address,
