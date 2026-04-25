@@ -180,7 +180,7 @@
                 <button @click="refreshAttendances" class="px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg">Try Again</button>
               </div>
               
-              <div v-else-if="attendances.length === 0" class="py-16 text-center px-4">
+              <div v-else-if="filteredAttendances.length === 0" class="py-16 text-center px-4">
                 <p class="text-gray-900 font-bold mb-1 text-sm">No records found</p>
               </div>
               
@@ -229,7 +229,7 @@
                 </table>
               </div>
               
-              <div v-if="!loading && !error && attendances.length > 0" class="px-4 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <div v-if="!loading && !error && filteredAttendances.length > 0" class="px-4 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
                 <div class="flex gap-2 w-full justify-between">
                   <button @click="prevPage" :disabled="currentPage === 1" class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 disabled:opacity-50">Prev</button>
                   <div class="flex items-center px-2 py-2 text-[10px] font-medium text-gray-700">Page {{ currentPage }} / {{ totalPages }}</div>
@@ -364,12 +364,12 @@
               <button @click="refreshAttendances" class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">Try Again</button>
             </div>
             
-            <div v-else-if="attendances.length === 0" class="py-20 flex flex-col items-center justify-center text-center px-4">
+            <div v-else-if="filteredAttendances.length === 0" class="py-20 flex flex-col items-center justify-center text-center px-4">
               <div class="w-16 h-16 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mb-4">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
               </div>
               <p class="text-gray-900 font-bold mb-1">No records found</p>
-              <p class="text-gray-500">You don't have any attendance records yet.</p>
+              <p class="text-gray-500">You don't have any attendance records for this period.</p>
             </div>
             
             <div v-else class="overflow-x-auto">
@@ -454,7 +454,7 @@
               </table>
             </div>
             
-            <div v-if="!loading && !error && attendances.length > 0" class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <div v-if="!loading && !error && filteredAttendances.length > 0" class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
               <span class="text-sm text-gray-500">
                 Showing <span class="font-medium text-gray-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to <span class="font-medium text-gray-900">{{ Math.min(currentPage * itemsPerPage, filteredAttendances.length) }}</span> of <span class="font-medium text-gray-900">{{ filteredAttendances.length }}</span> records
               </span>
