@@ -700,7 +700,7 @@ export default {
           return;
         }
 
-        const response = await fetch(`http://localhost:3001/users/${basic.id}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${basic.id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch full user profile');
         }
@@ -731,7 +731,7 @@ export default {
         }
 
         this.infoSaving = true;
-        const response = await fetch(`http://localhost:3001/users/${this.intern.id}/info`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${this.intern.id}/info`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -828,7 +828,7 @@ export default {
         if (!this.intern.id) return;
 
         try {
-          await fetch(`http://localhost:3001/users/${this.intern.id}/sessions`, {
+          await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${this.intern.id}/sessions`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -840,7 +840,7 @@ export default {
           });
         } catch (e) {}
 
-        const res = await fetch(`http://localhost:3001/users/${this.intern.id}/sessions`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${this.intern.id}/sessions`);
         const data = await res.json().catch(() => null);
         if (!res.ok) {
           return;
@@ -895,7 +895,7 @@ export default {
 
         this.pwdSaving = true;
 
-        const response = await fetch(`http://localhost:3001/users/${this.intern.id}/change-password`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${this.intern.id}/change-password`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -934,7 +934,7 @@ export default {
       try {
         if (!this.intern.id) return;
         if (session && session.isCurrent) {
-          const res = await fetch(`http://localhost:3001/users/${this.intern.id}/sessions`, {
+          const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${this.intern.id}/sessions`, {
             method: 'DELETE',
           });
           if (!res.ok) {
@@ -946,7 +946,7 @@ export default {
           this.sessions = [];
           this.$router.push('/auth/login');
         } else if (session && session.id) {
-          const res = await fetch(`http://localhost:3001/users/${this.intern.id}/sessions/${session.id}`, {
+          const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${this.intern.id}/sessions/${session.id}`, {
             method: 'DELETE',
           });
           if (!res.ok) {

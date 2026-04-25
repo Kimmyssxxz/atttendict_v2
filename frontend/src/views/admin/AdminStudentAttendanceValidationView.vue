@@ -662,7 +662,7 @@ export default {
 
       try {
         const res = await fetch(
-          `http://localhost:3001/attendance/intern/history?internId=${encodeURIComponent(internId)}`
+          `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/attendance/intern/history?internId=${encodeURIComponent(internId)}`
         )
         const data = await res.json()
 
@@ -731,7 +731,7 @@ export default {
       try {
         // Use an empty query to fetch all interns/history or handle based on selected intern
         const qs = '' 
-        const res = await fetch(`http://localhost:3001/admin/attendance/today-interns${qs}`)
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/admin/attendance/today-interns${qs}`)
         const data = await res.json()
 
         if (!res.ok) {

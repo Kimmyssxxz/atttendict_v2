@@ -143,7 +143,7 @@ export default {
       this.loading = true;
 
       try {
-        const response = await fetch(`http://localhost:3001/users/${this.user.id}/change-password`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${this.user.id}/change-password`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

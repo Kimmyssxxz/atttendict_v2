@@ -562,7 +562,7 @@ export default {
 
       try {
         const endpoint = this.form.role === 'staff' ? '/auth/staff/register' : '/auth/intern/register';
-        const response = await fetch(`http://localhost:3001${endpoint}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}${endpoint}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

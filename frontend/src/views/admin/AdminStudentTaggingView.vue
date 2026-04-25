@@ -246,7 +246,7 @@ export default {
       this.error = ''
 
       try {
-        const res = await fetch('http://localhost:3001/admin/attendance/today-interns')
+        const res = await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/admin/attendance/today-interns')
         const data = await res.json()
 
         if (!res.ok) {
@@ -323,7 +323,7 @@ export default {
 
         // Also ask backend to sync today's attendance tagging for this intern (day-level default)
         try {
-          await fetch('http://localhost:3001/admin/attendance/update-tagging', {
+          await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/admin/attendance/update-tagging', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -344,7 +344,7 @@ export default {
 
           const amTag = this.todayTagAM
           if (amTag) {
-            await fetch('http://localhost:3001/admin/attendance/retag-session', {
+            await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/admin/attendance/retag-session', {
               ...baseOptions,
               body: JSON.stringify({
                 internId,
@@ -356,7 +356,7 @@ export default {
 
           const pmTag = this.todayTagPM
           if (pmTag) {
-            await fetch('http://localhost:3001/admin/attendance/retag-session', {
+            await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/admin/attendance/retag-session', {
               ...baseOptions,
               body: JSON.stringify({
                 internId,

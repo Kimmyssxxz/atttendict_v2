@@ -198,7 +198,7 @@ export default {
       }
       this.isLoading = true;
       try {
-        const response = await fetch('http://localhost:3001/auth/verify-otp', {
+        const response = await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/auth/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: this.email, otp: this.otpCode }),
@@ -222,7 +222,7 @@ export default {
       if (this.isResending) return;
       this.isResending = true;
       try {
-        const response = await fetch('http://localhost:3001/auth/resend-otp', {
+        const response = await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/auth/resend-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: this.email }),

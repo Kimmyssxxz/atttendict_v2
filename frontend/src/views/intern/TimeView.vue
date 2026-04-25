@@ -788,7 +788,7 @@ export default {
     },
     async fetchUserTags() {
       try {
-        const res = await fetch(`http://localhost:3001/users/${encodeURIComponent(this.internId)}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${encodeURIComponent(this.internId)}`);
         if (!res.ok) return;
         const data = await res.json();
         const user = data && data.user ? data.user : null;
@@ -861,7 +861,7 @@ export default {
     },
     async fetchTodayRecord() {
       try {
-        const res = await fetch(`http://localhost:3001/attendance/intern/today?internId=${this.internId}`)
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/attendance/intern/today?internId=${this.internId}`)
         
         const serverDateStr = res.headers.get('date')
         if (serverDateStr) {
@@ -956,7 +956,7 @@ export default {
       }
       
       try {
-        const res = await fetch('http://localhost:3001/attendance/intern/time-in', {
+        const res = await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/attendance/intern/time-in', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ internId: this.internId, location })
@@ -1015,7 +1015,7 @@ export default {
       this.loading = true
       this.loadingType = 'out'
       try {
-        const res = await fetch('http://localhost:3001/attendance/intern/time-out', {
+        const res = await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/attendance/intern/time-out', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ internId: this.internId })
@@ -1117,7 +1117,7 @@ export default {
         const basic = JSON.parse(stored);
         this.intern = { ...this.intern, ...basic, id: basic.id };
         if (!basic.id) return;
-        const response = await fetch(`http://localhost:3001/users/${basic.id}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${basic.id}`);
         if (response.ok) {
           const data = await response.json();
           if (data && data.user) {

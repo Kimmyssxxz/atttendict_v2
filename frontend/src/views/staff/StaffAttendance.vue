@@ -468,7 +468,7 @@
   import iconUrl from 'leaflet/dist/images/marker-icon.png?url'
   import shadowUrl from 'leaflet/dist/images/marker-shadow.png?url'
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')'
   const GEO_API_BASE_URL = import.meta.env.DEV ? '' : API_BASE_URL
 
   const router = useRouter()

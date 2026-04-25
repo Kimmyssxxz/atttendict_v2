@@ -182,7 +182,7 @@ const handleLogin = async () => {
   isLoading.value = true;
   errorMessage.value = '';
   try {
-    const response = await fetch('http://localhost:3001/auth/admin/login', {
+    const response = await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/auth/admin/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

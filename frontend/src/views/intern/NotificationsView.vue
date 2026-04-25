@@ -323,7 +323,7 @@ export default {
       }
       this.internId = internId;
       // First try to load from backend (Firebase notifications table)
-      fetch(`http://localhost:3001/notifications/user/${internId}`)
+      fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/notifications/user/${internId}`)
         .then((res) => res.json())
         .then((data) => {
           if (data && Array.isArray(data.notifications)) {
@@ -407,7 +407,7 @@ export default {
         const internId = basic.id;
         if (!internId) return;
 
-        const res = await fetch(`http://localhost:3001/users/${encodeURIComponent(internId)}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${encodeURIComponent(internId)}`);
         if (!res.ok) {
           this.intern = { ...this.intern, ...basic };
           return;
@@ -466,7 +466,7 @@ export default {
     executeDeleteAll() {
       if (!this.internId) return
       // First call backend to delete from Firestore
-      fetch(`http://localhost:3001/notifications/user/${this.internId}`, {
+      fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/notifications/user/${this.internId}`, {
         method: 'DELETE'
       }).catch(() => {})
       
@@ -493,7 +493,7 @@ export default {
         .filter((v) => typeof v === 'string');
 
       // Call backend to delete matching notifications in Firestore
-      fetch(`http://localhost:3001/notifications/user/${this.internId}/delete-selected`, {
+      fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/notifications/user/${this.internId}/delete-selected`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: messagesToDelete })

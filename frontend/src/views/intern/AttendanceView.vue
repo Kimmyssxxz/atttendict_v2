@@ -524,7 +524,7 @@ export default {
     async fetchAttendanceHistory() {
       if (!this.intern.id) return;
       try {
-        const res = await fetch(`http://localhost:3001/attendance/intern/history?internId=${encodeURIComponent(this.intern.id)}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/attendance/intern/history?internId=${encodeURIComponent(this.intern.id)}`);
         if (!res.ok) throw new Error('Failed to fetch attendance history');
         const json = await res.json();
         this.records = (json.data || []).map((r) => ({
@@ -616,7 +616,7 @@ export default {
         const internId = basic.id;
         if (!internId) return;
 
-        const res = await fetch(`http://localhost:3001/users/${encodeURIComponent(internId)}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${encodeURIComponent(internId)}`);
         if (!res.ok) {
           this.intern = { ...this.intern, ...basic };
           return;

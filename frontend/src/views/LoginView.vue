@@ -195,6 +195,7 @@
 
 <script>
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
+import { API_BASE_URL } from '../config'
 
 export default {
   name: 'LoginView',
@@ -241,7 +242,7 @@ export default {
       this.isLoading = true;
       try {
         console.log('Sending request to backend...');
-        const response = await fetch('http://localhost:3001/auth/login', {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

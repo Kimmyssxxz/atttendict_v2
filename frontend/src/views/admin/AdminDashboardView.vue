@@ -463,7 +463,7 @@ const fetchChartData = async () => {
   
   // 3. Fetch Internship Status (Progress & Placement)
   try {
-    const ojtRes = await fetch('http://localhost:3001/admin/ojt-summary')
+    const ojtRes = await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/admin/ojt-summary')
     if (ojtRes.ok) {
       const ojtData = await ojtRes.json()
       let list = Array.isArray(ojtData.interns) ? ojtData.interns : []

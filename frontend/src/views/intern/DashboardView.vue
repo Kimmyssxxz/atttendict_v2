@@ -725,7 +725,7 @@ export default {
         const internId = basic.id;
         if (!internId) return;
 
-        const res = await fetch(`http://localhost:3001/users/${encodeURIComponent(internId)}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${encodeURIComponent(internId)}`);
         if (!res.ok) {
           this.intern = { ...this.intern, ...basic };
           return;
@@ -752,7 +752,7 @@ export default {
 
         let user = basicUser || {};
         try {
-          const userRes = await fetch(`http://localhost:3001/users/${encodeURIComponent(internId)}`);
+          const userRes = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${encodeURIComponent(internId)}`);
           if (userRes.ok) {
             const userJson = await userRes.json().catch(() => null);
             if (userJson && userJson.user) {
@@ -774,7 +774,7 @@ export default {
         this.remainingHours = Number.isFinite(parsedRemaining) && parsedRemaining >= 0 ? parsedRemaining : null;
 
         try {
-          const attRes = await fetch(`http://localhost:3001/attendance/intern/history?internId=${encodeURIComponent(internId)}`);
+          const attRes = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/attendance/intern/history?internId=${encodeURIComponent(internId)}`);
           if (attRes.ok) {
             const json = await attRes.json().catch(() => null);
             const records = Array.isArray(json && json.data) ? json.data : [];

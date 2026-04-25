@@ -313,7 +313,7 @@ export default {
       
       // Enable Register Mode on backend
       try {
-        await fetch('http://localhost:3001/api/rfid/register-mode', {
+        await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/api/rfid/register-mode', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: staff.id, enable: true })
@@ -331,7 +331,7 @@ export default {
 
       // Disable Register Mode on backend
       try {
-        await fetch('http://localhost:3001/api/rfid/register-mode', {
+        await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/api/rfid/register-mode', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: oldId, enable: false })
@@ -346,7 +346,7 @@ export default {
       this.saving = true
 
       try {
-        const response = await fetch('http://localhost:3001/api/rfid/register-manual', {
+        const response = await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/api/rfid/register-manual', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

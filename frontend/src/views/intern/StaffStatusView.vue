@@ -348,7 +348,7 @@ export default {
         const internId = basic.id;
         if (!internId) return;
 
-        const res = await fetch(`http://localhost:3001/users/${encodeURIComponent(internId)}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/users/${encodeURIComponent(internId)}`);
         if (!res.ok) {
           this.intern = { ...this.intern, ...basic };
           return;
@@ -381,7 +381,7 @@ export default {
       this.loading = true
       this.error = ''
       try {
-        const res = await fetch('http://localhost:3001/staff')
+        const res = await fetch((import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')/staff')
         const json = await (res.ok ? res.json() : Promise.resolve(null))
         if (!json || !Array.isArray(json.staff)) {
           this.staff = []
@@ -403,7 +403,7 @@ export default {
     async fetchStaffStatuses() {
       if (!Array.isArray(this.staff) || this.staff.length === 0) return
 
-      const base = 'http://localhost:3001'
+      const base = (import.meta.env.VITE_API_BASE_URL || '${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}')'
 
       const results = await Promise.all(
         this.staff.map(async (s) => {
