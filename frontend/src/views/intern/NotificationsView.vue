@@ -226,8 +226,9 @@
             <!-- Mobile Header Buttons -->
             <div class="flex items-center justify-between px-1 mb-1">
               <div class="flex items-center gap-4">
-                <button class="border-none bg-[#dae9fb] text-[#13438a] font-medium text-sm px-8 py-2 rounded-full cursor-pointer active:scale-95 transition-transform shrink-0" :disabled="!unreadCount" @click="markAllAsRead">
-                  All
+                <button class="border-none bg-[#dae9fb] text-[#13438a] font-medium text-xs px-4 py-2 rounded-full cursor-pointer active:scale-95 transition-transform shrink-0 flex items-center gap-1" :disabled="!unreadCount" @click="markAllAsRead">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Mark all as read
                 </button>
                 <button class="border-none bg-transparent text-slate-800 font-medium text-[0.95rem] p-0 cursor-pointer disabled:opacity-50" :disabled="!selectedIndexes.length" @click="deleteSelected">
                   Delete Selected
@@ -477,20 +478,44 @@ export default {
     toggleNotifications() {
       this.showNotifications = !this.showNotifications
     },
-    markAsRead(index) {
-      if (this.notifications[index]) {
-        this.notifications[index].isRead = true;
+    async markAsRead(index) {
+      const n = this.notifications[index];
+      if (n && !n.isRead) {
+        // Optimistic update
+        n.isRead = true;
         this.syncUnreadCount();
         this.saveNotificationsToLocal();
+
+        // Backend update
+        if (n.id) {
+          try {
+            await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/notifications/${n.id}/mark-read`, {
+              method: 'POST'
+            });
+          } catch (e) {
+            console.error('Error marking as read:', e);
+          }
+        }
       }
     },
-    markAllAsRead() {
-      if (!this.internId) return
+    async markAllAsRead() {
+      if (!this.internId || !this.unreadCount) return
+      
+      // Optimistic update
       this.notifications.forEach(n => {
         n.isRead = true;
       });
       this.syncUnreadCount();
       this.saveNotificationsToLocal();
+
+      // Backend update
+      try {
+        await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/notifications/user/${this.internId}/mark-all-read`, {
+          method: 'POST'
+        });
+      } catch (e) {
+        console.error('Error marking all as read:', e);
+      }
     },
     syncUnreadCount() {
       const count = this.notifications.filter(n => !n.isRead).length;

@@ -965,6 +965,45 @@ app.post('/notifications/user/:id/delete-selected', async (req, res) => {
   }
 });
 
+// Mark all notifications as read for a user
+app.post('/notifications/user/:id/mark-all-read', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ message: 'User id is required' });
+
+    const snap = await db.collection('notifications')
+      .where('userId', '==', id)
+      .where('isRead', '==', false)
+      .get();
+
+    const batch = db.batch();
+    snap.docs.forEach((doc) => {
+      batch.update(doc.ref, { isRead: true });
+    });
+    await batch.commit();
+
+    return res.json({ message: 'All notifications marked as read', count: snap.size });
+  } catch (err) {
+    console.error('Mark all read error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Mark a single notification as read
+app.post('/notifications/:id/mark-read', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ message: 'Notification id is required' });
+
+    await db.collection('notifications').doc(id).update({ isRead: true });
+
+    return res.json({ message: 'Notification marked as read' });
+  } catch (err) {
+    console.error('Mark read error:', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Fetch notifications for a specific user
 app.get('/notifications/user/:id', async (req, res) => {
   try {
