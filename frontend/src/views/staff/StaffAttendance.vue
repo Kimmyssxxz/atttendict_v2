@@ -403,8 +403,8 @@
                   <div class="flex-1 ml-12 bg-gray-50 p-5 rounded-2xl border border-gray-100 hover:bg-white hover:border-blue-100 transition-all">
                     <div class="flex items-center gap-3 mb-4"><span class="px-3 py-1 rounded-md text-xs font-bold uppercase" :class="getLogType(log) === 'time-in' ? 'bg-emerald-100 text-emerald-800' : 'bg-orange-100 text-orange-800'">{{ getLogType(log) === 'time-in' ? 'Time In' : 'Time Out' }}</span><span class="text-xs text-gray-500 font-medium">{{ log.status }}</span></div>
                     <div v-if="getLogAddress(log)" class="text-sm text-gray-600 mb-4">{{ getLogAddress(log) }}</div>
-                    <div class="flex gap-4" v-if="(log.latitude && log.longitude) || getLogPhoto(log)">
-                      <div v-if="log.latitude && log.longitude" class="flex-1 rounded-xl overflow-hidden border border-gray-200 h-32 bg-gray-100 shadow-inner"><iframe :src="getOsmEmbedUrl(log.latitude, log.longitude)" class="w-full h-full border-0"></iframe></div>
+                    <div class="flex gap-4" v-if="(log.latitude && log.longitude && log.status !== 'At Office') || getLogPhoto(log)">
+                      <div v-if="log.latitude && log.longitude && log.status !== 'At Office'" class="flex-1 rounded-xl overflow-hidden border border-gray-200 h-32 bg-gray-100 shadow-inner"><iframe :src="getOsmEmbedUrl(log.latitude, log.longitude)" class="w-full h-full border-0"></iframe></div>
                       <div v-if="getLogPhoto(log)" class="w-40 rounded-xl overflow-hidden border border-gray-200 h-32 cursor-pointer relative group-img" @click="openModal('Photo Preview', '', 'image', getLogPhoto(log))">
                          <img :src="getLogPhoto(log)" class="w-full h-full object-cover transition-transform group-img:scale-105" />
                       </div>
