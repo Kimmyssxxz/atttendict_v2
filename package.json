@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "start": "node backend/server.js",
+    "install-backend": "npm install --prefix backend",
+    "build": "npm install --prefix backend"
+  },
   "devDependencies": {
     "@iconify/tailwind4": "^1.2.3"
   }
