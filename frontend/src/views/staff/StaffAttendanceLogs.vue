@@ -1058,25 +1058,26 @@ const drawDTRPanel = (doc, startX, width) => {
       continue
     }
 
-    if (isSaturday) {
+    const logs = attendanceMap[i] || {}
+    
+    const formatTimeOrStatus = (val) => {
+      if (!val) return ''
+      if (val === 'LEAVE') return 'LEAVE'
+      return parseMilitaryTime(val)
+    }
+
+    const amIn = formatTimeOrStatus(logs['AM']?.timeIn)
+    const amOut = formatTimeOrStatus(logs['AM']?.timeOut)
+    const pmIn = formatTimeOrStatus(logs['PM']?.timeIn)
+    const pmOut = formatTimeOrStatus(logs['PM']?.timeOut)
+    
+    const hasLogs = amIn || amOut || pmIn || pmOut
+
+    if (isSaturday && !hasLogs) {
       tableDataArr.push([{ content: i.toString() }, { content: 'Saturday', colSpan: 4, styles: { align: 'center', textColor: [0, 0, 0] } }, '', ''])
-    } else if (isSunday) {
+    } else if (isSunday && !hasLogs) {
       tableDataArr.push([{ content: i.toString() }, { content: 'Sunday', colSpan: 4, styles: { align: 'center', textColor: [0, 0, 0] } }, '', ''])
     } else {
-      // Normal Weekday row
-      const logs = attendanceMap[i] || {}
-      
-      const formatTimeOrStatus = (val) => {
-        if (!val) return ''
-        if (val === 'LEAVE') return 'LEAVE'
-        return parseMilitaryTime(val)
-      }
-
-      const amIn = formatTimeOrStatus(logs['AM']?.timeIn)
-      const amOut = formatTimeOrStatus(logs['AM']?.timeOut)
-      const pmIn = formatTimeOrStatus(logs['PM']?.timeIn)
-      const pmOut = formatTimeOrStatus(logs['PM']?.timeOut)
-      
       tableDataArr.push([i.toString(), amIn, amOut, pmIn, pmOut, '', ''])
     }
   }
