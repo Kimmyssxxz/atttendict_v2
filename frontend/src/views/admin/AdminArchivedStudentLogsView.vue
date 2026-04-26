@@ -420,17 +420,43 @@ export default {
       if (!this.studentToDelete) return
       this.deleting = true
       try {
-        // 1. Delete profile photo from Storage
+        const studentId = this.studentToDelete.id
+
+        // 1. Delete associated attendance records and their photos
+        const attQ = query(collection(db, 'intern_attendance'), where('internId', '==', studentId))
+        const attSnap = await getDocs(attQ)
+        
+        if (!attSnap.empty) {
+          const batch = writeBatch(db)
+          for (const d of attSnap.docs) {
+            const data = d.data()
+            // Delete time-in photo
+            if (data.photoUrl) await this.deleteFileByUrl(data.photoUrl)
+            // Delete time-out photo
+            if (data.photoOutUrl) await this.deleteFileByUrl(data.photoOutUrl)
+            // Delete any leave documents if they exist
+            if (Array.isArray(data.leaveDocumentUrls)) {
+              for (const docObj of data.leaveDocumentUrls) {
+                if (docObj.url) await this.deleteFileByUrl(docObj.url)
+              }
+            }
+            batch.delete(d.ref)
+          }
+          await batch.commit()
+        }
+
+        // 2. Delete profile photo from Storage
         if (this.studentToDelete.photoUrl) {
           await this.deleteFileByUrl(this.studentToDelete.photoUrl)
         }
 
-        // 2. Delete user from Firestore
-        await deleteDoc(doc(db, 'users', this.studentToDelete.id))
+        // 3. Delete user from Firestore
+        await deleteDoc(doc(db, 'users', studentId))
         
-        this.students = this.students.filter(s => s.id !== this.studentToDelete.id)
+        this.students = this.students.filter(s => s.id !== studentId)
         this.showDeleteModal = false
         this.studentToDelete = null
+        await this.fetchData()
       } catch (e) {
         console.error('Error deleting student:', e)
         alert('Failed to delete student.')
@@ -446,13 +472,35 @@ export default {
         const studentsToProcess = [...this.archivedStudents]
         
         for (const s of studentsToProcess) {
-          // Delete photo
+          const studentId = s.id
+
+          // Delete attendance records and photos for this student
+          const attQ = query(collection(db, 'intern_attendance'), where('internId', '==', studentId))
+          const attSnap = await getDocs(attQ)
+          
+          if (!attSnap.empty) {
+            const batch = writeBatch(db)
+            for (const d of attSnap.docs) {
+              const data = d.data()
+              if (data.photoUrl) await this.deleteFileByUrl(data.photoUrl)
+              if (data.photoOutUrl) await this.deleteFileByUrl(data.photoOutUrl)
+              if (Array.isArray(data.leaveDocumentUrls)) {
+                for (const docObj of data.leaveDocumentUrls) {
+                  if (docObj.url) await this.deleteFileByUrl(docObj.url)
+                }
+              }
+              batch.delete(d.ref)
+            }
+            await batch.commit()
+          }
+
+          // Delete profile photo
           if (s.photoUrl) {
             await this.deleteFileByUrl(s.photoUrl)
           }
 
           // Delete user doc
-          await deleteDoc(doc(db, 'users', s.id))
+          await deleteDoc(doc(db, 'users', studentId))
         }
 
         this.students = []

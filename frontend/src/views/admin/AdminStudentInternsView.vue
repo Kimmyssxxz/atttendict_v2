@@ -982,8 +982,8 @@ export default {
           await batch.commit()
         }
 
-        await this.fetchInterns()
         this.closeDeleteModal()
+        await this.fetchInterns()
       } catch (err) {
         console.error('Error archiving intern:', err)
         alert('Failed to delete intern.')
