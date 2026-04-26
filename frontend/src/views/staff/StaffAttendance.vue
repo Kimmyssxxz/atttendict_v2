@@ -470,35 +470,46 @@
     </main>
 
 
-    <!-- Modal Overlay -->
-    <div v-if="modalVisible" class="fixed inset-0 bg-gray-900/60  flex items-center justify-center z-[100] px-4 animate-[fadeIn_0.2s_ease-out]" @click.self="closeModal">
-      <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden animate-[modalSlideUp_0.3s_ease-out]" role="dialog" aria-modal="true">
-        <!-- Modal Header -->
-        <div class="px-6 py-4 text-white border-b border-gray-100" 
-             :class="{
-               'bg-blue-900': modalType === 'info',
-               'bg-emerald-900': modalType === 'success',
-               'bg-amber-900': modalType === 'warning',
-               'bg-red-900': modalType === 'error'
-             }">
-          <div class="flex items-center gap-3">
-            
-            <h3 class="text-xl font-semibold text-white">{{ modalTitle }}</h3>
-          </div>
-        </div>
+    <!-- Shared Modal (Styled like TimeView.vue) -->
+    <div v-if="modalVisible" class="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm transition-all duration-300" @click.self="closeModal">
+      <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden p-10 flex flex-col items-center text-center gap-2 relative shadow-2xl animate-[modalSlideUp_0.3s_ease-out]">
         
-        <!-- Modal Body -->
-        <div class="px-6 py-6 ">
-          <p class="text-gray-900 text-SM leading-relaxed">{{ modalMessage }}</p>
-          <div v-if="modalType === 'image'" class="mt-4 rounded-xl overflow-hidden border border-gray-200">
-            <img :src="modalMessage" alt="Full Preview" class="w-full h-auto max-h-[60vh] object-contain bg-gray-900" />
+        <!-- Image Preview Specific Layout -->
+        <template v-if="modalType === 'image'">
+          <div class="w-full mb-4">
+             <h3 class="m-0 text-xl font-bold text-black mb-4">{{ modalTitle }}</h3>
+             <div class="rounded-xl overflow-hidden border border-gray-100 shadow-inner bg-gray-50">
+               <img :src="modalMessage" alt="Preview" class="w-full h-auto max-h-[50vh] object-contain block" />
+             </div>
           </div>
-        </div>
-        
-        <!-- Modal Footer -->
-        <div class="px-6 py-4  flex justify-end">
-          <button class="px-6 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-800 focus:ring-4 focus:ring-gray-200 transition-all" @click="closeModal">OK</button>
-        </div>
+          <button @click="closeModal" class="w-full py-3.5 rounded-xl bg-gray-900 text-white font-bold text-base cursor-pointer hover:bg-gray-800 transition-all active:scale-95 border-none mt-2">Close Preview</button>
+        </template>
+
+        <!-- Success/Error/Info Layout (Lottie) -->
+        <template v-else>
+          <div class="w-48 h-48 flex items-center justify-center shrink-0">
+            <DotLottieVue 
+              v-if="modalVisible"
+              style="height: 250px; width: 250px;" 
+              autoplay 
+              loop 
+              :src="modalType === 'error' 
+                ? 'https://lottie.host/b1636a86-e0f4-42dc-b420-bf9d11d75c71/FLgw0AFgg2.lottie' 
+                : 'https://lottie.host/5a2b6a8e-c3f7-4d76-b6b9-ce08829d6b7f/SqD9E9ZlXz.lottie'" 
+            />
+          </div>
+          <h3 class="m-0 text-2xl font-bold text-black">{{ modalTitle }}</h3>
+          <p class="m-0 text-gray-600 text-sm mb-4 leading-relaxed">{{ modalMessage }}</p>
+          <button @click="closeModal" 
+                  class="w-full max-w-[160px] py-3.5 rounded-full text-white font-bold text-base cursor-pointer transition-all hover:opacity-90 active:scale-95 border-none shadow-lg" 
+                  :class="{
+                    'bg-[#b92e2b] shadow-red-200': modalType === 'error',
+                    'bg-[#00c853] shadow-green-200': modalType === 'success',
+                    'bg-[#133e75] shadow-blue-200': modalType === 'info' || modalType === 'warning'
+                  }">
+            OK
+          </button>
+        </template>
       </div>
     </div>
   </div>
@@ -507,6 +518,7 @@
 
 <script setup>
   import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+  import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
   import StaffSidebar from './StaffSidebar.vue'
   import AttendanceSkeleton from '../../components/skeletons/AttendanceSkeleton.vue'
   import { useRouter } from 'vue-router'
@@ -693,9 +705,10 @@
   const leafletMap = ref(null)
   const leafletMarker = ref(null)
 
-  const openModal = (title, message, type = 'info') => {
+  const openModal = (title, message, type = 'info', extra = null) => {
     modalTitle.value = title
-    modalMessage.value = message
+    // If it's an image type and we have extra data (the URL), use it as the message
+    modalMessage.value = (type === 'image' && extra) ? extra : message
     modalType.value = type
     modalVisible.value = true
   }
