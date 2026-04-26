@@ -1007,6 +1007,7 @@ export default {
         }
       }
       
+      try {
         const isApproved = this.locationMatchesAutoApprove(reverseGeocodedAddress || this.locationAddress)
         
         if (!isApproved) {
