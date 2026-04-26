@@ -292,11 +292,19 @@
                 </div>
               </div>
 
-              <div class="mb-0">
+              <div class="mb-3">
                 <span class="text-xs font-medium text-gray-500">Location</span>
                 <div class="mt-1 text-sm text-gray-900 ">
                   {{ extractLocationLabel(selectedRecordDetails.locationAM) || 'No location data' }}
                 </div>
+              </div>
+
+              <!-- Notes for AM -->
+              <div v-if="selectedRecordDetails.notesInAM || selectedRecordDetails.notesOutAM" class="mb-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <span class="text-[0.65rem] font-bold text-amber-600 uppercase tracking-widest block mb-1">Reason / Notes (AM)</span>
+                <p class="m-0 text-sm text-amber-900 leading-relaxed italic">
+                  {{ selectedRecordDetails.notesInAM || selectedRecordDetails.notesOutAM }}
+                </p>
               </div>
 
               <div class="mb-3 flex-1 flex flex-col justify-end">
@@ -349,6 +357,14 @@
                 <div class="mt-1 text-sm text-gray-900 ">
                   {{ extractLocationLabel(selectedRecordDetails.locationPM) || 'No location data' }}
                 </div>
+              </div>
+
+              <!-- Notes for PM -->
+              <div v-if="selectedRecordDetails.notesInPM || selectedRecordDetails.notesOutPM" class="mb-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <span class="text-[0.65rem] font-bold text-amber-600 uppercase tracking-widest block mb-1">Reason / Notes (PM)</span>
+                <p class="m-0 text-sm text-amber-900 leading-relaxed italic">
+                  {{ selectedRecordDetails.notesInPM || selectedRecordDetails.notesOutPM }}
+                </p>
               </div>
 
               <div class="mb-3 flex-1 flex flex-col justify-end">
@@ -690,6 +706,10 @@ export default {
             statusPM: h.statusPM || null,
             locationAM: h.locationAM || null,
             locationPM: h.locationPM || null,
+            notesInAM: h.notesInAM || null,
+            notesOutAM: h.notesOutAM || null,
+            notesInPM: h.notesInPM || null,
+            notesOutPM: h.notesOutPM || null,
             totalHoursLabel: '',
             locationStatus: '',
             amLocationLabel: '',
