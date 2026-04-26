@@ -1061,6 +1061,9 @@ app.post('/auth/admin/login', async (req, res) => {
 
 app.post('/auth/intern/register', async (req, res) => {
   try {
+    console.log('--- INTERN REGISTER BODY ---');
+    console.log(JSON.stringify(req.body, null, 2));
+    
     const {
       username,
       firstName,
