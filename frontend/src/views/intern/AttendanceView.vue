@@ -181,6 +181,7 @@
             <thead>
               <tr class="bg-slate-50">
                 <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Date</th>
+                <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Session</th>
                 <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Time In</th>
                 <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Time Out</th>
                 <th class="font-semibold text-[0.8rem] uppercase tracking-wider text-slate-500 px-4 py-3 text-left border-b border-slate-200">Total Hours</th>
@@ -191,6 +192,11 @@
             <tbody>
               <tr v-for="record in paginatedRecords" :key="record.id + '-' + (record.sessionLabel || 'all')" class="hover:bg-slate-50/50 transition-colors cursor-pointer" @click="openDetailsModal(record)">
                 <td class="px-4 py-3 border-b border-slate-100 text-slate-700">{{ formatDate(record.date) }}</td>
+                <td class="px-4 py-3 border-b border-slate-100">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[0.7rem] font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-tighter">
+                    {{ record.sessionLabel || 'N/A' }}
+                  </span>
+                </td>
                 <td class="px-4 py-3 border-b border-slate-100 text-slate-700">{{ formatTime12h(record.timeIn) }}</td>
                 <td class="px-4 py-3 border-b border-slate-100 text-slate-700">{{ formatTime12h(record.timeOut) }}</td>
                 <td class="px-4 py-3 border-b border-slate-100 text-slate-900 font-medium">{{ record.totalHoursLabel || '0h 0m' }}</td>
@@ -229,10 +235,15 @@
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
                 <div class="flex flex-col">
-                  <span class="text-sm text-gray-900 font-semibold">Date</span>
+                  <span class="text-sm text-gray-900 font-semibold">{{ formatDate(record.date) }}</span>
+                  <span class="text-[0.65rem] font-bold text-gray-400 uppercase tracking-widest">{{ record.sessionLabel || '' }} Session</span>
                 </div>
               </div>
-              <span class="text-sm text-gray-600">{{ formatDate(record.date) }}</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full border" :class="[
+                (record.validationStatus || 'Pending') === 'Pending' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                (record.validationStatus || 'Pending') === 'Approved' ? 'bg-green-50 text-green-600 border-green-100' :
+                'bg-red-50 text-red-600 border-red-100'
+              ]">{{ record.validationStatus || 'Pending' }}</span>
             </div>
 
             <!-- Expanded Details -->
