@@ -225,8 +225,8 @@
               <div class="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center mb-3">
                 <span class="w-5 h-5 bg-[#a855f7] inline-block" :style="{ WebkitMaskImage: icons.requiredHoursIcon, WebkitMaskSize: 'cover', maskImage: icons.requiredHoursIcon, maskSize: 'cover' }"></span>
               </div>
-              <span class="text-xs text-gray-400 font-medium">OJT Required Hours</span>
-              <span class="text-[0.8rem] font-bold text-gray-900 leading-tight">{{ requiredHours }} hrs</span>
+              <span class="text-xs text-gray-400 font-medium">OJT Remaining Hours</span>
+              <span class="text-[0.8rem] font-bold text-gray-900 leading-tight">{{ remainingHoursDisplay }}</span>
             </div>
           </div>
 
