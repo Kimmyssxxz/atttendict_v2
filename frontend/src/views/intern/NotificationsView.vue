@@ -396,15 +396,8 @@ export default {
           this.isInitialLoading = false;
         });
 
-      // Load unread count from localStorage for the bell and buttons
-      const unreadKey = `internNotificationsUnread_${internId}`;
-      const unreadRaw = localStorage.getItem(unreadKey);
-      if (unreadRaw != null) {
-        const num = parseInt(unreadRaw, 10);
-        if (!Number.isNaN(num) && num >= 0) {
-          this.unreadCount = num;
-        }
       }
+      this.syncUnreadCount();
     } catch (e) {
     }
   },
@@ -596,12 +589,10 @@ export default {
       const remaining = this.notifications.filter((_, idx) => !this.selectedIndexes.includes(idx));
       this.notifications = remaining;
       this.selectedIndexes = [];
-      this.unreadCount = Math.min(this.unreadCount, remaining.length);
+      this.syncUnreadCount();
       try {
         const key = `internNotifications_${this.internId}`;
-        const unreadKey = `internNotificationsUnread_${this.internId}`;
         localStorage.setItem(key, JSON.stringify(remaining));
-        localStorage.setItem(unreadKey, String(this.unreadCount));
       } catch (e) {}
     }
   }

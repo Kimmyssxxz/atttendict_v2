@@ -536,15 +536,8 @@ export default {
             this.notifications = list;
           }
         }
-        const unreadRaw = localStorage.getItem(unreadKey);
-        if (unreadRaw != null) {
-          const num = parseInt(unreadRaw, 10);
-          if (!Number.isNaN(num) && num >= 0) {
-            this.unreadCount = num;
-          }
-        } else {
-          this.unreadCount = this.notifications.length;
         }
+        this.syncUnreadCount();
       } catch (e) {
       }
     }
@@ -837,6 +830,27 @@ export default {
     },
     toggleNotifications() {
       this.showNotifications = !this.showNotifications
+    },
+    syncUnreadCount() {
+      const count = this.notifications.filter(n => {
+        const isRead = typeof n === 'object' ? n.isRead : false;
+        return !isRead;
+      }).length;
+      this.unreadCount = count;
+      if (this.internId) {
+        const unreadKey = `internNotificationsUnread_${this.internId}`;
+        localStorage.setItem(unreadKey, String(count));
+      }
+    },
+    addNotification(msg) {
+      if (!this.internId) return;
+      const n = { message: msg, isRead: false, timestamp: new Date().toISOString() };
+      this.notifications.unshift(n);
+      this.syncUnreadCount();
+      try {
+        const key = `internNotifications_${this.internId}`;
+        localStorage.setItem(key, JSON.stringify(this.notifications));
+      } catch (e) {}
     },
     async fetchUserTags() {
       try {

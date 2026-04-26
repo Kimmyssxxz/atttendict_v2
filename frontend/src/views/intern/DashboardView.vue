@@ -642,15 +642,8 @@ export default {
           this.notifications = list;
         }
       }
-      const unreadRaw = localStorage.getItem(unreadKey);
-      if (unreadRaw != null) {
-        const num = parseInt(unreadRaw, 10);
-        if (!Number.isNaN(num) && num >= 0) {
-          this.unreadCount = num;
-        }
-      } else {
-        this.unreadCount = this.notifications.length;
       }
+      this.syncUnreadCount();
 
       this.loadDashboardData(basicUser);
       this.loadInternProfile();
@@ -711,6 +704,17 @@ export default {
     },
     toggleNotifications() {
       this.showNotifications = !this.showNotifications
+    },
+    syncUnreadCount() {
+      const count = this.notifications.filter(n => {
+        const isRead = typeof n === 'object' ? n.isRead : false;
+        return !isRead;
+      }).length;
+      this.unreadCount = count;
+      if (this.internId) {
+        const unreadKey = `internNotificationsUnread_${this.internId}`;
+        localStorage.setItem(unreadKey, String(count));
+      }
     },
     async loadInternProfile() {
       try {

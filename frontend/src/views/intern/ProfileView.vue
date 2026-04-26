@@ -603,15 +603,8 @@ export default {
               this.notifications = list;
             }
           }
-          const unreadRaw = localStorage.getItem(unreadKey);
-          if (unreadRaw != null) {
-            const num = parseInt(unreadRaw, 10);
-            if (!Number.isNaN(num) && num >= 0) {
-              this.unreadCount = num;
-            }
-          } else {
-            this.unreadCount = this.notifications.length;
           }
+          this.syncUnreadCount();
         }
       }
     } catch (e) {}
@@ -652,31 +645,25 @@ export default {
     toggleNotifications() {
       this.showNotifications = !this.showNotifications
     },
-    addLocalNotification(message) {
-      try {
-        if (!this.intern.id || !message) return;
-        const key = `internNotifications_${this.intern.id}`;
+    syncUnreadCount() {
+      const count = this.notifications.filter(n => {
+        const isRead = typeof n === 'object' ? n.isRead : false;
+        return !isRead;
+      }).length;
+      this.unreadCount = count;
+      if (this.intern.id) {
         const unreadKey = `internNotificationsUnread_${this.intern.id}`;
-        const existingRaw = localStorage.getItem(key);
-        let list = [];
-        if (existingRaw) {
-          const parsed = JSON.parse(existingRaw);
-          if (Array.isArray(parsed)) {
-            list = parsed;
-          }
-        }
-        list.unshift(message);
-        localStorage.setItem(key, JSON.stringify(list));
-        const unreadRaw = localStorage.getItem(unreadKey);
-        let unread = 0;
-        if (unreadRaw != null) {
-          const num = parseInt(unreadRaw, 10);
-          if (!Number.isNaN(num) && num >= 0) {
-            unread = num;
-          }
-        }
-        unread += 1;
-        localStorage.setItem(unreadKey, String(unread));
+        localStorage.setItem(unreadKey, String(count));
+      }
+    },
+    addLocalNotification(message) {
+      if (!this.intern.id || !message) return;
+      const n = { message, isRead: false, timestamp: new Date().toISOString() };
+      this.notifications.unshift(n);
+      this.syncUnreadCount();
+      try {
+        const key = `internNotifications_${this.intern.id}`;
+        localStorage.setItem(key, JSON.stringify(this.notifications));
       } catch (e) {}
     },
     async loadInternProfile() {
