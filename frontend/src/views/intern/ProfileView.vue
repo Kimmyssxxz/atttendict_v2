@@ -171,6 +171,14 @@
                   <label class="text-xs font-normal text-slate-700">OJT Required Hours</label>
                   <input type="number" v-model.number="intern.ojtRequiredHours" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm" />
                 </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-normal text-slate-700">Start Date of Internship</label>
+                  <input type="date" v-model="intern.startDate" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm" />
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-normal text-slate-700">End Date of Internship</label>
+                  <input type="date" v-model="intern.endDate" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm" />
+                </div>
               </div>
             </section>
 

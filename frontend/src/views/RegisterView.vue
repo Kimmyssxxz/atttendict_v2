@@ -114,7 +114,6 @@
           placeholder="Assigned Office / Company"
         />
 
-        <template v-if="form.role === 'student'">
           <input
             v-model="form.schoolOrUniversity"
             type="text"
@@ -129,6 +128,35 @@
             class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-blue-500 focus:outline-none transition-colors"
             placeholder="Course (e.g. BSIT)"
           />
+          
+          <!-- Year Level Dropdown (Mobile) -->
+          <div class="relative">
+            <button
+              type="button"
+              @click="showYearDropdown = !showYearDropdown"
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-blue-500 focus:outline-none transition-colors bg-white text-left flex justify-between items-center"
+              :class="form.yearLevel ? 'text-black' : 'text-gray-500'"
+            >
+              {{ form.yearLevel || 'Select Year Level' }}
+              <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showYearDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+            <div v-if="showYearDropdown" @click="showYearDropdown = false" class="fixed inset-0 z-40"></div>
+            <transition
+              enter-active-class="transition ease-out duration-100"
+              enter-from-class="transform opacity-0 scale-95"
+              enter-to-class="transform opacity-100 scale-100"
+              leave-active-class="transition ease-in duration-75"
+              leave-from-class="transform opacity-100 scale-100"
+              leave-to-class="transform opacity-0 scale-95"
+            >
+              <div v-if="showYearDropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                <div class="py-1">
+                  <button v-for="y in ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']" :key="y" type="button" @click="form.yearLevel = y; showYearDropdown = false" class="w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors text-sm" :class="form.yearLevel === y ? 'bg-gray-100 text-blue-600' : 'text-gray-900'">{{ y }}</button>
+                </div>
+              </div>
+            </transition>
+          </div>
+
           <input
             v-model.number="form.ojtRequiredHours"
             type="number"
@@ -385,6 +413,33 @@
               </div>
 
               <div v-if="form.role === 'student'" class="relative">
+                <button
+                  type="button"
+                  @click="showYearDropdown = !showYearDropdown"
+                  class="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors bg-white text-left flex justify-between items-center"
+                  :class="form.yearLevel ? 'text-black' : 'text-gray-500'"
+                >
+                  {{ form.yearLevel || 'Select Year Level' }}
+                  <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showYearDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div v-if="showYearDropdown" @click="showYearDropdown = false" class="fixed inset-0 z-40"></div>
+                <transition
+                  enter-active-class="transition ease-out duration-100"
+                  enter-from-class="transform opacity-0 scale-95"
+                  enter-to-class="transform opacity-100 scale-100"
+                  leave-active-class="transition ease-in duration-75"
+                  leave-from-class="transform opacity-100 scale-100"
+                  leave-to-class="transform opacity-0 scale-95"
+                >
+                  <div v-if="showYearDropdown" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                    <div class="py-1">
+                      <button v-for="y in ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']" :key="y" type="button" @click="form.yearLevel = y; showYearDropdown = false" class="w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors text-sm" :class="form.yearLevel === y ? 'bg-gray-50 text-blue-600' : 'text-gray-900'">{{ y }}</button>
+                    </div>
+                  </div>
+                </transition>
+              </div>
+
+              <div v-if="form.role === 'student'" class="relative">
                 <input
                   id="ojtRequiredHours"
                   v-model.number="form.ojtRequiredHours"
@@ -518,6 +573,7 @@ export default {
       modalTitle: '',
       modalMessage: '',
       showRoleDropdown: false,
+      showYearDropdown: false,
       showPassword: false,
       showConfirmPassword: false,
       isMobile: window.innerWidth < 1024,
@@ -532,6 +588,7 @@ export default {
         assignedOffice: '',
         schoolOrUniversity: '',
         course: '',
+        yearLevel: '',
         ojtRequiredHours: null,
         password: '',
         confirmPassword: ''
@@ -597,6 +654,7 @@ export default {
             assignedOffice: this.form.assignedOffice,
             schoolOrUniversity: this.form.schoolOrUniversity || '',
             course: this.form.course || '',
+            yearLevel: this.form.yearLevel || '',
             ojtRequiredHours: this.form.ojtRequiredHours ?? null,
           }),
         });
