@@ -299,13 +299,9 @@ export default {
           localStorage.setItem('user', JSON.stringify(user));
           localStorage.setItem('staffUser', JSON.stringify(user));
           this.showCustomModal('success', 'Login Successful', 'Welcome back! Redirecting to dashboard...', { type: 'redirect', route: { name: 'StaffDashboard' } });
-        } else if (user.role === 'admin') {
-          localStorage.setItem('user', JSON.stringify(user));
-          localStorage.setItem('adminUser', JSON.stringify(user));
-          this.showCustomModal('success', 'Login Successful', 'Welcome Admin! Redirecting to portal...', { type: 'redirect', route: { name: 'AdminDashboard' } });
         } else {
           console.error('Unhandled role type:', user.role);
-          throw new Error('Unauthorized role.');
+          throw new Error('This login page is only for intern and staff accounts.');
         }
       } catch (error) {
         console.error('Login error:', error);

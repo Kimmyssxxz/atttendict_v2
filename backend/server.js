@@ -584,12 +584,6 @@ app.post('/auth/login', async (req, res) => {
     }
 
     if (snapshot.empty) {
-      // Fallback to check admins collection
-      snapshot = await db.collection('admins').where('username', 'in', usernameCandidates).limit(1).get();
-    }
-
-
-    if (snapshot.empty) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
