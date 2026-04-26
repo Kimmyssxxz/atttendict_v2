@@ -536,7 +536,6 @@ export default {
             this.notifications = list;
           }
         }
-        }
         this.syncUnreadCount();
       } catch (e) {
       }

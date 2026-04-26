@@ -642,7 +642,6 @@ export default {
           this.notifications = list;
         }
       }
-      }
       this.syncUnreadCount();
 
       this.loadDashboardData(basicUser);

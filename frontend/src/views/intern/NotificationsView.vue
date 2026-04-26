@@ -396,7 +396,6 @@ export default {
           this.isInitialLoading = false;
         });
 
-      }
       this.syncUnreadCount();
     } catch (e) {
     }
