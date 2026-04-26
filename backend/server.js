@@ -1062,6 +1062,10 @@ app.post('/auth/admin/login', async (req, res) => {
 app.post('/auth/intern/register', async (req, res) => {
   try {
     const {
+      username,
+      firstName,
+      middleName,
+      lastName,
       email,
       schoolOrUniversity,
       course,
