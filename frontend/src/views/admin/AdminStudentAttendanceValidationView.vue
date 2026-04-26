@@ -11,47 +11,64 @@
         <TableSkeleton v-if="loading && !selectedInternId" :rows="5" />
         <div v-else>
           <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div class=" bg-white p-5 mb-5">
-            <div class="mb-3">
-              <h3 class="m-0 text-2xl font-semibold text-gray-900">Available Interns</h3>
+          <div class="bg-white p-5 mb-5 border-b border-gray-100">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+              <div>
+                <h3 class="m-0 text-xl font-bold text-gray-900">Available Interns</h3>
+                <p class="text-sm text-gray-500 m-0">Select an intern to review their attendance records</p>
+              </div>
+              
+              <!-- Intern Search Bar -->
+              <div class="flex-1 max-w-md">
+                <div class="flex items-center gap-2 w-full border border-gray-200 rounded-xl bg-gray-50 px-3 py-1.5 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#133e75]/10 transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <input
+                    v-model="internCardSearch"
+                    type="text"
+                    class="w-full p-0 border-none text-sm bg-transparent focus:outline-none text-gray-900"
+                    placeholder="Search by intern name..."
+                  />
+                </div>
+              </div>
             </div>
 
-            <div class="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] justify-start gap-4">
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] justify-start gap-3">
               <button
                 v-for="intern in filteredInternCards"
                 :key="intern.id"
                 type="button"
                 :class="[
-                  'flex flex-col items-center bg-white border rounded-lg p-6 cursor-pointer transition-all duration-300',
+                  'flex flex-col items-center bg-white border rounded-xl p-4 cursor-pointer transition-all duration-300 relative group',
                   intern.id === selectedInternId 
-                    ? 'border-gray-100 ' 
-                    : 'border-gray-200'
+                    ? 'border-[#133e75] bg-blue-50/30 shadow-md ring-1 ring-[#133e75]' 
+                    : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
                 ]"
                 @click="selectIntern(intern)"
               >
-                <!-- Profile Image -->
-                <div class="relative mb-2">
-                  <div class="w-28 h-28 rounded-full overflow-hidden flex items-center justify-center border-4 border-slate-50 bg-blue-50 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                <!-- Profile Image (Smaller) -->
+                <div class="relative mb-3">
+                  <div class="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center border-2 border-white bg-blue-50 shadow-sm transition-transform duration-300 group-hover:scale-105">
                     <img v-if="intern.photoUrl" :src="intern.photoUrl" class="w-full h-full object-cover block" :alt="intern.name" />
-                    <span v-else class="text-2xl font-bold text-blue-600 uppercase tracking-tight">{{ getInitials(intern.name) }}</span>
+                    <span v-else class="text-lg font-bold text-blue-600 uppercase">{{ getInitials(intern.name) }}</span>
                   </div>
                 </div>
 
-                <!-- Intern Name -->
-                <div class="mb-5">
-                  <div class="text-lg font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] flex items-center justify-center">{{ intern.name || '-' }}</div>
+                <!-- Intern Name (Compact) -->
+                <div class="mb-3 text-center">
+                  <div class="text-[0.95rem] font-bold text-gray-900 line-clamp-1 leading-tight">{{ intern.name || '-' }}</div>
+                  <div class="text-[0.7rem] text-gray-500 uppercase tracking-widest mt-1 font-medium">Intern</div>
                 </div>
 
-                <!-- Action Button (Pill style) -->
+                <!-- Action Button (Smaller Pill) -->
                 <div 
                   :class="[
-                    'px-6 py-2.5 rounded-full border text-sm font-semibold transition-all duration-200 whitespace-nowrap',
+                    'px-4 py-1.5 rounded-lg border text-xs font-bold transition-all duration-200 whitespace-nowrap uppercase tracking-wide',
                     intern.id === selectedInternId 
-                      ? 'bg-[#133e75] text-white  hover:bg-[#133e75]/80' 
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      ? 'bg-[#133e75] text-white border-[#133e75]' 
+                      : 'bg-white text-gray-600 border-gray-200 group-hover:bg-gray-50'
                   ]"
                 >
-                  Review Attendance
+                  {{ intern.id === selectedInternId ? 'Selected' : 'Review' }}
                 </div>
               </button>
             </div>
@@ -426,7 +443,7 @@ export default {
       savingRowIds: {},
       currentPage: 1,
       itemsPerPage: 10,
-      pageSizeOptions: [10, 15, 20, 25],
+      pageSizeOptions: [5, 10, 15, 20, 25, 30],
       rejectReasonModalVisible: false,
       rejectingRow: null,
       rejectingSession: null,
