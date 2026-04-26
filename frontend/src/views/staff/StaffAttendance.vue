@@ -1656,6 +1656,14 @@
       shadowUrl,
     })
 
+    // If we have a map but the container element has changed (e.g. mobile/desktop swap), 
+    // we must destroy the old map and recreate it.
+    if (leafletMap.value && leafletMap.value.getContainer() !== leafletMapEl.value) {
+      leafletMap.value.remove()
+      leafletMap.value = null
+      leafletMarker.value = null
+    }
+
     if (!leafletMap.value) {
       leafletMap.value = L.map(leafletMapEl.value, {
         zoomControl: true,
@@ -1668,9 +1676,6 @@
       }).addTo(leafletMap.value)
 
       leafletMarker.value = L.marker([lat, lng]).addTo(leafletMap.value)
-      if (userLocation.value?.address) {
-        leafletMarker.value.bindPopup(userLocation.value.address).openPopup()
-      }
     } else {
       leafletMap.value.setView([lat, lng], 16)
       if (leafletMarker.value) {
@@ -1678,19 +1683,27 @@
       } else {
         leafletMarker.value = L.marker([lat, lng]).addTo(leafletMap.value)
       }
-      
-      if (userLocation.value?.address) {
-        leafletMarker.value.bindPopup(userLocation.value.address).openPopup()
-      }
+    }
+    
+    if (userLocation.value?.address) {
+      leafletMarker.value.bindPopup(userLocation.value.address).openPopup()
     }
 
+    // Aggressive invalidation to ensure tiles load correctly
     setTimeout(() => {
       try {
         leafletMap.value?.invalidateSize()
-      } catch {
-        // ignore
+      } catch (e) {
+        console.warn('Map invalidation failed:', e)
       }
-    }, 0)
+    }, 100)
+    
+    // One more check after a longer delay for slow renders
+    setTimeout(() => {
+      try {
+        leafletMap.value?.invalidateSize()
+      } catch (e) {}
+    }, 500)
   }
 
   const reverseGeocode = async (latitude, longitude) => {
@@ -1810,6 +1823,27 @@
       initOrUpdateLeafletMap()
     },
     { deep: true }
+  )
+
+  watch(
+    () => isMobile.value,
+    () => {
+      // Allow time for DOM to update and refs to bind
+      setTimeout(() => {
+        initOrUpdateLeafletMap()
+      }, 200)
+    }
+  )
+
+  watch(
+    () => selectedStatus.value,
+    (newVal) => {
+      if (newVal === 'On Field' || newVal === 'Travel') {
+        setTimeout(() => {
+          initOrUpdateLeafletMap()
+        }, 300)
+      }
+    }
   )
 
   onUnmounted(() => {
