@@ -114,6 +114,7 @@
           placeholder="Assigned Office / Company"
         />
 
+        <template v-if="form.role === 'student'">
           <input
             v-model="form.schoolOrUniversity"
             type="text"
