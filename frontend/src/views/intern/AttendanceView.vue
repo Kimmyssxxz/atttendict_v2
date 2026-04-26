@@ -739,24 +739,30 @@ export default {
         const dayNum = d.getDate();
         if (dayNum < 1 || dayNum > 31) return;
 
-        const amArrival = r.timeInAM ? this.formatTime12h(r.timeInAM) : '';
-        const amDeparture = r.timeOutAM ? this.formatTime12h(r.timeOutAM) : '';
-        const pmArrival = r.timeInPM ? this.formatTime12h(r.timeInPM) : '';
-        const pmDeparture = r.timeOutPM ? this.formatTime12h(r.timeOutPM) : '';
+        // Only include times if they are approved
+        const amArrival = (r.validationStatusAM === 'Approved' && r.timeInAM) ? this.formatTime12h(r.timeInAM) : '';
+        const amDeparture = (r.validationStatusAM === 'Approved' && r.timeOutAM) ? this.formatTime12h(r.timeOutAM) : '';
+        const pmArrival = (r.validationStatusPM === 'Approved' && r.timeInPM) ? this.formatTime12h(r.timeInPM) : '';
+        const pmDeparture = (r.validationStatusPM === 'Approved' && r.timeOutPM) ? this.formatTime12h(r.timeOutPM) : '';
+
+        // Calculate hours based only on approved sessions
+        let approvedMinutes = 0;
+        if (r.validationStatusAM === 'Approved') {
+          approvedMinutes += (r.totalMinutesAM || 0);
+        }
+        if (r.validationStatusPM === 'Approved') {
+          approvedMinutes += (r.totalMinutesPM || 0);
+        }
 
         byDay[dayNum] = {
           amArrival,
           amDeparture,
           pmArrival,
           pmDeparture,
-          hours: (() => {
-            const num = parseFloat(r.totalHours || '0');
-            const safe = Number.isFinite(num) ? num : 0;
-            const totalMinutes = Math.round(safe * 60);
-            const h = Math.floor(totalMinutes / 60);
-            const m = totalMinutes % 60;
-            return { h, m };
-          })(),
+          hours: {
+            h: Math.floor(approvedMinutes / 60),
+            m: approvedMinutes % 60
+          },
         };
       });
 
