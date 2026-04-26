@@ -1235,6 +1235,15 @@
         throw new Error('Invalid coordinates received from GPS')
       }
 
+      // Set coordinates immediately so map can start rendering while we reverse geocode
+      userLocation.value = {
+        lat: latitude.toFixed(6),
+        lng: longitude.toFixed(6),
+        address: userLocation.value?.address || null, // Keep existing address if any
+        accuracy: accuracy.toFixed(2),
+        timestamp: new Date().toISOString()
+      }
+
       // Get address from coordinates using OpenStreetMap Nominatim reverse geocoding
       let address = null
       try {
@@ -1242,16 +1251,13 @@
         address = addressLine || null
       } catch (error) {
         console.error('Geocoding error (non-blocking):', error)
-        showNotification(error.message, 'warning')
         address = null
       }
 
+      // Update with address
       userLocation.value = {
-        lat: latitude.toFixed(6),
-        lng: longitude.toFixed(6),
-        address: address ? address.trim() : null,
-        accuracy: accuracy.toFixed(2),
-        timestamp: new Date().toISOString()
+        ...userLocation.value,
+        address: address ? address.trim() : userLocation.value.address
       }
 
       showNotification(
@@ -1260,7 +1266,6 @@
           : `Location detected: ${userLocation.value.lat}, ${userLocation.value.lng}`,
         'success'
       )
-      console.log('Location detected successfully:', userLocation.value)
       
       return userLocation.value
       
@@ -1803,6 +1808,21 @@
         const res = await staffAttendanceStore.createOrGetDailyAttendance(staffId.value)
         if (res.success && res.data?.staffStatus) {
           selectedStatus.value = res.data.staffStatus
+          // If status is Field/Travel, trigger location detection immediately
+          if (selectedStatus.value === 'On Field' || selectedStatus.value === 'Travel') {
+            // Check if record already has a location we can use immediately
+            const loc = res.data.LocPM || res.data.LocAM || res.data.locationPM || res.data.locationAM
+            if (loc && loc.latitude && loc.longitude) {
+              userLocation.value = {
+                lat: loc.latitude.toFixed(6),
+                lng: loc.longitude.toFixed(6),
+                address: loc.address || null,
+                timestamp: new Date().toISOString()
+              }
+            }
+            // Also start fresh GPS detection
+            getUserLocation().catch(() => {})
+          }
         }
         if (res.success && res.data?.id) {
           import('firebase/firestore').then(({ onSnapshot }) => {
