@@ -1504,7 +1504,7 @@ app.get('/staff/:id/status', async (req, res) => {
 
 app.post('/attendance/intern/time-in', async (req, res) => {
   try {
-    const { internId, location } = req.body;
+    const { internId, location, notes } = req.body;
 
     if (!internId) {
       return res.status(400).json({ message: 'internId is required' });
@@ -1608,6 +1608,8 @@ app.post('/attendance/intern/time-in', async (req, res) => {
         validationStatusAM: session === 'AM' && isAutoApprove ? 'Approved' : 'Pending',
         validationStatusPM: session === 'PM' && isAutoApprove ? 'Approved' : 'Pending',
 
+        notesInAM: session === 'AM' && notes ? notes : null,
+        notesInPM: session === 'PM' && notes ? notes : null,
         isLocked: false,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -1629,6 +1631,7 @@ app.post('/attendance/intern/time-in', async (req, res) => {
         payload.tagging = userTagging;
         // For AM session, prefer per-session default then fall back to day-level
         payload.tagAM = userTagAM || userTagging;
+        if (notes) payload.notesInAM = notes;
         if (location) {
           payload.locationAM = location;
           if (isAutoApprove) {
@@ -1642,6 +1645,7 @@ app.post('/attendance/intern/time-in', async (req, res) => {
         payload.tagging = userTagging;
         // For PM session, prefer per-session default then fall back to day-level
         payload.tagPM = userTagPM || userTagging;
+        if (notes) payload.notesInPM = notes;
         if (location) {
           payload.locationPM = location;
           if (isAutoApprove) {
@@ -1731,7 +1735,7 @@ app.post('/attendance/intern/time-in', async (req, res) => {
 
 app.post('/attendance/intern/time-out', async (req, res) => {
   try {
-    const { internId, location } = req.body;
+    const { internId, location, notes } = req.body;
 
     if (!internId) {
       return res.status(400).json({ message: 'internId is required' });
@@ -1783,10 +1787,12 @@ app.post('/attendance/intern/time-out', async (req, res) => {
       updated.timeOutAM = timeString;
       updated.totalMinutesAM = totalMinutesForSession;
       if (location) updated.timeOutLocationAM = location;
+      if (notes) updated.notesOutAM = notes;
     } else {
       updated.timeOutPM = timeString;
       updated.totalMinutesPM = totalMinutesForSession;
       if (location) updated.timeOutLocationPM = location;
+      if (notes) updated.notesOutPM = notes;
     }
 
     const totalMinutesAM = updated.totalMinutesAM ?? data.totalMinutesAM ?? 0;

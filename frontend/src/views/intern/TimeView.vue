@@ -351,6 +351,55 @@
       </nav>
     </div>
 
+    <!-- Reason Modal -->
+    <div v-if="showReasonModal" class="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-[10000] p-4 backdrop-blur-sm transition-all duration-300">
+      <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all border border-slate-100 flex flex-col animate-in fade-in zoom-in duration-300">
+        <!-- Header -->
+        <div class="px-8 pt-8 pb-4 text-center">
+          <div class="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-100">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <h3 class="m-0 text-2xl font-bold text-slate-900">Inexact Location</h3>
+          <p class="mt-2 text-slate-500 text-sm leading-relaxed px-4">
+            You are currently outside the approved office location. Please provide a reason for your current location.
+          </p>
+        </div>
+        
+        <!-- Content -->
+        <div class="px-8 py-4">
+          <div class="flex flex-col gap-2">
+            <label class="text-[0.75rem] font-bold text-slate-400 uppercase tracking-widest px-1">Reason / Notes</label>
+            <textarea 
+              v-model="reasonText" 
+              placeholder="Enter your reason here..." 
+              class="w-full h-32 px-4 py-3 rounded-2xl border border-slate-200 focus:border-[#133e75] focus:ring-4 focus:ring-[#133e75]/10 outline-none transition-all resize-none text-slate-700 text-[0.95rem] bg-slate-50/50"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="px-8 pb-8 pt-4 flex flex-col gap-3">
+          <button 
+            @click="submitTimeWithReason" 
+            :disabled="!reasonText.trim() || loading"
+            class="w-full py-4 rounded-2xl bg-[#133e75] text-white font-bold text-[1rem] cursor-pointer transition-all hover:bg-[#0d2b52] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#133e75]/20 flex items-center justify-center gap-2"
+          >
+            <svg v-if="loading" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ loading ? 'Saving...' : 'Save & Continue' }}
+          </button>
+          <button 
+            @click="closeReasonModal" 
+            class="w-full py-3.5 rounded-2xl bg-transparent text-slate-400 font-semibold text-[0.9rem] cursor-pointer transition-all hover:text-slate-600 hover:bg-slate-50 border-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Shared Modal -->
     <div v-if="showModal" class="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm transition-all duration-300">
       <div class="bg-white rounded-2xl  w-full max-w-sm overflow-hidden p-10 flex flex-col items-center text-center gap-2 relative">
@@ -420,6 +469,9 @@ export default {
       modalTitle: '',
       modalMessage: '',
       modalType: 'success',
+      showReasonModal: false,
+      reasonText: '',
+      pendingAction: null, // { type: 'in'|'out', location, reverseGeocodedAddress }
       showGenderDropdown: false,
       showYearDropdown: false,
       isInitialLoading: true,
@@ -955,51 +1007,17 @@ export default {
         }
       }
       
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/attendance/intern/time-in`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ internId: this.internId, location })
-        })
-
-        const data = await res.json()
-
-        if (!res.ok) {
-          this.openModal('Time In Failed', data.message || 'Time in failed', 'error')
+        const isApproved = this.locationMatchesAutoApprove(reverseGeocodedAddress || this.locationAddress)
+        
+        if (!isApproved) {
+          this.pendingAction = { type: 'in', location, reverseGeocodedAddress }
+          this.showReasonModal = true
+          this.loading = false
+          this.loadingType = null
           return
         }
 
-        const payload = data.data
-        this.currentDate = payload.date
-        this.lastActionTime = payload.timeIn || payload.lastActionTime || ''
-
-        // Replace local record so map and times get latest values (including location)
-        if (payload.record) {
-          this.record = payload.record
-        } else {
-          if (!this.record) this.record = {}
-          if (payload.session === 'AM') {
-            this.record.timeInAM = payload.timeIn
-          } else if (payload.session === 'PM') {
-            this.record.timeInPM = payload.timeIn
-          }
-        }
-
-        this.updateLocationAddress()
-        this.$nextTick(() => {
-          this.ensureLeafletMap()
-          this.updateLeafletMapFromRecord()
-        })
-
-        await this.autoApproveIfEligible({
-          date: payload.date,
-          session: payload.session,
-          record: payload.record || this.record,
-          fallbackAddress: reverseGeocodedAddress || this.locationAddress,
-        })
-
-        this.openModal('Time In Successful', `You have successfully timed in for the ${payload.session || ''} session.`, 'success')
-        this.addNotification(`Time in for ${payload.session || ''} session at ${this.formatTime(this.lastActionTime)}`)
+        await this.submitTimeAction('in', location, reverseGeocodedAddress)
       } catch (err) {
         this.openModal('Connection Error', 'Error connecting to server. Please try again.', 'error')
       } finally {
@@ -1016,6 +1034,7 @@ export default {
       this.loadingType = 'out'
 
       let location = null;
+      let reverseGeocodedAddress = '';
       if (navigator.geolocation) {
         try {
           location = await new Promise((resolve) => {
@@ -1045,58 +1064,110 @@ export default {
             const data = await res.json()
             if (data && data.display_name) {
               location.address = data.display_name
+              reverseGeocodedAddress = data.display_name
             }
           }
         } catch (e) {}
       }
 
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/attendance/intern/time-out`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ internId: this.internId, location })
-        })
-
-        const data = await res.json()
-
-        if (!res.ok) {
-          this.openModal('Time Out Failed', data.message || 'Time out failed', 'error')
+        const isApproved = this.locationMatchesAutoApprove(reverseGeocodedAddress || location?.address)
+        
+        if (!isApproved) {
+          this.pendingAction = { type: 'out', location, reverseGeocodedAddress }
+          this.showReasonModal = true
+          this.loading = false
+          this.loadingType = null
           return
         }
 
-        const payload = data.data
-        this.currentDate = payload.date
-        this.lastActionTime = payload.timeOut || payload.lastActionTime || ''
-
-        // Replace local record so map and times get latest values (including location)
-        if (payload.record) {
-          this.record = payload.record
-        } else {
-          if (!this.record) this.record = {}
-          if (payload.session === 'AM') {
-            this.record.timeOutAM = payload.timeOut
-          } else if (payload.session === 'PM') {
-            this.record.timeOutPM = payload.timeOut
-          }
-        }
-
-        // Also update totalMinutes so "Total Time Today" updates immediately
-        if (payload.record && typeof payload.record.totalMinutes === 'number') {
-          this.record.totalMinutes = payload.record.totalMinutes
-        }
-        this.updateLocationAddress()
-        this.$nextTick(() => {
-          this.ensureLeafletMap()
-          this.updateLeafletMapFromRecord()
-        })
-        this.openModal('Time Out Successful', `You have successfully timed out for the ${payload.session || ''} session.`, 'success')
-        this.addNotification(`Time out for ${payload.session || ''} session at ${this.formatTime(this.lastActionTime)}`)
+        await this.submitTimeAction('out', location, reverseGeocodedAddress)
       } catch (err) {
         this.openModal('Connection Error', 'Error connecting to server. Please try again.', 'error')
       } finally {
         this.loading = false
         this.loadingType = null
       }
+    },
+    async submitTimeWithReason() {
+      if (!this.reasonText.trim() || !this.pendingAction) return
+      
+      this.loading = true
+      const { type, location, reverseGeocodedAddress } = this.pendingAction
+      this.loadingType = type
+
+      try {
+        await this.submitTimeAction(type, location, reverseGeocodedAddress, this.reasonText.trim())
+        this.closeReasonModal()
+      } catch (err) {
+        console.error('Error submitting with reason:', err)
+      } finally {
+        this.loading = false
+        this.loadingType = null
+      }
+    },
+    async submitTimeAction(type, location, reverseGeocodedAddress, notes = null) {
+      const endpoint = type === 'in' ? 'time-in' : 'time-out'
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'}/attendance/intern/${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ internId: this.internId, location, notes })
+        })
+
+        const data = await res.json()
+
+        if (!res.ok) {
+          this.openModal(`${type === 'in' ? 'Time In' : 'Time Out'} Failed`, data.message || `${type === 'in' ? 'Time in' : 'Time out'} failed`, 'error')
+          throw new Error(data.message)
+        }
+
+        const payload = data.data
+        this.currentDate = payload.date
+        this.lastActionTime = type === 'in' ? (payload.timeIn || payload.lastActionTime || '') : (payload.timeOut || payload.lastActionTime || '')
+
+        if (payload.record) {
+          this.record = payload.record
+        } else {
+          if (!this.record) this.record = {}
+          if (type === 'in') {
+            if (payload.session === 'AM') this.record.timeInAM = payload.timeIn
+            else if (payload.session === 'PM') this.record.timeInPM = payload.timeIn
+          } else {
+            if (payload.session === 'AM') this.record.timeOutAM = payload.timeOut
+            else if (payload.session === 'PM') this.record.timeOutPM = payload.timeOut
+            
+            if (typeof payload.record?.totalMinutes === 'number') {
+              this.record.totalMinutes = payload.record.totalMinutes
+            }
+          }
+        }
+
+        this.updateLocationAddress()
+        this.$nextTick(() => {
+          this.ensureLeafletMap()
+          this.updateLeafletMapFromRecord()
+        })
+
+        if (type === 'in') {
+          await this.autoApproveIfEligible({
+            date: payload.date,
+            session: payload.session,
+            record: payload.record || this.record,
+            fallbackAddress: reverseGeocodedAddress || this.locationAddress,
+          })
+        }
+
+        this.openModal(`${type === 'in' ? 'Time In' : 'Time Out'} Successful`, `You have successfully ${type === 'in' ? 'timed in' : 'timed out'} for the ${payload.session || ''} session.`, 'success')
+        this.addNotification(`${type === 'in' ? 'Time in' : 'Time out'} for ${payload.session || ''} session at ${this.formatTime(this.lastActionTime)}`)
+      } catch (err) {
+        throw err
+      }
+    },
+    closeReasonModal() {
+      this.showReasonModal = false
+      this.reasonText = ''
+      this.pendingAction = null
     },
     async updateLocationAddress() {
       this.locationAddress = ''
