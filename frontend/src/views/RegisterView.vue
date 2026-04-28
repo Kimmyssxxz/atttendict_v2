@@ -59,7 +59,7 @@
             class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-blue-500 focus:outline-none transition-colors bg-white text-left flex justify-between items-center"
             :class="form.role ? 'text-black' : 'text-gray-500'"
           >
-            {{ form.role === 'student' ? 'Student / Intern' : (form.role === 'staff' ? 'Staff' : 'Select role') }}
+            {{ form.role === 'student' ? 'Student / Intern' : (form.role === 'staff' ? 'Employee' : 'Select role') }}
             <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showRoleDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
           </button>
           
@@ -89,7 +89,7 @@
                   class="w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors duration-150 text-sm"
                   :class="form.role === 'staff' ? 'bg-gray-100 text-blue-600 font-medium' : 'text-gray-900'"
                 >
-                  Staff
+                  Employee
                 </button>
               </div>
             </div>
@@ -329,7 +329,7 @@
                   class="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors bg-white text-left flex justify-between items-center"
                   :class="form.role ? 'text-black' : 'text-gray-500'"
                 >
-                  {{ form.role === 'student' ? 'Student / Intern' : (form.role === 'staff' ? 'Staff' : 'Select role') }}
+                  {{ form.role === 'student' ? 'Student / Intern' : (form.role === 'staff' ? 'Employee' : 'Select role') }}
                   <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': showRoleDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
                 
@@ -360,7 +360,7 @@
                         class="w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors duration-150 flex items-center"
                         :class="form.role === 'staff' ? 'bg-gray-50 text-blue-600 font-medium' : 'text-gray-900'"
                       >
-                        <span class="text-sm">Staff</span>
+                        <span class="text-sm">Employee</span>
                       </button>
                     </div>
                   </div>
