@@ -430,7 +430,7 @@ import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '../../firebase'
 
-const AUTO_APPROVE_LOCATION = 'M. Roxas Drive, Lalom, Santa Isabel, Calapan, Oriental Mindoro, Mimaropa, Philippines'
+const AUTO_APPROVE_LOCATION = 'M. Roxas Drive, Lalom, Santa Isabel, Calapan, Oriental Mindoro, Mimaropa, 5200, Philippines'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
