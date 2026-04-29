@@ -588,7 +588,7 @@ export default {
         lastName: '',
         role: '',
         position: '',
-        assignedOffice: 'Department of Information and Communications Technology - Oriental Mindoro',
+        assignedOffice: 'DICT - Oriental Mindoro',
         schoolOrUniversity: '',
         course: '',
         yearLevel: '',
