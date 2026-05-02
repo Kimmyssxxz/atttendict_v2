@@ -220,50 +220,81 @@ export default {
       const pageWidth = doc.internal.pageSize.getWidth()
       const pageHeight = doc.internal.pageSize.getHeight()
 
-      // Professional Elegant Borders
-      // Outer Navy Blue Border
-      doc.setDrawColor(15, 30, 84) // Navy Blue
-      doc.setLineWidth(8)
-      doc.rect(20, 20, pageWidth - 40, pageHeight - 40)
+      // --- COLORS ---
+      const navyBlue = [26, 77, 140]
+      const goldYellow = [255, 204, 0]
+      const recipientBlue = [36, 79, 145]
 
-      // Inner Gold Border
-      doc.setDrawColor(212, 175, 55) // Gold
-      doc.setLineWidth(2)
-      doc.rect(32, 32, pageWidth - 64, pageHeight - 64)
+      // --- BACKGROUND & CORNERS ---
+      // Fill background
+      doc.setFillColor(255, 255, 255)
+      doc.rect(0, 0, pageWidth, pageHeight, 'F')
 
-      // Inner Thin Navy Blue Border
-      doc.setDrawColor(15, 30, 84)
-      doc.setLineWidth(1)
-      doc.rect(36, 36, pageWidth - 72, pageHeight - 72)
+      // Draw Corner Decorations (Triangles/Polygons)
+      const drawCorner = (x, y, rotation) => {
+        doc.saveGraphicsState()
+        // Large Blue Triangle
+        doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
+        if (rotation === 0) { // Top Left
+          doc.triangle(0, 0, 80, 0, 0, 80, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
+          doc.triangle(70, 0, 100, 0, 95, 25, 'F')
+        } else if (rotation === 1) { // Top Right
+          doc.triangle(pageWidth, 0, pageWidth - 80, 0, pageWidth, 80, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
+          doc.triangle(pageWidth - 70, 0, pageWidth - 100, 0, pageWidth - 95, 25, 'F')
+        } else if (rotation === 2) { // Bottom Left
+          doc.triangle(0, pageHeight, 80, pageHeight, 0, pageHeight - 80, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
+          doc.triangle(70, pageHeight, 100, pageHeight, 95, pageHeight - 25, 'F')
+        } else if (rotation === 3) { // Bottom Right
+          doc.triangle(pageWidth, pageHeight, pageWidth - 80, pageHeight, pageWidth, pageHeight - 80, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
+          doc.triangle(pageWidth - 70, pageHeight, pageWidth - 100, pageHeight, pageWidth - 95, pageHeight - 25, 'F')
+        }
+        doc.restoreGraphicsState()
+      }
 
-      // Background accent (very light gray/yellow in the center)
-      doc.setFillColor(252, 252, 250)
-      doc.rect(37, 37, pageWidth - 74, pageHeight - 74, 'F')
+      drawCorner(0, 0, 0)
+      drawCorner(0, 0, 1)
+      drawCorner(0, 0, 2)
+      drawCorner(0, 0, 3)
 
-      // Load logos
+      // --- LOGOS (Top Center Group) ---
       try {
-        const logo1 = await this.loadImage('/dictlogo2.png')
-        const logo2 = await this.loadImage('/Bagongpilipinas.png')
+        const logoDict = await this.loadImage('/dictlogo2.png')
+        const logoBP = await this.loadImage('/Bagongpilipinas.png')
+        const logoILCDB = await this.loadImage('/ilcdb-removebg-preview.png')
+        const logoDTC = await this.loadImage('/OIP-removebg-preview.png')
         
-        // DICT Logo (Left) - Moved closer to edge
-        doc.addImage(logo1, 'PNG', 50, 55, 65, 65)
-        // Bagong Pilipinas Logo (Right) - Moved closer to edge
-        doc.addImage(logo2, 'PNG', pageWidth - 115, 55, 65, 65)
+        const logoY = 40
+        const logoSize = 55
+        const centerX = pageWidth / 2
+        
+        // Row 1: DICT & Bagong Pilipinas
+        doc.addImage(logoDict, 'PNG', centerX - 90, logoY, logoSize, logoSize)
+        doc.addImage(logoBP, 'PNG', centerX + 30, logoY, logoSize, logoSize)
+        
+        // Row 2: ILCDB & DTC/Tech4ED
+        doc.addImage(logoILCDB, 'PNG', centerX - 110, logoY + logoSize + 5, 80, 30)
+        doc.addImage(logoDTC, 'PNG', centerX + 10, logoY + logoSize + 5, 100, 35)
       } catch (err) {
         console.error('Could not load logos for certificate', err)
       }
 
-      const internName = this.formatName(intern) || intern.username || 'Intern'
-      const requiredHours = intern.ojtRequiredHours || ''
-      const hoursText = requiredHours ? String(requiredHours) : '[Number of Hours]'
-
+      const internName = (this.formatName(intern) || intern.username || 'Intern').toUpperCase()
       const now = new Date()
       const day = this.formatOrdinal(now.getDate())
       const monthName = now.toLocaleString('en-US', { month: 'long' })
       const year = now.getFullYear()
-      const issuedText = `${day} of ${monthName}, ${year}`
 
-      const centerText = (text, y, size, font = 'Times', style = 'normal', color = [0, 0, 0]) => {
+      // Signatory Info (as in image)
+      const sigName = 'ENGR. MARVIN D. BEJASA'
+      const sigPos1 = 'OIC - PROVINCIAL OFFICER'
+      const sigPos2 = 'DICT ORIENTAL MINDORO'
+
+      // Helper for centered text
+      const centerText = (text, y, size, font = 'Helvetica', style = 'normal', color = [0, 0, 0]) => {
         doc.setFont(font, style)
         doc.setFontSize(size)
         doc.setTextColor(color[0], color[1], color[2])
@@ -272,12 +303,13 @@ export default {
         doc.text(text, x, y)
       }
 
-      const centerParagraph = (text, startY, size, lineHeight = 18) => {
-        doc.setFont('Times', 'normal')
+      // Helper for centered paragraph
+      const centerParagraph = (text, startY, size, lineHeight = 18, color = [0,0,0]) => {
+        doc.setFont('Helvetica', 'normal')
         doc.setFontSize(size)
-        doc.setTextColor(0, 0, 0)
+        doc.setTextColor(color[0], color[1], color[2])
         let y = startY
-        const lines = doc.splitTextToSize(text, pageWidth - 160)
+        const lines = doc.splitTextToSize(text, pageWidth - 200)
         lines.forEach(l => {
           const w = doc.getTextWidth(l)
           doc.text(l, (pageWidth - w) / 2, y)
@@ -286,90 +318,46 @@ export default {
         return y
       }
 
-      let currentY = 70
-      centerText('Republic of the Philippines', currentY, 11)
-      currentY += 15
-      centerText('Department of Information and Communications Technology', currentY, 13, 'Times', 'bold')
-      currentY += 14
-      centerText('Oriental Mindoro Provincial Office', currentY, 11, 'Times', 'italic')
-
-      currentY += 50
-      centerText('CERTIFICATE OF COMPLETION', currentY, 34, 'Times', 'bold', [15, 30, 84]) // Navy Blue Title
+      let currentY = 170
+      centerText('CERTIFICATE OF COMPLETION', currentY, 38, 'Helvetica', 'bold', navyBlue)
       
       currentY += 35
-      centerText('This is to certify that', currentY, 16, 'Times', 'italic')
+      centerText('This certificate is awarded to', currentY, 18, 'Helvetica', 'normal', [50, 50, 50])
       
-      currentY += 40
-      centerText(internName.toUpperCase(), currentY, 28, 'Times', 'bold')
+      currentY += 60
+      centerText(internName, currentY, 42, 'Helvetica', 'bold', recipientBlue)
       
-      const nameWidth = doc.getTextWidth(internName.toUpperCase())
-      const nameX = (pageWidth - nameWidth) / 2
-      doc.setDrawColor(0, 0, 0)
-      doc.setLineWidth(1)
-      doc.line(nameX - 25, currentY + 8, nameX + nameWidth + 25, currentY + 8)
+      // Blue underline for name
+      doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2])
+      doc.setLineWidth(2)
+      doc.line(80, currentY + 15, pageWidth - 80, currentY + 15)
 
-      currentY += 40
-      
-      const p1 = `Has successfully completed his/her On-the-Job Training (OJT) at the Department of Information and Communications Technology – Oriental Mindoro Provincial Office.`
-      currentY = centerParagraph(p1, currentY, 14, 20)
-      
-      currentY += 10
-      const p2 = `He/She has rendered a total of ${hoursText} hours of service and has satisfactorily complied with all the requirements of the internship program.`
-      currentY = centerParagraph(p2, currentY, 14, 20)
-      
-      currentY += 10
-      const p3 = `Throughout the training period, he/she demonstrated dedication, professionalism, and competence in performing assigned tasks and responsibilities in support of the office's programs and initiatives.`
-      currentY = centerParagraph(p3, currentY, 14, 20)
+      currentY += 45
+      const description = `For his invaluable contribution as one of our On-the-Job trainee from Mindoro State University- Bongabong Campus that significantly help the institution in delivering extension services to our clients.`
+      currentY = centerParagraph(description, currentY, 13, 18, [36, 79, 145]) // Use recipientBlue for text too as in image
       
       currentY += 30
-      centerText(`Issued this ${issuedText} at DICT Oriental Mindoro Provincial Office, Philippines.`, currentY, 12, 'Times', 'italic', [40, 40, 40])
+      const dateText = `Given this ${day} day of ${monthName} ${year} at the Department of Information and Communications Technology – MIMAROPA Oriental Mindoro.`
+      centerText(dateText, currentY, 13, 'Helvetica', 'normal', [36, 79, 145])
 
-      currentY += 40
-      const sigX = pageWidth - 300
-      doc.setFont('Times', 'bold')
-      doc.setFontSize(14)
-      const sigName = 'ENGR. MARVIN D. BEJASA'
-      const sigWidth = doc.getTextWidth(sigName)
-      doc.text(sigName, sigX + (200 - sigWidth)/2, currentY) // Center within right block
-      
+      // Signatory at bottom center
+      currentY = pageHeight - 100
       doc.setDrawColor(0, 0, 0)
-      doc.setLineWidth(1)
-      doc.line(sigX, currentY + 4, sigX + 200, currentY + 4)
-
-      currentY += 18
-      doc.setFont('Times', 'normal')
-      doc.setFontSize(12)
-      const pos1 = 'OIC - Provincial Officer'
-      const pos1Width = doc.getTextWidth(pos1)
-      doc.text(pos1, sigX + (200 - pos1Width)/2, currentY)
+      doc.setLineWidth(1.5)
+      const sigLineWidth = 200
+      doc.line((pageWidth - sigLineWidth) / 2, currentY, (pageWidth + sigLineWidth) / 2, currentY)
       
+      currentY += 20
+      centerText(sigName, currentY, 14, 'Helvetica', 'bold')
       currentY += 16
-      const pos2 = 'Department of Information and Communications Technology'
-      doc.setFontSize(10)
-      const pos2Width = doc.getTextWidth(pos2)
-      doc.text(pos2, sigX + (200 - pos2Width)/2, currentY)
-      
+      centerText(sigPos1, currentY, 12, 'Helvetica', 'normal', [80, 80, 80])
       currentY += 14
-      const pos3 = 'Oriental Mindoro Provincial Office'
-      const pos3Width = doc.getTextWidth(pos3)
-      doc.text(pos3, sigX + (200 - pos3Width)/2, currentY)
-
-      // Subtle seal/accent in the bottom left - Adjusted position to avoid border
-      doc.setDrawColor(212, 175, 55)
-      doc.setFillColor(212, 175, 55)
-      doc.circle(80, pageHeight - 90, 25, 'F')
-      doc.setDrawColor(255, 255, 255)
-      doc.setLineWidth(1)
-      doc.circle(80, pageHeight - 90, 20, 'S')
-      doc.circle(80, pageHeight - 90, 15, 'S')
-      doc.setFontSize(8)
-      doc.setTextColor(255, 255, 255)
-      doc.text('DICT', 72, pageHeight - 87)
+      centerText(sigPos2, currentY, 12, 'Helvetica', 'normal', [80, 80, 80])
 
       const safeName = internName.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '') || 'intern'
       const filename = `${safeName}_completion_certificate.pdf`
       doc.save(filename)
-    },
+    },},
   },
   created() {
     this.fetchInterns()
