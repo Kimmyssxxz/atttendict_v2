@@ -81,7 +81,15 @@
                 </button>
               </div>
               <div class="space-y-4">
-                <div v-for="(item, index) in formConfig.services" :key="index" class="border border-gray-200 rounded-lg p-4 transition-all flex items-center justify-between">
+                <div v-for="(item, index) in formConfig.services" :key="index" 
+                     draggable="true"
+                     @dragstart="handleDragStart(index, 'services', $event)"
+                     @dragover.prevent
+                     @drop="handleDrop(index, 'services')"
+                     class="border border-gray-200 rounded-lg p-4 transition-all flex items-center justify-between cursor-move hover:bg-gray-50">
+                  <div class="mr-3 text-gray-400 cursor-grab active:cursor-grabbing">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                  </div>
                   <div class="flex-1 mr-4">
                     <input
                       v-model="item.value"
@@ -112,7 +120,15 @@
                 </button>
               </div>
               <div class="space-y-4">
-                <div v-for="(item, index) in formConfig.sectors" :key="index" class="border border-gray-200 rounded-lg p-4 transition-all flex items-center justify-between">
+                <div v-for="(item, index) in formConfig.sectors" :key="index" 
+                     draggable="true"
+                     @dragstart="handleDragStart(index, 'sectors', $event)"
+                     @dragover.prevent
+                     @drop="handleDrop(index, 'sectors')"
+                     class="border border-gray-200 rounded-lg p-4 transition-all flex items-center justify-between cursor-move hover:bg-gray-50">
+                  <div class="mr-3 text-gray-400 cursor-grab active:cursor-grabbing">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                  </div>
                   <div class="flex-1 mr-4">
                     <input
                       v-model="item.value"
@@ -142,8 +158,12 @@
                   <div class="overflow-y-auto flex-1">
                     <div 
                       v-for="(cityObj, index) in formConfig.cities" :key="index"
+                      draggable="true"
+                      @dragstart="handleDragStart(index, 'cities', $event)"
+                      @dragover.prevent
+                      @drop="handleDrop(index, 'cities')"
                       @click="selectedCityIndex = index"
-                      :class="['p-4 border-b border-gray-100 cursor-pointer transition-colors flex justify-between items-center', selectedCityIndex === index ? 'bg-blue-50 border-l-4 border-l-blue-600' : 'hover:bg-gray-50']"
+                      :class="['p-4 border-b border-gray-100 cursor-move transition-colors flex justify-between items-center', selectedCityIndex === index ? 'bg-blue-50 border-l-4 border-l-blue-600' : 'hover:bg-gray-50']"
                     >
                       <input 
                         v-if="cityObj.isEditing"
@@ -171,7 +191,15 @@
                       <button @click="addBarangay" class="px-3 py-1 bg-[#133e75] border border-[#133e75] text-white rounded-full hover:bg-white hover:text-[#133e75] text-sm font-medium">+ Add Barangay</button>
                     </div>
                     <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-[500px]">
-                      <div v-for="(b, bIndex) in selectedCity.barangays" :key="bIndex" class="flex items-center gap-2">
+                      <div v-for="(b, bIndex) in selectedCity.barangays" :key="bIndex" 
+                           draggable="true"
+                           @dragstart="handleDragStart(bIndex, 'barangays', $event)"
+                           @dragover.prevent
+                           @drop="handleDrop(bIndex, 'barangays')"
+                           class="flex items-center gap-2 cursor-move hover:bg-gray-50 p-1 rounded transition-colors">
+                        <div class="text-gray-400 cursor-grab active:cursor-grabbing">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                        </div>
                         <input
                           v-model="b.value"
                           type="text"
@@ -280,6 +308,33 @@ const selectedCityIndex = ref(0)
 
 const switchTab = (tab) => {
   activeTab.value = tab
+}
+
+// Drag and Drop Logic
+const draggedIndex = ref(null)
+const draggedType = ref(null)
+
+const handleDragStart = (index, type, event) => {
+  draggedIndex.value = index
+  draggedType.value = type
+  if (event && event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+  }
+}
+
+const handleDrop = (index, type) => {
+  if (draggedIndex.value === null || draggedType.value !== type || draggedIndex.value === index) return
+  
+  let list
+  if (type === 'services') list = formConfig.services
+  else if (type === 'sectors') list = formConfig.sectors
+  else if (type === 'cities') list = formConfig.cities
+  else if (type === 'barangays') list = selectedCity.value.barangays
+
+  const item = list.splice(draggedIndex.value, 1)[0]
+  list.splice(index, 0, item)
+  draggedIndex.value = null
+  draggedType.value = null
 }
 
 const formConfig = reactive({
