@@ -127,7 +127,7 @@
                     <td colspan="9" class="px-6 py-20 text-center text-gray-400 font-medium">No attendance records found matched your criteria.</td>
                   </tr>
                   <tr
-                    v-for="att in filteredAttendances"
+                    v-for="att in paginatedAttendances"
                     :key="att.id"
                     class="hover:bg-blue-50/30 transition-colors group"
                   >
@@ -255,7 +255,51 @@
                 </tbody>
               </table>
             </div>
-          </section>
+
+            <!-- Pagination Controls -->
+            <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-white" v-if="filteredAttendances.length">
+              <div class="text-sm text-gray-500 font-medium">
+                Showing <span class="text-gray-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to <span class="text-gray-900">{{ Math.min(currentPage * itemsPerPage, filteredAttendances.length) }}</span> of <span class="text-gray-900">{{ filteredAttendances.length }}</span> logs
+              </div>
+              
+              <div class="flex items-center gap-6">
+                <!-- Items Per Page Selector -->
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Rows:</span>
+                  <select 
+                    v-model.number="itemsPerPage" 
+                    @change="currentPage = 1"
+                    class="bg-gray-50 border border-gray-200 text-gray-700 text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-1.5 transition-all outline-none"
+                  >
+                    <option v-for="size in [10, 20, 30, 40, 50, 60]" :key="size" :value="size">{{ size }}</option>
+                  </select>
+                </div>
+
+                <!-- Page Navigation -->
+                <div class="flex items-center gap-2">
+                  <button
+                    @click="currentPage--"
+                    :disabled="currentPage === 1"
+                    class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                  </button>
+                  <div class="flex items-center gap-1">
+                    <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-bold">{{ currentPage }}</span>
+                    <span class="text-xs font-medium text-gray-400">/</span>
+                    <span class="text-xs font-medium text-gray-600">{{ totalPages }}</span>
+                  </div>
+                  <button
+                    @click="currentPage++"
+                    :disabled="currentPage === totalPages"
+                    class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 
@@ -456,6 +500,8 @@ export default {
         status: 'Approved',
         remarks: ''
       },
+      currentPage: 1,
+      itemsPerPage: 10,
       // The specific Calapan address for auto-approval
       OFFICE_ADDRESS: 'M. Roxas Drive, Lalom, Santa Isabel, Calapan, Oriental Mindoro, Philippines'
     }
@@ -490,6 +536,16 @@ export default {
 
         return matchesSearch && matchesStatus && matchesValidation
       })
+    },
+
+    totalPages() {
+      return Math.ceil(this.filteredAttendances.length / this.itemsPerPage) || 1
+    },
+
+    paginatedAttendances() {
+      const start = (this.currentPage - 1) * this.itemsPerPage
+      const end = start + this.itemsPerPage
+      return this.filteredAttendances.slice(start, end)
     }
   },
   methods: {
