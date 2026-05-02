@@ -492,10 +492,7 @@
               <tbody>
                 <tr v-for="day in 31" :key="day" :class="{'bg-slate-50': dtrEditData[day]?.isWeekend}">
                   <td class="border border-slate-200 p-2 font-medium">{{ day }}</td>
-                  <template v-if="dtrEditData[day]?.isWeekend && !dtrEditData[day]?.amArrival && !dtrEditData[day]?.amDeparture && !dtrEditData[day]?.pmArrival && !dtrEditData[day]?.pmDeparture && !dtrEditData[day]?.hours && !dtrEditData[day]?.mins">
-                    <td colspan="5" class="border border-slate-200 p-2 text-slate-400 uppercase tracking-widest font-bold text-xs md:text-sm">{{ dtrEditData[day].dayName }}</td>
-                  </template>
-                  <template v-else-if="dtrEditData[day]">
+                  <template v-if="dtrEditData[day]">
                     <td class="border border-slate-200 p-1 min-w-[90px]">
                       <input v-model="dtrEditData[day].amArrival" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
                     </td>
