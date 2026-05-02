@@ -222,43 +222,18 @@ export default {
 
       // --- COLORS ---
       const navyBlue = [26, 77, 140]
-      const goldYellow = [255, 204, 0]
       const recipientBlue = [36, 79, 145]
 
-      // --- BACKGROUND & CORNERS ---
-      // Fill background
-      doc.setFillColor(255, 255, 255)
-      doc.rect(0, 0, pageWidth, pageHeight, 'F')
-
-      // Draw Corner Decorations (Triangles/Polygons)
-      const drawCorner = (x, y, rotation) => {
-        doc.saveGraphicsState()
-        // Large Blue Triangle
-        doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
-        if (rotation === 0) { // Top Left
-          doc.triangle(0, 0, 80, 0, 0, 80, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.triangle(70, 0, 100, 0, 95, 25, 'F')
-        } else if (rotation === 1) { // Top Right
-          doc.triangle(pageWidth, 0, pageWidth - 80, 0, pageWidth, 80, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.triangle(pageWidth - 70, 0, pageWidth - 100, 0, pageWidth - 95, 25, 'F')
-        } else if (rotation === 2) { // Bottom Left
-          doc.triangle(0, pageHeight, 80, pageHeight, 0, pageHeight - 80, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.triangle(70, pageHeight, 100, pageHeight, 95, pageHeight - 25, 'F')
-        } else if (rotation === 3) { // Bottom Right
-          doc.triangle(pageWidth, pageHeight, pageWidth - 80, pageHeight, pageWidth, pageHeight - 80, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.triangle(pageWidth - 70, pageHeight, pageWidth - 100, pageHeight, pageWidth - 95, pageHeight - 25, 'F')
-        }
-        doc.restoreGraphicsState()
+      // --- BACKGROUND IMAGE ---
+      try {
+        const bgImg = await this.loadImage('/cert bg.jpg')
+        doc.addImage(bgImg, 'JPEG', 0, 0, pageWidth, pageHeight)
+      } catch (err) {
+        console.error('Could not load background image', err)
+        // Fallback to white if background fails
+        doc.setFillColor(255, 255, 255)
+        doc.rect(0, 0, pageWidth, pageHeight, 'F')
       }
-
-      drawCorner(0, 0, 0)
-      drawCorner(0, 0, 1)
-      drawCorner(0, 0, 2)
-      drawCorner(0, 0, 3)
 
       // --- LOGOS (Top Center Group) ---
       try {
@@ -267,17 +242,17 @@ export default {
         const logoILCDB = await this.loadImage('/ilcdb-removebg-preview.png')
         const logoDTC = await this.loadImage('/OIP-removebg-preview.png')
         
-        const logoY = 40
-        const logoSize = 55
+        const logoY = 45
+        const logoSize = 65 // Increased size
         const centerX = pageWidth / 2
         
         // Row 1: DICT & Bagong Pilipinas
-        doc.addImage(logoDict, 'PNG', centerX - 90, logoY, logoSize, logoSize)
-        doc.addImage(logoBP, 'PNG', centerX + 30, logoY, logoSize, logoSize)
+        doc.addImage(logoDict, 'PNG', centerX - 100, logoY, logoSize, logoSize)
+        doc.addImage(logoBP, 'PNG', centerX + 35, logoY, logoSize, logoSize)
         
         // Row 2: ILCDB & DTC/Tech4ED
-        doc.addImage(logoILCDB, 'PNG', centerX - 110, logoY + logoSize + 5, 80, 30)
-        doc.addImage(logoDTC, 'PNG', centerX + 10, logoY + logoSize + 5, 100, 35)
+        doc.addImage(logoILCDB, 'PNG', centerX - 120, logoY + logoSize + 5, 90, 35)
+        doc.addImage(logoDTC, 'PNG', centerX + 15, logoY + logoSize + 5, 110, 40)
       } catch (err) {
         console.error('Could not load logos for certificate', err)
       }
@@ -288,7 +263,7 @@ export default {
       const monthName = now.toLocaleString('en-US', { month: 'long' })
       const year = now.getFullYear()
 
-      // Signatory Info (as in image)
+      // Signatory Info
       const sigName = 'ENGR. MARVIN D. BEJASA'
       const sigPos1 = 'OIC - PROVINCIAL OFFICER'
       const sigPos2 = 'DICT ORIENTAL MINDORO'
@@ -318,7 +293,7 @@ export default {
         return y
       }
 
-      let currentY = 170
+      let currentY = 185 // Adjusted for larger logos
       centerText('CERTIFICATE OF COMPLETION', currentY, 38, 'Helvetica', 'bold', navyBlue)
       
       currentY += 35
