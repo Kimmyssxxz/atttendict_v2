@@ -300,26 +300,6 @@
                   </td>
                 </tr>
               </tbody>
-              <tfoot v-if="filteredEvaluations.length > 0" class="bg-gray-50 font-bold border-t-2 border-gray-200">
-                <tr>
-                  <td colspan="4" class="px-6 py-4 text-right text-sm text-gray-700 uppercase tracking-wider">
-                    Total System Average
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="text-sm text-blue-600">{{ statistics.averageRP.toFixed(1) }}</span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="text-sm text-blue-600">{{ statistics.averageContent.toFixed(1) }}</span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="text-sm text-blue-600">{{ statistics.averageVenue.toFixed(1) }}</span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="text-sm text-blue-700 font-extrabold">{{ statistics.averageOverall.toFixed(1) }}</span>
-                  </td>
-                  <td class="px-6 py-4"></td>
-                </tr>
-              </tfoot>
             </table>
           </div>
 
@@ -1167,10 +1147,10 @@ const exportAllToPDF = async () => {
     styles: { fontSize: 8 },
     headStyles: { fillColor: [59, 130, 246] },
     foot: [[
-      '', 
-      '', 
-      '', 
       'TOTAL AVERAGE', 
+      '', 
+      '', 
+      '', 
       statistics.value.averageRP.toFixed(1),
       statistics.value.averageContent.toFixed(1),
       statistics.value.averageVenue.toFixed(1),
@@ -1235,7 +1215,10 @@ const exportAllToWord = async () => {
 
   // Add Footer Row for Averages
   html += `<tr style="background-color: #f3f4f6; font-weight: bold;">
-    <td colspan="4" style="text-align: right;">TOTAL AVERAGE</td>
+    <td>TOTAL AVERAGE</td>
+    <td></td>
+    <td></td>
+    <td></td>
     <td>${statistics.value.averageRP.toFixed(1)}</td>
     <td>${statistics.value.averageContent.toFixed(1)}</td>
     <td>${statistics.value.averageVenue.toFixed(1)}</td>
