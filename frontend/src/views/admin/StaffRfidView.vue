@@ -50,6 +50,7 @@
                     <th class="px-6 py-4 font-semibold text-gray-700">Email</th>
                     <th class="px-6 py-4 font-semibold text-gray-700">Position</th>
                     <th class="px-6 py-4 font-semibold text-gray-700">RFID Tag</th>
+                    <th class="px-6 py-4 font-semibold text-gray-700">Status</th>
                     <th class="px-6 py-4 font-semibold text-gray-700">Actions</th>
                   </tr>
                 </thead>
@@ -69,6 +70,17 @@
                         <span class="font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-xs font-semibold  border border-blue-100">{{ staff.rfid }}</span>
                       </div>
                       <span v-else class="text-gray-400 italic text-xs">No RFID registered</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <button 
+                        @click="toggleStatus(staff)"
+                        :disabled="saving"
+                        class="px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 border"
+                        :class="staff.status === 'Inactive' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full" :class="staff.status === 'Inactive' ? 'bg-red-500' : 'bg-emerald-500'"></span>
+                        {{ staff.status === 'Inactive' ? 'Inactive' : 'Active' }}
+                      </button>
                     </td>
                     <td class="px-6 py-4">
                       <button
@@ -409,6 +421,26 @@ export default {
           }
         }
       })
+    },
+    async toggleStatus(staff) {
+      const newStatus = staff.status === 'Inactive' ? 'Active' : 'Inactive'
+      
+      try {
+        const userRef = doc(db, 'users', staff.id)
+        await updateDoc(userRef, {
+          status: newStatus,
+          updatedAt: new Date()
+        })
+        
+        // Local update
+        const index = this.staffMembers.findIndex(s => s.id === staff.id)
+        if (index !== -1) {
+          this.staffMembers[index].status = newStatus
+        }
+      } catch (err) {
+        console.error('Error toggling status:', err)
+        alert('Failed to update status.')
+      }
     },
     async fetchLastScanned() {
       try {

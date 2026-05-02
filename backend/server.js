@@ -2702,6 +2702,17 @@ app.post('/api/rfid/scan', async (req, res) => {
     const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'User';
     const role = user.role || 'unknown';
 
+    // --- NEW: Status Check ---
+    if (user.status === 'Inactive') {
+      return res.json({
+        status: 'error',
+        message: 'Account Disabled',
+        name: userName,
+        role: 'Inactive'
+      });
+    }
+    // ------------------------
+
     // Simplified attendance logic for RFID terminal
     // Determine target collection
     const collectionName = (role === 'student' || role === 'intern') ? 'intern_attendance' : 'staff_attendance';
