@@ -462,65 +462,67 @@
     </div>
 
     <!-- DTR Edit Modal -->
-    <div v-if="showDtrEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-5">
+    <div v-if="showDtrEditModal" class="fixed inset-0 z-[1100] flex items-center justify-center p-2 md:p-5">
       <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showDtrEditModal = false"></div>
-      <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-          <h3 class="text-lg font-semibold text-slate-800 m-0">Edit DTR ({{ dtrPdfMetadata.monthName }} {{ dtrPdfMetadata.year }})</h3>
-          <button @click="showDtrEditModal = false" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="px-4 md:px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+          <h3 class="text-base md:text-lg font-semibold text-slate-800 m-0">Edit DTR ({{ dtrPdfMetadata.monthName }} {{ dtrPdfMetadata.year }})</h3>
+          <button @click="showDtrEditModal = false" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none p-1">
+            <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div class="p-6 flex-1 overflow-y-auto custom-scrollbar">
-          <div class="bg-blue-50 text-blue-800 text-sm p-3 rounded-lg mb-4">
+        <div class="p-4 md:p-6 flex-1 overflow-auto custom-scrollbar">
+          <div class="bg-blue-50 text-blue-800 text-xs md:text-sm p-3 rounded-lg mb-4">
             Changes made here are <strong>temporary</strong> and only affect the printed DTR. They do not alter your official database records.
           </div>
-          <table class="w-full border-collapse text-sm text-center border border-slate-200">
-            <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm">
-              <tr>
-                <th class="border border-slate-200 p-2">Day</th>
-                <th class="border border-slate-200 p-2">AM Arrival</th>
-                <th class="border border-slate-200 p-2">AM Departure</th>
-                <th class="border border-slate-200 p-2">PM Arrival</th>
-                <th class="border border-slate-200 p-2">PM Departure</th>
-                <th class="border border-slate-200 p-2">Total (h m)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="day in 31" :key="day" :class="{'bg-slate-50': dtrEditData[day]?.isWeekend}">
-                <td class="border border-slate-200 p-2 font-medium">{{ day }}</td>
-                <template v-if="dtrEditData[day]?.isWeekend && !dtrEditData[day]?.amArrival && !dtrEditData[day]?.amDeparture && !dtrEditData[day]?.pmArrival && !dtrEditData[day]?.pmDeparture && !dtrEditData[day]?.hours && !dtrEditData[day]?.mins">
-                  <td colspan="5" class="border border-slate-200 p-2 text-slate-400 uppercase tracking-widest font-bold">{{ dtrEditData[day].dayName }}</td>
-                </template>
-                <template v-else-if="dtrEditData[day]">
-                  <td class="border border-slate-200 p-1">
-                    <input v-model="dtrEditData[day].amArrival" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
-                  </td>
-                  <td class="border border-slate-200 p-1">
-                    <input v-model="dtrEditData[day].amDeparture" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
-                  </td>
-                  <td class="border border-slate-200 p-1">
-                    <input v-model="dtrEditData[day].pmArrival" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
-                  </td>
-                  <td class="border border-slate-200 p-1">
-                    <input v-model="dtrEditData[day].pmDeparture" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
-                  </td>
-                  <td class="border border-slate-200 p-1">
-                    <div class="flex gap-1">
-                      <input v-model="dtrEditData[day].hours" type="text" placeholder="h" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
-                      <input v-model="dtrEditData[day].mins" type="text" placeholder="m" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
-                    </div>
-                  </td>
-                </template>
-              </tr>
-            </tbody>
-          </table>
+          <div class="overflow-x-auto pb-2">
+            <table class="w-full min-w-[650px] border-collapse text-sm text-center border border-slate-200">
+              <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                <tr>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">Day</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">AM Arrival</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">AM Departure</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">PM Arrival</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">PM Departure</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">Total (h m)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="day in 31" :key="day" :class="{'bg-slate-50': dtrEditData[day]?.isWeekend}">
+                  <td class="border border-slate-200 p-2 font-medium">{{ day }}</td>
+                  <template v-if="dtrEditData[day]?.isWeekend && !dtrEditData[day]?.amArrival && !dtrEditData[day]?.amDeparture && !dtrEditData[day]?.pmArrival && !dtrEditData[day]?.pmDeparture && !dtrEditData[day]?.hours && !dtrEditData[day]?.mins">
+                    <td colspan="5" class="border border-slate-200 p-2 text-slate-400 uppercase tracking-widest font-bold text-xs md:text-sm">{{ dtrEditData[day].dayName }}</td>
+                  </template>
+                  <template v-else-if="dtrEditData[day]">
+                    <td class="border border-slate-200 p-1 min-w-[90px]">
+                      <input v-model="dtrEditData[day].amArrival" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                    </td>
+                    <td class="border border-slate-200 p-1 min-w-[90px]">
+                      <input v-model="dtrEditData[day].amDeparture" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                    </td>
+                    <td class="border border-slate-200 p-1 min-w-[90px]">
+                      <input v-model="dtrEditData[day].pmArrival" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                    </td>
+                    <td class="border border-slate-200 p-1 min-w-[90px]">
+                      <input v-model="dtrEditData[day].pmDeparture" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                    </td>
+                    <td class="border border-slate-200 p-1 min-w-[120px]">
+                      <div class="flex gap-1">
+                        <input v-model="dtrEditData[day].hours" type="text" placeholder="h" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                        <input v-model="dtrEditData[day].mins" type="text" placeholder="m" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                      </div>
+                    </td>
+                  </template>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-          <button @click="showDtrEditModal = false" class="px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm text-sm font-semibold cursor-pointer transition-colors hover:bg-slate-100">Cancel</button>
-          <button @click="generatePdfFromEditedData" class="px-5 py-2.5 rounded-full border-none bg-[#eebb3b] text-white text-sm font-bold cursor-pointer transition-all hover:brightness-105 active:scale-[0.98]">Confirm & Download</button>
+        <div class="px-4 md:px-6 py-3 md:py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2 md:gap-3 shrink-0">
+          <button @click="showDtrEditModal = false" class="px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm text-sm font-semibold cursor-pointer transition-colors hover:bg-slate-100">Cancel</button>
+          <button @click="generatePdfFromEditedData" class="px-4 md:px-5 py-2 md:py-2.5 rounded-full border-none bg-[#eebb3b] text-white text-sm font-bold cursor-pointer transition-all hover:brightness-105 active:scale-[0.98] flex-1 md:flex-none">Confirm & Download</button>
         </div>
       </div>
     </div>
