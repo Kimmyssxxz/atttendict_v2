@@ -81,22 +81,54 @@
           </div>
 
           <!-- Statistics Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="bg-white border border-gray-200 rounded-lg p-4">
-              <div class="text-2xl font-bold text-blue-600">{{ statistics.totalEvaluations }}</div>
-              <div class="text-sm text-gray-600">Total Evaluations</div>
+          </div>
+
+          <!-- Global Averages Row -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-white shadow-lg shadow-blue-200/50 relative overflow-hidden group">
+              <div class="relative z-10">
+                <div class="text-3xl font-bold mb-1 flex items-baseline gap-2">
+                  {{ statistics.averageOverall.toFixed(1) }}
+                  <span class="text-blue-200 text-xs font-normal">/ 5.0</span>
+                </div>
+                <div class="text-sm font-medium text-blue-100 uppercase tracking-wider">Total Overall Average</div>
+              </div>
+              <div class="absolute -right-4 -bottom-4 text-blue-500/20 group-hover:scale-110 transition-transform duration-500">
+                <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+              </div>
             </div>
-            <div class="bg-white border border-gray-200 rounded-lg p-4">
-              <div class="text-2xl font-bold text-green-600">{{ statistics.todayEvaluations }}</div>
-              <div class="text-sm text-gray-600">Today</div>
+            
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border-l-4 border-l-amber-400">
+              <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Resource Person</div>
+              <div class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                {{ statistics.averageRP.toFixed(1) }}
+                <div class="flex text-amber-400 text-xs">
+                  <span v-for="i in 5" :key="i">{{ i <= Math.round(statistics.averageRP) ? '★' : '☆' }}</span>
+                </div>
+              </div>
+              <div class="text-[10px] text-gray-500 mt-1">Average of all instructors</div>
             </div>
-            <div class="bg-white border border-gray-200 rounded-lg p-4">
-              <div class="text-2xl font-bold text-purple-600">{{ statistics.thisWeekEvaluations }}</div>
-              <div class="text-sm text-gray-600">This Week</div>
+
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border-l-4 border-l-emerald-400">
+              <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Course Content</div>
+              <div class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                {{ statistics.averageContent.toFixed(1) }}
+                <div class="flex text-emerald-400 text-xs">
+                  <span v-for="i in 5" :key="i">{{ i <= Math.round(statistics.averageContent) ? '★' : '☆' }}</span>
+                </div>
+              </div>
+              <div class="text-[10px] text-gray-500 mt-1">Average of all materials</div>
             </div>
-            <div class="bg-white border border-gray-200 rounded-lg p-4">
-              <div class="text-2xl font-bold text-orange-600">{{ statistics.thisMonthEvaluations }}</div>
-              <div class="text-sm text-gray-600">This Month</div>
+
+            <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all border-l-4 border-l-purple-400">
+              <div class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Venue & Facilities</div>
+              <div class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                {{ statistics.averageVenue.toFixed(1) }}
+                <div class="flex text-purple-400 text-xs">
+                  <span v-for="i in 5" :key="i">{{ i <= Math.round(statistics.averageVenue) ? '★' : '☆' }}</span>
+                </div>
+              </div>
+              <div class="text-[10px] text-gray-500 mt-1">Average of environment</div>
             </div>
           </div>
 
@@ -801,7 +833,19 @@ const statistics = computed(() => {
     thisMonthEvaluations: evaluations.value.filter(evaluation => {
       const evalDate = evaluation.submittedAt.toDate ? evaluation.submittedAt.toDate() : new Date(evaluation.submittedAt)
       return evalDate >= thisMonth
-    }).length
+    }).length,
+    
+    averageRP: evaluations.value.length ? 
+      evaluations.value.reduce((acc, e) => acc + calculateAverageRating(e.resourcePersonEvaluation), 0) / evaluations.value.length : 0,
+    
+    averageContent: evaluations.value.length ? 
+      evaluations.value.reduce((acc, e) => acc + calculateAverageRating(e.courseContentEvaluation), 0) / evaluations.value.length : 0,
+    
+    averageVenue: evaluations.value.length ? 
+      evaluations.value.reduce((acc, e) => acc + calculateAverageRating(e.venueEvaluation), 0) / evaluations.value.length : 0,
+    
+    averageOverall: evaluations.value.length ? 
+      evaluations.value.reduce((acc, e) => acc + calculateOverallRating(e), 0) / evaluations.value.length : 0
   }
 })
 
