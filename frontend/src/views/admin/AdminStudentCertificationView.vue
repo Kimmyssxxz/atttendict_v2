@@ -357,7 +357,7 @@ export default {
       const safeName = internName.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '') || 'intern'
       const filename = `${safeName}_completion_certificate.pdf`
       doc.save(filename)
-    },},
+    },
   },
   created() {
     this.fetchInterns()
