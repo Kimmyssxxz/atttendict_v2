@@ -115,20 +115,20 @@
 
 
           <!-- Table Content -->
-          <div class="overflow-x-auto">
+          <div>
             <table class="w-full text-left">
               <thead>
-                <tr class="bg-gray-50/50 text-gray-500 text-xs">
-                  <th class="px-6 py-4">Full Name</th>
-                  <th class="px-6 py-4">Username</th>
-                  <th class="px-6 py-4">Email</th>
-                  <th class="px-6 py-4">Role / Position</th>
-                  <th class="px-6 py-4">Office</th>
-                  <th class="px-6 py-4">Gender</th>
-                  <th class="px-6 py-4">Age</th>
-                  <th class="px-6 py-4">Phone</th>
-                  <th class="px-6 py-4">Status</th>
-                  <th class="px-6 py-4 text-right">Actions</th>
+                <tr class="bg-gray-50/50 text-gray-500 text-[10px] uppercase tracking-wider">
+                  <th class="px-2 py-4 font-bold">Full Name</th>
+                  <th class="px-2 py-4 font-bold">User</th>
+                  <th class="px-2 py-4 font-bold">Email</th>
+                  <th class="px-2 py-4 font-bold">Role</th>
+                  <th class="px-2 py-4 font-bold">Office</th>
+                  <th class="px-2 py-4 font-bold text-center">G</th>
+                  <th class="px-2 py-4 font-bold text-center">Age</th>
+                  <th class="px-2 py-4 font-bold">Phone</th>
+                  <th class="px-2 py-4 font-bold">Stat</th>
+                  <th class="px-2 py-4 font-bold text-right">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100">
@@ -145,49 +145,49 @@
                   :key="s.id"
                   class="hover:bg-blue-50/30 transition-colors group"
                 >
-                  <td class="px-6 py-5 whitespace-nowrap">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 flex items-center justify-center font-bold text-sm shadow-sm overflow-hidden">
+                  <td class="px-3 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 flex items-center justify-center font-bold text-xs shadow-sm overflow-hidden shrink-0">
                         <img v-if="s.photoUrl" :src="s.photoUrl" class="w-full h-full object-cover" :alt="formatName(s)" />
                         <span v-else>{{ getInitials(s) }}</span>
                       </div>
-                      <div>
-                        <p class="font-semibold text-gray-900 leading-tight">{{ formatName(s) }}</p>
-                        <p class="text-xs text-gray-500 mt-0.5">{{ formatAddress(s.address) }}</p>
+                      <div class="min-w-0">
+                        <p class="font-semibold text-gray-900 leading-tight text-xs truncate max-w-[140px]">{{ formatName(s) }}</p>
+                        <p class="text-[10px] text-gray-500 mt-0.5 truncate max-w-[140px]">{{ formatAddress(s.address) }}</p>
                       </div>
                     </div>
                   </td>
-                  <td class="px-6 py-5 whitespace-nowrap text-gray-600 text-xs font-medium">{{ s.username || '-' }}</td>
-                  <td class="px-6 py-5 whitespace-nowrap text-gray-600 text-xs font-medium">{{ s.email || '-' }}</td>
-                  <td class="px-6 py-5 whitespace-nowrap">
-                    <div>
-                      <span class="px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-semibold uppercase tracking-tighter inline-block mb-1">
+                  <td class="px-3 py-4 whitespace-nowrap text-gray-600 text-[11px] font-medium">{{ s.username || '-' }}</td>
+                  <td class="px-3 py-4 whitespace-nowrap text-gray-600 text-[11px] font-medium truncate max-w-[140px]" :title="s.email">{{ s.email || '-' }}</td>
+                  <td class="px-3 py-4 whitespace-nowrap">
+                    <div class="min-w-0">
+                      <span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-bold uppercase inline-block mb-0.5">
                         {{ s.role || 'Staff' }}
                       </span>
-                      <p class="text-xs font-medium text-gray-600">{{ s.position || '-' }}</p>
+                      <p class="text-[10px] font-medium text-gray-500 truncate max-w-[100px]">{{ s.position || '-' }}</p>
                     </div>
                   </td>
-                  <td class="px-6 py-5 whitespace-nowrap">
-                    <span class="px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 text-xs font-semibold">
+                  <td class="px-3 py-4 whitespace-nowrap">
+                    <span class="px-2 py-0.5 rounded-lg bg-gray-100 text-gray-700 text-[10px] font-semibold truncate max-w-[120px] inline-block" :title="s.assignedOffice">
                       {{ s.assignedOffice || '-' }}
                     </span>
                   </td>
-                  <td class="px-6 py-5 whitespace-nowrap">
-                    <span class="px-2 py-1 rounded bg-purple-50 text-purple-700 text-xs font-semibold">
-                      {{ s.gender || '-' }}
+                  <td class="px-3 py-4 whitespace-nowrap text-center">
+                    <span class="text-[11px] font-medium text-gray-600">
+                      {{ s.gender?.[0] || '-' }}
                     </span>
                   </td>
-                  <td class="px-6 py-5 whitespace-nowrap text-gray-600 text-xs font-semibold">
-                    {{ calculateAge(s.dateOfBirth) }} yrs
+                  <td class="px-2 py-4 whitespace-nowrap text-center text-gray-600 text-[11px] font-semibold">
+                    {{ calculateAge(s.dateOfBirth) }}
                   </td>
-                  <td class="px-6 py-5 whitespace-nowrap text-gray-600 text-xs font-semibold">{{ s.phone || '-' }}</td>
-                  <td class="px-6 py-5 whitespace-nowrap">
-                    <span :class="s.status === 'Inactive' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'" class="px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide">
-                      {{ s.status === 'Inactive' ? 'Inactive' : 'Active' }}
+                  <td class="px-2 py-4 whitespace-nowrap text-gray-600 text-[11px] font-semibold">{{ s.phone || '-' }}</td>
+                  <td class="px-2 py-4 whitespace-nowrap">
+                    <span :class="s.status === 'Inactive' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'" class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
+                      {{ s.status === 'Inactive' ? 'Inact' : 'Act' }}
                     </span>
                   </td>
-                  <td class="px-6 py-5 whitespace-nowrap text-right">
-                    <div class="flex items-center justify-end gap-1 pr-2">
+                  <td class="px-2 py-4 whitespace-nowrap text-right">
+                    <div class="flex items-center justify-end gap-0">
                       <button
                         @click="openViewEditModal(s, 'view')"
                         class="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"

@@ -44,43 +44,43 @@
 
           <div v-if="error" class="text-[0.95rem] text-red-700 my-4">{{ error }}</div>
           
-          <div class="border border-gray-100 rounded-xl overflow-x-auto shadow-sm">
-            <table class="min-w-full divide-y divide-gray-100" v-if="filteredInterns.length">
+          <div class="border border-gray-100 rounded-xl shadow-sm">
+            <table class="w-full divide-y divide-gray-100" v-if="filteredInterns.length">
               <thead class="bg-gray-50/50">
-                <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 ">No.</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Full Name</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Email</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">School</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Hrs</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Address</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Course</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Year</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Start</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">End</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Status</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Actions</th>
+                <tr class="text-[10px] uppercase tracking-wider">
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">No</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Name</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Email</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">School</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Hrs</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Address</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Course</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Yr</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Start</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">End</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Stat</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Actions</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr v-for="(intern, index) in paginatedInterns" :key="intern.id" class="hover:bg-gray-50 transition-colors duration-150">
-                  <td class="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
-                  <td class="px-4 py-3 text-xs font-semibold text-gray-900 whitespace-nowrap">{{ formatName(intern) }}</td>
-                  <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{{ intern.email || '-' }}</td>
-                  <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{{ intern.schoolOrUniversity || '-' }}</td>
-                  <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap font-bold">{{ intern.ojtRequiredHours ?? '-' }}</td>
-                  <td class="px-4 py-3 text-xs text-gray-500 whitespace-nowrap truncate max-w-[150px]" :title="intern.address">{{ intern.address || '-' }}</td>
-                  <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{{ intern.course || '-' }}</td>
-                  <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{{ intern.yearLevel || '-' }}</td>
-                  <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{{ intern.startDate || '-' }}</td>
-                  <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{{ intern.endDate || '-' }}</td>
-                  <td class="px-4 py-3 whitespace-nowrap">
-                    <span :class="intern.status === 'Inactive' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'" class="px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide">
-                      {{ intern.status === 'Inactive' ? 'Inactive' : 'Active' }}
+                  <td class="px-2 py-3 text-[11px] text-gray-500 whitespace-nowrap">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
+                  <td class="px-2 py-3 text-[11px] font-semibold text-gray-900 whitespace-nowrap truncate max-w-[120px]" :title="formatName(intern)">{{ formatName(intern) }}</td>
+                  <td class="px-2 py-3 text-[11px] text-gray-600 whitespace-nowrap truncate max-w-[120px]" :title="intern.email">{{ intern.email || '-' }}</td>
+                  <td class="px-2 py-3 text-[11px] text-gray-600 whitespace-nowrap truncate max-w-[100px]" :title="intern.schoolOrUniversity">{{ intern.schoolOrUniversity || '-' }}</td>
+                  <td class="px-2 py-3 text-[11px] text-gray-600 whitespace-nowrap font-bold">{{ intern.ojtRequiredHours ?? '-' }}</td>
+                  <td class="px-2 py-3 text-[11px] text-gray-500 whitespace-nowrap truncate max-w-[100px]" :title="intern.address">{{ intern.address || '-' }}</td>
+                  <td class="px-2 py-3 text-[11px] text-gray-600 whitespace-nowrap truncate max-w-[80px]" :title="intern.course">{{ intern.course || '-' }}</td>
+                  <td class="px-2 py-3 text-[11px] text-gray-600 whitespace-nowrap">{{ intern.yearLevel || '-' }}</td>
+                  <td class="px-2 py-3 text-[11px] text-gray-600 whitespace-nowrap text-[10px]">{{ intern.startDate || '-' }}</td>
+                  <td class="px-2 py-3 text-[11px] text-gray-600 whitespace-nowrap text-[10px]">{{ intern.endDate || '-' }}</td>
+                  <td class="px-2 py-3 whitespace-nowrap">
+                    <span :class="intern.status === 'Inactive' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'" class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
+                      {{ intern.status === 'Inactive' ? 'Inact' : 'Act' }}
                     </span>
                   </td>
-                  <td class="px-4 py-3 whitespace-nowrap">
-                    <div class="flex items-center gap-1.5">
+                  <td class="px-2 py-3 whitespace-nowrap">
+                    <div class="flex items-center gap-0.5">
                       <button
                         @click="openViewEditModal(intern, 'view')"
                         class="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded transition-colors"
