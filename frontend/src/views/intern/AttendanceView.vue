@@ -167,7 +167,7 @@
             <input id="to" type="date" v-model="toDate" class="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm bg-white h-[42px]" />
           </div>
           <div class="col-span-2 md:col-span-1 mt-2 md:mt-0">
-            <button class="w-full h-[46px] rounded-xl border-none bg-[#eebb3b] text-white text-base font-semibold cursor-pointer transition-all active:scale-[0.98]" @click="exportPdf">Download DTR</button>
+            <button class="w-full h-[46px] rounded-xl border-none bg-[#eebb3b] text-white text-base font-semibold cursor-pointer transition-all active:scale-[0.98]" @click="prepareDtrForEdit">Download DTR</button>
           </div>
         </div>
       </section>
@@ -460,6 +460,70 @@
         </div>
       </div>
     </div>
+
+    <!-- DTR Edit Modal -->
+    <div v-if="showDtrEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-5">
+      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showDtrEditModal = false"></div>
+      <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <h3 class="text-lg font-semibold text-slate-800 m-0">Edit DTR ({{ dtrPdfMetadata.monthName }} {{ dtrPdfMetadata.year }})</h3>
+          <button @click="showDtrEditModal = false" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="p-6 flex-1 overflow-y-auto custom-scrollbar">
+          <div class="bg-blue-50 text-blue-800 text-sm p-3 rounded-lg mb-4">
+            Changes made here are <strong>temporary</strong> and only affect the printed DTR. They do not alter your official database records.
+          </div>
+          <table class="w-full border-collapse text-sm text-center border border-slate-200">
+            <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm">
+              <tr>
+                <th class="border border-slate-200 p-2">Day</th>
+                <th class="border border-slate-200 p-2">AM Arrival</th>
+                <th class="border border-slate-200 p-2">AM Departure</th>
+                <th class="border border-slate-200 p-2">PM Arrival</th>
+                <th class="border border-slate-200 p-2">PM Departure</th>
+                <th class="border border-slate-200 p-2">Total (h m)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="day in 31" :key="day" :class="{'bg-slate-50': dtrEditData[day]?.isWeekend}">
+                <td class="border border-slate-200 p-2 font-medium">{{ day }}</td>
+                <template v-if="dtrEditData[day]?.isWeekend && !dtrEditData[day]?.amArrival && !dtrEditData[day]?.amDeparture && !dtrEditData[day]?.pmArrival && !dtrEditData[day]?.pmDeparture && !dtrEditData[day]?.hours && !dtrEditData[day]?.mins">
+                  <td colspan="5" class="border border-slate-200 p-2 text-slate-400 uppercase tracking-widest font-bold">{{ dtrEditData[day].dayName }}</td>
+                </template>
+                <template v-else-if="dtrEditData[day]">
+                  <td class="border border-slate-200 p-1">
+                    <input v-model="dtrEditData[day].amArrival" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                  </td>
+                  <td class="border border-slate-200 p-1">
+                    <input v-model="dtrEditData[day].amDeparture" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                  </td>
+                  <td class="border border-slate-200 p-1">
+                    <input v-model="dtrEditData[day].pmArrival" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                  </td>
+                  <td class="border border-slate-200 p-1">
+                    <input v-model="dtrEditData[day].pmDeparture" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                  </td>
+                  <td class="border border-slate-200 p-1">
+                    <div class="flex gap-1">
+                      <input v-model="dtrEditData[day].hours" type="text" placeholder="h" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                      <input v-model="dtrEditData[day].mins" type="text" placeholder="m" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                    </div>
+                  </td>
+                </template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+          <button @click="showDtrEditModal = false" class="px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm text-sm font-semibold cursor-pointer transition-colors hover:bg-slate-100">Cancel</button>
+          <button @click="generatePdfFromEditedData" class="px-5 py-2.5 rounded-full border-none bg-[#eebb3b] text-white text-sm font-bold cursor-pointer transition-all hover:brightness-105 active:scale-[0.98]">Confirm & Download</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -478,6 +542,9 @@ export default {
       currentPage: 1,
       itemsPerPage: 10,
       showDetailsModal: false,
+      showDtrEditModal: false,
+      dtrEditData: {},
+      dtrPdfMetadata: { monthName: '', year: '', daysInMonth: 31 },
       showMonthDropdown: false,
       showItemsPerPageDropdown: false,
       selectedRecord: null,
@@ -691,7 +758,7 @@ export default {
       const m = safeMinutes % 60;
       return `${h}h ${m}m`;
     },
-    exportPdf() {
+    prepareDtrForEdit() {
       if (!this.filteredRecords.length) {
         alert('No attendance records to export.');
         return;
@@ -731,6 +798,8 @@ export default {
       const monthName = baseDate.toLocaleDateString('en-US', { month: 'long' });
       const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
 
+      this.dtrPdfMetadata = { monthName, year, daysInMonth };
+
       const byDay = {};
 
       this.filteredRecords.forEach((r) => {
@@ -762,12 +831,36 @@ export default {
           amDeparture,
           pmArrival,
           pmDeparture,
-          hours: {
-            h: Math.floor(approvedMinutes / 60),
-            m: approvedMinutes % 60
-          },
+          hours: Math.floor(approvedMinutes / 60) > 0 ? Math.floor(approvedMinutes / 60).toString() : '',
+          mins: (approvedMinutes % 60) > 0 ? (approvedMinutes % 60).toString() : '',
         };
       });
+
+      // Initialize all 31 days
+      const editData = {};
+      for (let day = 1; day <= 31; day++) {
+        const currentDt = new Date(year, monthIndex, day);
+        const dayOfWeek = currentDt.getDay();
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        const dayName = dayOfWeek === 0 ? 'SUNDAY' : 'SATURDAY';
+        
+        const data = byDay[day] || {};
+        editData[day] = {
+          amArrival: data.amArrival || '',
+          amDeparture: data.amDeparture || '',
+          pmArrival: data.pmArrival || '',
+          pmDeparture: data.pmDeparture || '',
+          hours: data.hours || '',
+          mins: data.mins || '',
+          isWeekend,
+          dayName
+        };
+      }
+      this.dtrEditData = editData;
+      this.showDtrEditModal = true;
+    },
+    generatePdfFromEditedData() {
+      const { monthName, year, daysInMonth } = this.dtrPdfMetadata;
 
       let tableHtmlOne = '';
       tableHtmlOne += '<div style="font-family:serif;margin:20px 20px 10px 20px;font-size:11px;">';
@@ -801,24 +894,19 @@ export default {
       tableHtmlOne += '<tbody>';
 
       for (let day = 1; day <= daysInMonth; day++) {
-        const data = byDay[day];
-        const amArr = data ? data.amArrival : '';
-        const amDep = data ? data.amDeparture : '';
-        const pmArr = data ? data.pmArrival : '';
-        const pmDep = data ? data.pmDeparture : '';
-        const hoursVal = '';
-        const minsVal = '';
-
-        const currentDt = new Date(year, monthIndex, day);
-        const dayOfWeek = currentDt.getDay();
-        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        const data = this.dtrEditData[day];
+        const amArr = data.amArrival || '';
+        const amDep = data.amDeparture || '';
+        const pmArr = data.pmArrival || '';
+        const pmDep = data.pmDeparture || '';
+        const hoursVal = data.hours || '';
+        const minsVal = data.mins || '';
 
         tableHtmlOne += '<tr>';
         tableHtmlOne += `<td style="text-align:center;">${day}</td>`;
         
-        if (isWeekend && !amArr && !amDep && !pmArr && !pmDep) {
-          const dayName = dayOfWeek === 0 ? 'SUNDAY' : 'SATURDAY';
-          tableHtmlOne += `<td colspan="4" style="text-align:center; font-weight:bold; letter-spacing: 2px;">${dayName}</td>`;
+        if (data.isWeekend && !amArr && !amDep && !pmArr && !pmDep && !hoursVal && !minsVal) {
+          tableHtmlOne += `<td colspan="4" style="text-align:center; font-weight:bold; letter-spacing: 2px;">${data.dayName}</td>`;
           tableHtmlOne += `<td style="text-align:center;"></td>`;
           tableHtmlOne += `<td style="text-align:center;"></td>`;
         } else {
@@ -887,6 +975,8 @@ export default {
       win.document.close();
       win.focus();
       win.print();
+      
+      this.showDtrEditModal = false;
     }
   },
   computed: {
