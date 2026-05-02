@@ -1148,6 +1148,29 @@ const exportAllToPDF = async () => {
     headStyles: { fillColor: [59, 130, 246] }
   })
 
+  // Add Global Averages Summary Table
+  const summaryY = doc.lastAutoTable.finalY + 30
+  doc.setFont('Times', 'bold')
+  doc.setFontSize(11)
+  doc.text('Global Averages Summary', 40, summaryY - 10)
+  
+  autoTable(doc, {
+    head: [['Category', 'Average Rating']],
+    body: [
+      ['Resource Person Overall Average', statistics.value.averageRP.toFixed(2)],
+      ['Course Content Overall Average', statistics.value.averageContent.toFixed(2)],
+      ['Venue & Facilities Overall Average', statistics.value.averageVenue.toFixed(2)],
+      ['TOTAL OVERALL SYSTEM AVERAGE', statistics.value.averageOverall.toFixed(2)]
+    ],
+    startY: summaryY,
+    margin: { right: 500 }, // Make it smaller/narrower
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [75, 85, 99] },
+    columnStyles: {
+      1: { halign: 'center', fontStyle: 'bold' }
+    }
+  })
+
   doc.save(`All_DTC_Evaluations_${new Date().toISOString().split('T')[0]}.pdf`)
 }
 
@@ -1202,7 +1225,33 @@ const exportAllToWord = async () => {
     </tr>`
   })
 
-  html += `</tbody></table></div></body></html>`
+  html += `</tbody></table>
+  
+  <h3 style="margin-top: 30px;">Global Averages Summary</h3>
+  <table style="width: 50%; margin-top: 10px; border-collapse: collapse;">
+    <tr style="background-color: #4b5563; color: white;">
+      <th style="border: 1px solid black; padding: 5px;">Category</th>
+      <th style="border: 1px solid black; padding: 5px; text-align: center;">Average Rating</th>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; padding: 5px;">Resource Person Overall Average</td>
+      <td style="border: 1px solid black; padding: 5px; text-align: center;">${statistics.value.averageRP.toFixed(2)}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; padding: 5px;">Course Content Overall Average</td>
+      <td style="border: 1px solid black; padding: 5px; text-align: center;">${statistics.value.averageContent.toFixed(2)}</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid black; padding: 5px;">Venue & Facilities Overall Average</td>
+      <td style="border: 1px solid black; padding: 5px; text-align: center;">${statistics.value.averageVenue.toFixed(2)}</td>
+    </tr>
+    <tr style="font-weight: bold; background-color: #f9fafb;">
+      <td style="border: 1px solid black; padding: 5px;">TOTAL OVERALL SYSTEM AVERAGE</td>
+      <td style="border: 1px solid black; padding: 5px; text-align: center;">${statistics.value.averageOverall.toFixed(2)}</td>
+    </tr>
+  </table>
+  
+  </div></body></html>`
 
   const blob = new Blob(['\ufeff', html], { type: 'application/msword' })
   const link = document.createElement('a')
