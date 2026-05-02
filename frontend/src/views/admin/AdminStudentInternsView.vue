@@ -58,6 +58,7 @@
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Year</th>
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Start</th>
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">End</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Status</th>
                   <th class="px-4 py-3 text-left text-xs font-medium text-gray-400">Actions</th>
                 </tr>
               </thead>
@@ -73,6 +74,11 @@
                   <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{{ intern.yearLevel || '-' }}</td>
                   <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{{ intern.startDate || '-' }}</td>
                   <td class="px-4 py-3 text-xs text-gray-600 whitespace-nowrap">{{ intern.endDate || '-' }}</td>
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <span :class="intern.status === 'Inactive' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'" class="px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide">
+                      {{ intern.status === 'Inactive' ? 'Inactive' : 'Active' }}
+                    </span>
+                  </td>
                   <td class="px-4 py-3 whitespace-nowrap">
                     <div class="flex items-center gap-1.5">
                       <button
@@ -102,6 +108,15 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
+                      </button>
+                      <button
+                        @click="toggleStatus(intern)"
+                        :class="intern.status === 'Inactive' ? 'text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50' : 'text-amber-500 hover:text-amber-700 hover:bg-amber-50'"
+                        class="p-1 rounded transition-colors"
+                        :title="intern.status === 'Inactive' ? 'Activate Account' : 'Deactivate Account'"
+                      >
+                        <svg v-if="intern.status === 'Inactive'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
                       </button>
                     </div>
                   </td>
@@ -996,6 +1011,20 @@ export default {
         alert('Failed to delete intern.')
       } finally {
         this.deletingIntern = false
+      }
+    },
+    async toggleStatus(intern) {
+      if (this.savingIntern) return
+      this.savingIntern = true
+      try {
+        const newStatus = intern.status === 'Inactive' ? 'Active' : 'Inactive'
+        const userRef = doc(db, 'users', intern.id)
+        await updateDoc(userRef, { status: newStatus })
+        await this.fetchInterns()
+      } catch (err) {
+        alert('Failed to update status: ' + err.message)
+      } finally {
+        this.savingIntern = false
       }
     },
   },

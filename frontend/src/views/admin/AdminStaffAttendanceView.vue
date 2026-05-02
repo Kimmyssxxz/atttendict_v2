@@ -127,7 +127,8 @@
                   <th class="px-6 py-4">Gender</th>
                   <th class="px-6 py-4">Age</th>
                   <th class="px-6 py-4">Phone</th>
-                  <th class="px-6 py-4 t">Actions</th>
+                  <th class="px-6 py-4">Status</th>
+                  <th class="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100">
@@ -180,8 +181,13 @@
                     {{ calculateAge(s.dateOfBirth) }} yrs
                   </td>
                   <td class="px-6 py-5 whitespace-nowrap text-gray-600 text-xs font-semibold">{{ s.phone || '-' }}</td>
-                  <td class="px-6 py-5 whitespace-nowrap text-left">
-                    <div class="flex items-left gap-1 pr-2">
+                  <td class="px-6 py-5 whitespace-nowrap">
+                    <span :class="s.status === 'Inactive' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'" class="px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide">
+                      {{ s.status === 'Inactive' ? 'Inactive' : 'Active' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-5 whitespace-nowrap text-right">
+                    <div class="flex items-center justify-end gap-1 pr-2">
                       <button
                         @click="openViewEditModal(s, 'view')"
                         class="p-2 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
@@ -202,6 +208,15 @@
                         title="Archive Account"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                      <button
+                        @click="toggleStatus(s)"
+                        :class="s.status === 'Inactive' ? 'text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50' : 'text-amber-500 hover:text-amber-700 hover:bg-amber-50'"
+                        class="p-2 rounded-lg transition-all"
+                        :title="s.status === 'Inactive' ? 'Activate Account' : 'Deactivate Account'"
+                      >
+                        <svg v-if="s.status === 'Inactive'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
                       </button>
                     </div>
                   </td>
@@ -620,6 +635,21 @@ export default {
         this.closeModal()
       } catch (err) {
         alert('Operation failed: ' + err.message)
+      } finally {
+        this.saving = false
+      }
+    },
+
+    async toggleStatus(s) {
+      if (this.saving) return
+      this.saving = true
+      try {
+        const newStatus = s.status === 'Inactive' ? 'Active' : 'Inactive'
+        const userRef = doc(db, 'users', s.id)
+        await updateDoc(userRef, { status: newStatus })
+        await this.fetchStaffUsers()
+      } catch (err) {
+        alert('Failed to update status: ' + err.message)
       } finally {
         this.saving = false
       }

@@ -532,6 +532,10 @@ async function loginWithRole(req, res, expectedRole) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
+    if (user.status === 'Inactive') {
+      return res.status(403).json({ message: 'Account is deactivated. Please contact the administrator.' });
+    }
+
     if (user.role !== expectedRole) {
       return res.status(403).json({
         message: `You are not allowed to login here. Your role is '${user.role}', this login is for '${expectedRole}' only.`,
@@ -604,6 +608,10 @@ app.post('/auth/login', async (req, res) => {
         message: 'Account not verified. Please check your email for the OTP.', 
         email: user.email 
       });
+    }
+
+    if (user.status === 'Inactive') {
+      return res.status(403).json({ message: 'Account is deactivated. Please contact the administrator.' });
     }
 
     const normalizedRole = user.role === 'intern' ? 'student' : user.role;
