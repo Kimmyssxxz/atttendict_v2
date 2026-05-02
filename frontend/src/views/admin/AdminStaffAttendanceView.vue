@@ -120,14 +120,14 @@
               <thead>
                 <tr class="bg-gray-50/50 text-gray-500 text-[10px] uppercase tracking-wider">
                   <th class="px-2 py-4 font-bold">Full Name</th>
-                  <th class="px-2 py-4 font-bold">User</th>
+                  <th class="px-2 py-4 font-bold">Username</th>
                   <th class="px-2 py-4 font-bold">Email</th>
                   <th class="px-2 py-4 font-bold">Role</th>
                   <th class="px-2 py-4 font-bold">Office</th>
-                  <th class="px-2 py-4 font-bold text-center">G</th>
+                  <th class="px-2 py-4 font-bold text-center">Gender</th>
                   <th class="px-2 py-4 font-bold text-center">Age</th>
                   <th class="px-2 py-4 font-bold">Phone</th>
-                  <th class="px-2 py-4 font-bold">Stat</th>
+                  <th class="px-2 py-4 font-bold">Status</th>
                   <th class="px-2 py-4 font-bold text-right">Actions</th>
                 </tr>
               </thead>
@@ -172,9 +172,9 @@
                       {{ s.assignedOffice || '-' }}
                     </span>
                   </td>
-                  <td class="px-3 py-4 whitespace-nowrap text-center">
+                  <td class="px-2 py-4 whitespace-nowrap text-center">
                     <span class="text-[11px] font-medium text-gray-600">
-                      {{ s.gender?.[0] || '-' }}
+                      {{ s.gender || '-' }}
                     </span>
                   </td>
                   <td class="px-2 py-4 whitespace-nowrap text-center text-gray-600 text-[11px] font-semibold">
@@ -183,7 +183,7 @@
                   <td class="px-2 py-4 whitespace-nowrap text-gray-600 text-[11px] font-semibold">{{ s.phone || '-' }}</td>
                   <td class="px-2 py-4 whitespace-nowrap">
                     <span :class="s.status === 'Inactive' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'" class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
-                      {{ s.status === 'Inactive' ? 'Inact' : 'Act' }}
+                      {{ s.status === 'Inactive' ? 'Inactive' : 'Active' }}
                     </span>
                   </td>
                   <td class="px-2 py-4 whitespace-nowrap text-right">

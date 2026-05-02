@@ -49,7 +49,7 @@
               <thead class="bg-gray-50/50">
                 <tr class="text-[10px] uppercase tracking-wider">
                   <th class="px-2 py-3 text-left font-bold text-gray-400">No</th>
-                  <th class="px-2 py-3 text-left font-bold text-gray-400">Name</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Full Name</th>
                   <th class="px-2 py-3 text-left font-bold text-gray-400">Email</th>
                   <th class="px-2 py-3 text-left font-bold text-gray-400">School</th>
                   <th class="px-2 py-3 text-left font-bold text-gray-400">Hrs</th>
@@ -58,7 +58,7 @@
                   <th class="px-2 py-3 text-left font-bold text-gray-400">Yr</th>
                   <th class="px-2 py-3 text-left font-bold text-gray-400">Start</th>
                   <th class="px-2 py-3 text-left font-bold text-gray-400">End</th>
-                  <th class="px-2 py-3 text-left font-bold text-gray-400">Stat</th>
+                  <th class="px-2 py-3 text-left font-bold text-gray-400">Status</th>
                   <th class="px-2 py-3 text-left font-bold text-gray-400">Actions</th>
                 </tr>
               </thead>
@@ -76,7 +76,7 @@
                   <td class="px-2 py-3 text-[11px] text-gray-600 whitespace-nowrap text-[10px]">{{ intern.endDate || '-' }}</td>
                   <td class="px-2 py-3 whitespace-nowrap">
                     <span :class="intern.status === 'Inactive' ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'" class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
-                      {{ intern.status === 'Inactive' ? 'Inact' : 'Act' }}
+                      {{ intern.status === 'Inactive' ? 'Inactive' : 'Active' }}
                     </span>
                   </td>
                   <td class="px-2 py-3 whitespace-nowrap">
