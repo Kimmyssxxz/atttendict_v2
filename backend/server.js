@@ -602,15 +602,14 @@ app.post('/auth/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
-    if (user.isVerified === false) {
-      return res.status(403).json({ 
-        errorCode: 'NOT_VERIFIED', 
-        message: 'Account not verified. Please check your email for the OTP.', 
-        email: user.email 
-      });
-    }
-
     if (user.status === 'Inactive') {
+      if (user.isVerified === false) {
+        return res.status(403).json({ 
+          errorCode: 'NOT_VERIFIED', 
+          message: 'Account not verified. Please check your email for the OTP.', 
+          email: user.email 
+        });
+      }
       return res.status(403).json({ message: 'Account is deactivated. Please contact the administrator.' });
     }
 
@@ -1132,6 +1131,7 @@ app.post('/auth/intern/register', async (req, res) => {
 
       password: hashedPassword,
       isVerified: false,
+      status: 'Inactive',
       otpCode,
       otpExpiresAt,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -1202,6 +1202,7 @@ app.post('/auth/staff/register', async (req, res) => {
       dateOfBirth: dateOfBirth || '',
       address: address || '',
       isVerified: false,
+      status: 'Inactive',
       otpCode,
       otpExpiresAt,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -1249,6 +1250,7 @@ app.post('/auth/verify-otp', async (req, res) => {
 
     await userDoc.ref.update({
       isVerified: true,
+      status: 'Active',
       otpCode: admin.firestore.FieldValue.delete(),
       otpExpiresAt: admin.firestore.FieldValue.delete(),
     });
