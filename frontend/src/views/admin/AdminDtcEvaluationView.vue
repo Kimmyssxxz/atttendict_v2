@@ -80,8 +80,8 @@
             </div>
           </div>
 
+
           <!-- Statistics Cards -->
-          </div>
 
           <!-- Global Averages Row -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
