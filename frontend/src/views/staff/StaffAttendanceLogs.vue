@@ -153,7 +153,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                   <!-- DTR Export -->
-                  <button @click="exportDTR" class="flex items-center justify-center gap-2 px-4 py-3 bg-[#133e75]/10 text-[#133e75] border border-[#133e75] rounded-xl text-xs font-semibold transition-colors ">
+                  <button @click="prepareDtrForEdit" class="flex items-center justify-center gap-2 px-4 py-3 bg-[#133e75]/10 text-[#133e75] border border-[#133e75] rounded-xl text-xs font-semibold transition-colors ">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                       <polyline points="14 2 14 8 20 8"></polyline>
@@ -331,7 +331,7 @@
               </div>
             
               <div class="flex items-center gap-2">
-                <button @click="exportDTR" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-semibold hover:bg-blue-100 transition-colors shadow-sm" title="Export as DTR (Form 48)">
+                <button @click="prepareDtrForEdit" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-semibold hover:bg-blue-100 transition-colors shadow-sm" title="Export as DTR (Form 48)">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
@@ -480,6 +480,74 @@
       </div>
     </main>
 
+    <!-- DTR Edit Modal -->
+    <div v-if="showDtrEditModal" class="fixed inset-0 z-[1100] flex items-center justify-center p-2 md:p-5">
+      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="showDtrEditModal = false"></div>
+      <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="px-4 md:px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+          <h3 class="text-base md:text-lg font-semibold text-slate-800 m-0">Edit DTR ({{ dtrPdfMetadata.monthName }} {{ dtrPdfMetadata.year }})</h3>
+          <button @click="showDtrEditModal = false" class="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none p-1">
+            <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="p-4 md:p-6 flex-1 overflow-auto custom-scrollbar">
+          <div class="bg-blue-50 text-blue-800 text-xs md:text-sm p-3 rounded-lg mb-4">
+            Changes made here are <strong>temporary</strong> and only affect the printed DTR. They do not alter your official database records.
+          </div>
+          <div class="overflow-x-auto pb-2">
+            <table class="w-full min-w-[650px] border-collapse text-sm text-center border border-slate-200">
+              <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                <tr>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">Day</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">AM Arrival</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">AM Departure</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">PM Arrival</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">PM Departure</th>
+                  <th class="border border-slate-200 p-2 whitespace-nowrap">Total (h m)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="day in 31" :key="day" :class="{'bg-slate-50': dtrEditData[day]?.isWeekend}">
+                  <td class="border border-slate-200 p-2 font-medium">
+                    <div class="flex flex-col items-center">
+                      <span>{{ day }}</span>
+                      <span v-if="dtrEditData[day]?.isWeekend" class="text-[0.6rem] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{{ dtrEditData[day].dayName }}</span>
+                    </div>
+                  </td>
+                  <template v-if="dtrEditData[day]">
+                    <td class="border border-slate-200 p-1 min-w-[90px]">
+                      <input v-model="dtrEditData[day].amArrival" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                    </td>
+                    <td class="border border-slate-200 p-1 min-w-[90px]">
+                      <input v-model="dtrEditData[day].amDeparture" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                    </td>
+                    <td class="border border-slate-200 p-1 min-w-[90px]">
+                      <input v-model="dtrEditData[day].pmArrival" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                    </td>
+                    <td class="border border-slate-200 p-1 min-w-[90px]">
+                      <input v-model="dtrEditData[day].pmDeparture" type="text" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                    </td>
+                    <td class="border border-slate-200 p-1 min-w-[120px]">
+                      <div class="flex gap-1">
+                        <input v-model="dtrEditData[day].hours" type="text" placeholder="h" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                        <input v-model="dtrEditData[day].mins" type="text" placeholder="m" class="w-full p-1 text-center border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white" />
+                      </div>
+                    </td>
+                  </template>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="px-4 md:px-6 py-3 md:py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2 md:gap-3 shrink-0">
+          <button @click="showDtrEditModal = false" class="px-4 md:px-5 py-2 md:py-2.5 rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm text-sm font-semibold cursor-pointer transition-colors hover:bg-slate-100">Cancel</button>
+          <button @click="generatePdfFromEditedData" class="px-4 md:px-5 py-2 md:py-2.5 rounded-full border-none bg-[#eebb3b] text-white text-sm font-bold cursor-pointer transition-all hover:brightness-105 active:scale-[0.98] flex-1 md:flex-none">Confirm & Download</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Overlay for Modal -->
     <div v-if="isViewModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 transition-opacity" @click.self="closeViewModal">
       <div class="bg-white rounded-2xl  w-full max-w-lg mx-4 overflow-hidden animate-[fadeIn_0.2s_ease-out]">
@@ -626,6 +694,10 @@ const selectedAttendance = ref(null)
 
 const isDeleteModalOpen = ref(false)
 const attendanceToDelete = ref(null)
+
+const showDtrEditModal = ref(false)
+const dtrEditData = ref({})
+const dtrPdfMetadata = ref({ monthName: '', year: '', daysInMonth: 31 })
 
 const selectedMonth = ref(new Date().getMonth())
 const selectedYear = ref(new Date().getFullYear())
@@ -1007,78 +1079,35 @@ const drawDTRPanel = (doc, startX, width) => {
   doc.line(startX + (width - 22), 43, startX + width - 5, 43)
   
   // Prepare Table logic (1 to 31)
-  const daysInMonth = 31 // Assume 31 for full form view or derive exact days based on month
-  const tableDataArr = []
-  
-  // Convert filtered logs into a Date -> Log map for easy lookup
-  const attendanceMap = {}
-  filteredAttendances.value.forEach(record => {
-    // 1. Expand leaves internally for the DTR only
-    if (record.type === 'Leave Application' && record.status === 'Leave (Approved)' && record.leaveStartDate && record.leaveEndDate) {
-      let current = new Date(record.leaveStartDate)
-      const end = new Date(record.leaveEndDate)
-      while (current <= end) {
-        if (!isNaN(current) && current.getMonth() === selectedMonth.value && current.getFullYear() === selectedYear.value) {
-          const dayNum = current.getDate()
-          if (!attendanceMap[dayNum]) attendanceMap[dayNum] = {}
-          attendanceMap[dayNum]['AM'] = { timeIn: 'Leave', timeOut: 'Leave' }
-          attendanceMap[dayNum]['PM'] = { timeIn: 'Leave', timeOut: 'Leave' }
-        }
-        current.setDate(current.getDate() + 1)
-      }
-    } else if (record.date) {
-      // 2. Normal processing
-      const d = new Date(record.date)
-      if (!isNaN(d)) {
-        const dayNum = d.getDate()
-        if (!attendanceMap[dayNum]) attendanceMap[dayNum] = {}
-        // Set standard AM/PM, ignore pure applications unless explicitly mapped
-        if (record.type === 'AM' || record.type === 'PM' || record.type === 'Afternoon') {
-          const normalizedType = record.type === 'Afternoon' ? 'PM' : record.type
-          attendanceMap[dayNum][normalizedType] = {
-             timeIn: record.timeIn,
-             timeOut: record.timeOut
-          }
-        }
-      }
-    }
-  })
+
 
   // Detect exact month/year
   const refYear = selectedYear.value
   const refMonth = selectedMonth.value
 
   for (let i = 1; i <= daysInMonth; i++) {
-    const curDate = new Date(refYear, refMonth, i)
-    const isSaturday = curDate.getDay() === 6
-    const isSunday = curDate.getDay() === 0
+    const data = dtrEditData.value[i] || {};
+    
     // Skip extra days if month < 31
+    const curDate = new Date(refYear, refMonth, i)
     if (curDate.getMonth() !== refMonth) {
-      tableDataArr.push([i.toString(), '', '', '', '', '', '']) // Exceeds month, blank
+      tableDataArr.push([i.toString(), '', '', '', '', '', ''])
       continue
     }
 
-    const logs = attendanceMap[i] || {}
+    const amIn = data.amArrival || '';
+    const amOut = data.amDeparture || '';
+    const pmIn = data.pmArrival || '';
+    const pmOut = data.pmDeparture || '';
+    const hours = data.hours || '';
+    const mins = data.mins || '';
     
-    const formatTimeOrStatus = (val) => {
-      if (!val) return ''
-      if (val === 'LEAVE') return 'LEAVE'
-      return parseMilitaryTime(val)
-    }
+    const hasLogs = amIn || amOut || pmIn || pmOut || hours || mins;
 
-    const amIn = formatTimeOrStatus(logs['AM']?.timeIn)
-    const amOut = formatTimeOrStatus(logs['AM']?.timeOut)
-    const pmIn = formatTimeOrStatus(logs['PM']?.timeIn)
-    const pmOut = formatTimeOrStatus(logs['PM']?.timeOut)
-    
-    const hasLogs = amIn || amOut || pmIn || pmOut
-
-    if (isSaturday && !hasLogs) {
-      tableDataArr.push([{ content: i.toString() }, { content: 'Saturday', colSpan: 4, styles: { align: 'center', textColor: [0, 0, 0] } }, '', ''])
-    } else if (isSunday && !hasLogs) {
-      tableDataArr.push([{ content: i.toString() }, { content: 'Sunday', colSpan: 4, styles: { align: 'center', textColor: [0, 0, 0] } }, '', ''])
+    if (data.isWeekend && !hasLogs) {
+      tableDataArr.push([{ content: i.toString() }, { content: data.dayName, colSpan: 4, styles: { align: 'center', textColor: [0, 0, 0], fontStyle: 'bold', cellPadding: 2, fontSize: 8, letterSpacing: 1 } }, '', ''])
     } else {
-      tableDataArr.push([i.toString(), amIn, amOut, pmIn, pmOut, '', ''])
+      tableDataArr.push([i.toString(), amIn, amOut, pmIn, pmOut, hours, mins])
     }
   }
   
@@ -1182,7 +1211,88 @@ const drawDTRPanel = (doc, startX, width) => {
   doc.text('In-Charge', centerLine, officerY + 10, { align: 'center' })
 }
 
-const exportDTR = () => {
+const prepareDtrForEdit = () => {
+  const refYear = selectedYear.value
+  const refMonth = selectedMonth.value
+  const daysInMonth = new Date(refYear, refMonth + 1, 0).getDate()
+  
+  dtrPdfMetadata.value = { 
+    monthName: months[refMonth], 
+    year: refYear, 
+    daysInMonth 
+  }
+
+  // Convert filtered logs into a Date -> Log map
+  const attendanceMap = {}
+  filteredAttendances.value.forEach(record => {
+    // Expand leaves internally for the DTR only
+    if (record.type === 'Leave Application' && record.status === 'Leave (Approved)' && record.leaveStartDate && record.leaveEndDate) {
+      let current = new Date(record.leaveStartDate)
+      const end = new Date(record.leaveEndDate)
+      while (current <= end) {
+        if (!isNaN(current) && current.getMonth() === refMonth && current.getFullYear() === refYear) {
+          const dayNum = current.getDate()
+          if (!attendanceMap[dayNum]) attendanceMap[dayNum] = {}
+          attendanceMap[dayNum]['AM'] = { timeIn: 'Leave', timeOut: 'Leave' }
+          attendanceMap[dayNum]['PM'] = { timeIn: 'Leave', timeOut: 'Leave' }
+        }
+        current.setDate(current.getDate() + 1)
+      }
+    } else if (record.date) {
+      const d = new Date(record.date)
+      if (!isNaN(d)) {
+        const dayNum = d.getDate()
+        if (!attendanceMap[dayNum]) attendanceMap[dayNum] = {}
+        // Set standard AM/PM, ignore pure applications unless explicitly mapped
+        if (record.type === 'AM' || record.type === 'PM' || record.type === 'Afternoon') {
+          const normalizedType = record.type === 'Afternoon' ? 'PM' : record.type
+          attendanceMap[dayNum][normalizedType] = {
+             timeIn: record.timeIn,
+             timeOut: record.timeOut
+          }
+        }
+      }
+    }
+  })
+
+  const formatTimeOrStatus = (val) => {
+    if (!val) return ''
+    if (val === 'LEAVE') return 'LEAVE'
+    return parseMilitaryTime(val)
+  }
+
+  const editData = {}
+  for (let day = 1; day <= 31; day++) {
+    const curDate = new Date(refYear, refMonth, day)
+    const isSaturday = curDate.getDay() === 6
+    const isSunday = curDate.getDay() === 0
+    const isWeekend = isSaturday || isSunday
+    const dayName = isSaturday ? 'SATURDAY' : 'SUNDAY'
+    
+    if (curDate.getMonth() !== refMonth) {
+      // Out of bounds day
+      editData[day] = { amArrival: '', amDeparture: '', pmArrival: '', pmDeparture: '', hours: '', mins: '', isWeekend: false, dayName: '' }
+      continue
+    }
+
+    const logs = attendanceMap[day] || {}
+    editData[day] = {
+      amArrival: formatTimeOrStatus(logs['AM']?.timeIn),
+      amDeparture: formatTimeOrStatus(logs['AM']?.timeOut),
+      pmArrival: formatTimeOrStatus(logs['PM']?.timeIn),
+      pmDeparture: formatTimeOrStatus(logs['PM']?.timeOut),
+      hours: '',
+      mins: '',
+      isWeekend,
+      dayName
+    }
+  }
+  
+  dtrEditData.value = editData
+  showDtrEditModal.value = true
+}
+
+const generatePdfFromEditedData = () => {
   // Use jsPDF directly, default is portrait, A4. (210 x 297 mm)
   const doc = new jsPDF('portrait', 'mm', 'a4')
   
@@ -1201,6 +1311,8 @@ const exportDTR = () => {
   // Create a blob URL to open in a new tab for printing, or just save it
   const blob = doc.output('bloburl')
   window.open(blob, '_blank')
+  
+  showDtrEditModal.value = false
 }
 // --- End Pagination & Filtering ---
 
