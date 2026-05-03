@@ -227,23 +227,15 @@ export default {
       const recipientBlue = [36, 79, 145]
       let currentY = 180
 
-      // --- MODERN CUSTOM BORDER & DECORATIONS ---
-      doc.setFillColor(255, 255, 255)
-      doc.rect(0, 0, pageWidth, pageHeight, 'F')
-
-      // Main Outer Border (Blue)
-      doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2])
-      doc.setLineWidth(10)
-      doc.rect(15, 15, pageWidth - 30, pageHeight - 30, 'S')
-
-      // Inner Accents (Red & Yellow)
-      doc.setDrawColor(dictRed[0], dictRed[1], dictRed[2])
-      doc.setLineWidth(2)
-      doc.rect(25, 25, pageWidth - 50, pageHeight - 50, 'S')
-      
-      doc.setDrawColor(goldYellow[0], goldYellow[1], goldYellow[2])
-      doc.setLineWidth(1.5)
-      doc.rect(30, 30, pageWidth - 60, pageHeight - 60, 'S')
+      // --- BACKGROUND IMAGE ---
+      try {
+        const bgImg = await this.loadImage('/cert bg 1.jpg')
+        doc.addImage(bgImg, 'JPEG', 0, 0, pageWidth, pageHeight)
+      } catch (err) {
+        console.error('Could not load background image', err)
+        doc.setFillColor(255, 255, 255)
+        doc.rect(0, 0, pageWidth, pageHeight, 'F')
+      }
 
       // Helper for centered text
       const centerText = (text, y, size, font = 'Helvetica', style = 'normal', color = [0, 0, 0]) => {
@@ -254,31 +246,6 @@ export default {
         const x = (pageWidth - textWidth) / 2
         doc.text(text, x, y)
       }
-
-      // Corner Geometric Decorations
-      const drawModernCorner = (type) => {
-        doc.saveGraphicsState()
-        if (type === 'TL') {
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(0, 0, 100, 0, 0, 100, 'F')
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(0, 0, 60, 0, 0, 60, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.triangle(0, 0, 30, 0, 0, 30, 'F')
-        } else if (type === 'TR') {
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(pageWidth, 0, pageWidth - 100, 0, pageWidth, 100, 'F')
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(pageWidth, 0, pageWidth - 60, 0, pageWidth, 60, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.triangle(pageWidth, 0, pageWidth - 30, 0, pageWidth, 30, 'F')
-        } else if (type === 'BL') {
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(0, pageHeight, 100, pageHeight, 0, pageHeight - 100, 'F')
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(0, pageHeight, 60, pageHeight, 0, pageHeight - 60, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.triangle(0, pageHeight, 30, pageHeight, 0, pageHeight - 30, 'F')
-        } else if (type === 'BR') {
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(pageWidth, pageHeight, pageWidth - 100, pageHeight, pageWidth, pageHeight - 100, 'F')
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(pageWidth, pageHeight, pageWidth - 60, pageHeight, pageWidth, pageHeight - 60, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.triangle(pageWidth, pageHeight, pageWidth - 30, pageHeight, pageWidth, pageHeight - 30, 'F')
-        }
-        doc.restoreGraphicsState()
-      }
-
-      drawModernCorner('TL'); drawModernCorner('TR'); drawModernCorner('BL'); drawModernCorner('BR')
 
       // --- LOGOS (Top Single Row) ---
       try {
