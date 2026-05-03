@@ -220,6 +220,30 @@ export default {
       const pageWidth = doc.internal.pageSize.getWidth()
       const pageHeight = doc.internal.pageSize.getHeight()
 
+      // --- HELPERS ---
+      const centerText = (text, y, size, font = 'Helvetica', style = 'normal', color = [0, 0, 0]) => {
+        doc.setFont(font, style)
+        doc.setFontSize(size)
+        doc.setTextColor(color[0], color[1], color[2])
+        const textWidth = doc.getTextWidth(text)
+        const x = (pageWidth - textWidth) / 2
+        doc.text(text, x, y)
+      }
+
+      const centerParagraph = (text, startY, size, lineHeight = 18, color = [0,0,0]) => {
+        doc.setFont('Helvetica', 'normal')
+        doc.setFontSize(size)
+        doc.setTextColor(color[0], color[1], color[2])
+        let y = startY
+        const lines = doc.splitTextToSize(text, pageWidth - 200)
+        lines.forEach(l => {
+          const w = doc.getTextWidth(l)
+          doc.text(l, (pageWidth - w) / 2, y)
+          y += lineHeight
+        })
+        return y
+      }
+
       // --- COLORS ---
       const navyBlue = [26, 77, 140]
       const goldYellow = [255, 204, 0]
@@ -239,74 +263,42 @@ export default {
 
       // --- ENHANCED ORNAMENTAL BORDERS ---
       const drawBorder = () => {
-        // Outer Elegant Frame (Navy)
-        doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2])
-        doc.setLineWidth(12)
+        doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.setLineWidth(12)
         doc.rect(15, 15, pageWidth - 30, pageHeight - 30, 'S')
-
-        // Inner Gold Thin Line
-        doc.setDrawColor(goldYellow[0], goldYellow[1], goldYellow[2])
-        doc.setLineWidth(2)
+        doc.setDrawColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.setLineWidth(2)
         doc.rect(26, 26, pageWidth - 52, pageHeight - 52, 'S')
-
-        // Inner Red Accent Line
-        doc.setDrawColor(dictRed[0], dictRed[1], dictRed[2])
-        doc.setLineWidth(1)
+        doc.setDrawColor(dictRed[0], dictRed[1], dictRed[2]); doc.setLineWidth(1)
         doc.rect(30, 30, pageWidth - 60, pageHeight - 60, 'S')
 
-        // ORNAMENTAL CORNER ACCENTS
         const drawOrnament = (x, y, r1, r2) => {
           doc.saveGraphicsState()
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
-          doc.triangle(x, y, x + r1, y, x, y + r1, 'F') // Base Navy
-          
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2])
-          doc.triangle(x, y, x + r2, y, x, y + r2, 'F') // Accent Red
-          
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.circle(x + r2/2, y + r2/2, 5, 'F') // Decorative dot
+          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(x, y, x + r1, y, x, y + r1, 'F')
+          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(x, y, x + r2, y, x, y + r2, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.circle(x + r2/2, y + r2/2, 5, 'F')
           doc.restoreGraphicsState()
         }
 
-        // Top Left
-        drawOrnament(0, 0, 120, 70)
-        // Top Right
-        doc.saveGraphicsState()
-        doc.translate(pageWidth, 0); doc.rotate(Math.PI / 2); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState()
-        // Bottom Right
-        doc.saveGraphicsState()
-        doc.translate(pageWidth, pageHeight); doc.rotate(Math.PI); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState()
-        // Bottom Left
-        doc.saveGraphicsState()
-        doc.translate(0, pageHeight); doc.rotate(-Math.PI / 2); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState()
+        drawOrnament(0, 0, 120, 70) // TL
+        doc.saveGraphicsState(); doc.translate(pageWidth, 0); doc.rotate(90); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState() // TR
+        doc.saveGraphicsState(); doc.translate(pageWidth, pageHeight); doc.rotate(180); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState() // BR
+        doc.saveGraphicsState(); doc.translate(0, pageHeight); doc.rotate(270); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState() // BL
       }
-
       drawBorder()
-
-      // Helper for centered text
-      const centerText = (text, y, size, font = 'Helvetica', style = 'normal', color = [0, 0, 0]) => {
-        doc.setFont(font, style)
-        doc.setFontSize(size)
-        doc.setTextColor(color[0], color[1], color[2])
-        const textWidth = doc.getTextWidth(text)
-        const x = (pageWidth - textWidth) / 2
-        doc.text(text, x, y)
-      }
 
       // --- LOGOS (Top Single Row) ---
       try {
-        const logoDict = await this.loadImage('/dictlogo2.png')
-        const logoBP = await this.loadImage('/Bagongpilipinas.png')
-        const logoILCDB = await this.loadImage('/ilcdb-removebg-preview.png')
-        const logoDTC = await this.loadImage('/OIP-removebg-preview.png')
+        const [logoDict, logoBP, logoILCDB, logoDTC] = await Promise.all([
+          this.loadImage('/dictlogo2.png'),
+          this.loadImage('/Bagongpilipinas.png'),
+          this.loadImage('/ilcdb-removebg-preview.png'),
+          this.loadImage('/OIP-removebg-preview.png')
+        ])
         
         let logoY = 55
         const logoHeight = 55
         const getWidth = (img, h) => (img.width / img.height) * h
-        
         const w1 = getWidth(logoDict, logoHeight); const w2 = getWidth(logoBP, logoHeight)
         const w3 = getWidth(logoILCDB, logoHeight); const w4 = getWidth(logoDTC, logoHeight)
-        
         const gap = 30
         const totalLogosWidth = w1 + w2 + w3 + w4 + (gap * 3)
         let currentX = (pageWidth - totalLogosWidth) / 2
@@ -317,14 +309,11 @@ export default {
         doc.addImage(logoDTC, 'PNG', currentX, logoY, w4, logoHeight)
         
         logoY += logoHeight + 25
-        
-        // --- HEADER TEXT ---
         centerText('Republic of the Philippines', logoY, 11, 'Helvetica', 'normal', [0, 0, 0])
         logoY += 15
         centerText('DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY', logoY, 12, 'Helvetica', 'bold', [0, 0, 0])
         logoY += 14
         centerText('STA. ISABEL, CALAPAN CITY ORIENTAL MINDORO', logoY, 11, 'Helvetica', 'normal', [0, 0, 0])
-        
         currentY = logoY + 45 
       } catch (err) {
         console.error('Could not load logos for certificate', err)
@@ -337,54 +326,30 @@ export default {
       const monthName = now.toLocaleString('en-US', { month: 'long' })
       const year = now.getFullYear()
 
-      // Signatory Info
       const sigName = 'ENGR. MARVIN D. BEJASA'
       const sigPos1 = 'OIC - PROVINCIAL OFFICER'
       const sigPos2 = 'DICT ORIENTAL MINDORO'
 
-      // Helper for centered paragraph
-      const centerParagraph = (text, startY, size, lineHeight = 18, color = [0,0,0]) => {
-        doc.setFont('Helvetica', 'normal')
-        doc.setFontSize(size)
-        doc.setTextColor(color[0], color[1], color[2])
-        let y = startY
-        const lines = doc.splitTextToSize(text, pageWidth - 200)
-        lines.forEach(l => {
-          const w = doc.getTextWidth(l)
-          doc.text(l, (pageWidth - w) / 2, y)
-          y += lineHeight
-        })
-        return y
-      }
-
       centerText('CERTIFICATE OF COMPLETION', currentY, 38, 'Helvetica', 'bold', navyBlue)
-      
       currentY += 35
       centerText('This certificate is awarded to', currentY, 18, 'Helvetica', 'normal', [50, 50, 50])
-      
       currentY += 60
       centerText(internName, currentY, 42, 'Helvetica', 'bold', recipientBlue)
       
-      // Blue underline for name
-      doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2])
-      doc.setLineWidth(2)
+      doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.setLineWidth(2)
       doc.line(80, currentY + 15, pageWidth - 80, currentY + 15)
 
       currentY += 45
       const description = `For his invaluable contribution as one of our On-the-Job trainee from Mindoro State University- Bongabong Campus that significantly help the institution in delivering extension services to our clients.`
-      currentY = centerParagraph(description, currentY, 13, 18, [36, 79, 145]) // Use recipientBlue for text too as in image
+      currentY = centerParagraph(description, currentY, 13, 18, [36, 79, 145])
       
       currentY += 30
       const dateText = `Given this ${day} day of ${monthName} ${year} at the Department of Information and Communications Technology – MIMAROPA Oriental Mindoro.`
       centerText(dateText, currentY, 13, 'Helvetica', 'normal', [36, 79, 145])
 
-      // Signatory at bottom center
       currentY = pageHeight - 100
-      doc.setDrawColor(0, 0, 0)
-      doc.setLineWidth(1.5)
-      const sigLineWidth = 200
-      doc.line((pageWidth - sigLineWidth) / 2, currentY, (pageWidth + sigLineWidth) / 2, currentY)
-      
+      doc.setDrawColor(0, 0, 0); doc.setLineWidth(1.5)
+      doc.line((pageWidth - 200) / 2, currentY, (pageWidth + 200) / 2, currentY)
       currentY += 20
       centerText(sigName, currentY, 14, 'Helvetica', 'bold')
       currentY += 16
@@ -393,8 +358,7 @@ export default {
       centerText(sigPos2, currentY, 12, 'Helvetica', 'normal', [80, 80, 80])
 
       const safeName = internName.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '') || 'intern'
-      const filename = `${safeName}_completion_certificate.pdf`
-      doc.save(filename)
+      doc.save(`${safeName}_completion_certificate.pdf`)
     },
   },
   created() {
