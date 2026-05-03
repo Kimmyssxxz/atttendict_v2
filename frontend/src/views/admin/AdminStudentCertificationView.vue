@@ -297,19 +297,27 @@ export default {
         const logoILCDB = await this.loadImage('/ilcdb-removebg-preview.png')
         const logoDTC = await this.loadImage('/OIP-removebg-preview.png')
         
-        const logoY = 50
-        const logoSize = 65 
         const centerX = pageWidth / 2
+        let logoY = 45
         
-        // Row 1: DICT & Bagong Pilipinas
-        doc.addImage(logoDict, 'PNG', centerX - 100, logoY, logoSize, logoSize)
-        doc.addImage(logoBP, 'PNG', centerX + 35, logoY, logoSize, logoSize)
+        // Row 1: DICT & Bagong Pilipinas (More compact and larger)
+        const row1Size = 75
+        const row1Gap = 20
+        doc.addImage(logoDict, 'PNG', centerX - (row1Size + row1Gap/2), logoY, row1Size, row1Size)
+        doc.addImage(logoBP, 'PNG', centerX + row1Gap/2, logoY, row1Size, row1Size)
         
-        // Row 2: ILCDB & DTC/Tech4ED
-        doc.addImage(logoILCDB, 'PNG', centerX - 120, logoY + logoSize + 5, 90, 35)
-        doc.addImage(logoDTC, 'PNG', centerX + 15, logoY + logoSize + 5, 110, 40)
+        // Row 2: ILCDB & DTC/Tech4ED (Wider, grouped closer to row 1)
+        logoY += row1Size + 5
+        const row2Gap = 30
+        // ILCDB: ~3:1 ratio
+        doc.addImage(logoILCDB, 'PNG', centerX - 120, logoY, 100, 35)
+        // DTC: ~4:1 ratio
+        doc.addImage(logoDTC, 'PNG', centerX + 20, logoY, 120, 35)
+        
+        currentY = logoY + 75 // Start text after logos
       } catch (err) {
         console.error('Could not load logos for certificate', err)
+        currentY = 180
       }
 
       const internName = (this.formatName(intern) || intern.username || 'Intern').toUpperCase()
@@ -348,7 +356,6 @@ export default {
         return y
       }
 
-      let currentY = 185 // Adjusted for larger logos
       centerText('CERTIFICATE OF COMPLETION', currentY, 38, 'Helvetica', 'bold', navyBlue)
       
       currentY += 35
