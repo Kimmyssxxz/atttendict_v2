@@ -243,7 +243,7 @@ export default {
         doc.setFontSize(size)
         doc.setTextColor(color[0], color[1], color[2])
         let y = startY
-        const lines = doc.splitTextToSize(text, pageWidth - 200)
+        const lines = doc.splitTextToSize(text, pageWidth - 300)
         lines.forEach(l => {
           const w = doc.getTextWidth(l)
           doc.text(l, (pageWidth - w) / 2, y)
@@ -333,7 +333,7 @@ export default {
       
       currentY += 30
       const dateText = `Given this ${day} day of ${monthName} ${year} at the Department of Information and Communications Technology – MIMAROPA Oriental Mindoro.`
-      centerText(dateText, currentY, 13, 'CenturyGothic', 'normal', [36, 79, 145])
+      centerParagraph(dateText, currentY, 13, 18, [36, 79, 145])
 
       currentY = pageHeight - 100
       doc.setDrawColor(0, 0, 0); doc.setLineWidth(1.5)
