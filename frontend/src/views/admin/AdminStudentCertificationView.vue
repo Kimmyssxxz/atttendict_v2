@@ -124,6 +124,8 @@
 import AdminSidebar from './AdminSidebar.vue'
 import TableSkeleton from '../../components/skeletons/TableSkeleton.vue'
 import jsPDF from 'jspdf'
+import { centuryGothicRegular } from '../../assets/fonts/century-gothic-regular.js'
+import { centuryGothicBold } from '../../assets/fonts/century-gothic-bold.js'
 
 export default {
   name: 'AdminStudentCertificationView',
@@ -220,8 +222,14 @@ export default {
       const pageWidth = doc.internal.pageSize.getWidth()
       const pageHeight = doc.internal.pageSize.getHeight()
 
+      // --- REGISTER CUSTOM FONTS ---
+      doc.addFileToVFS('CenturyGothic.ttf', centuryGothicRegular)
+      doc.addFont('CenturyGothic.ttf', 'CenturyGothic', 'normal')
+      doc.addFileToVFS('CenturyGothic-Bold.ttf', centuryGothicBold)
+      doc.addFont('CenturyGothic-Bold.ttf', 'CenturyGothic', 'bold')
+
       // --- HELPERS ---
-      const centerText = (text, y, size, font = 'Helvetica', style = 'normal', color = [0, 0, 0]) => {
+      const centerText = (text, y, size, font = 'CenturyGothic', style = 'normal', color = [0, 0, 0]) => {
         doc.setFont(font, style)
         doc.setFontSize(size)
         doc.setTextColor(color[0], color[1], color[2])
@@ -231,7 +239,7 @@ export default {
       }
 
       const centerParagraph = (text, startY, size, lineHeight = 18, color = [0,0,0]) => {
-        doc.setFont('Helvetica', 'normal')
+        doc.setFont('CenturyGothic', 'normal')
         doc.setFontSize(size)
         doc.setTextColor(color[0], color[1], color[2])
         let y = startY
@@ -288,11 +296,11 @@ export default {
         doc.addImage(logoDTC, 'PNG', currentX, logoY, w4, logoHeight)
         
         logoY += logoHeight + 25
-        centerText('Republic of the Philippines', logoY, 11, 'Helvetica', 'normal', [0, 0, 0])
+        centerText('Republic of the Philippines', logoY, 11, 'CenturyGothic', 'normal', [0, 0, 0])
         logoY += 15
-        centerText('DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY', logoY, 12, 'Helvetica', 'bold', [0, 0, 0])
+        centerText('DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY', logoY, 12, 'CenturyGothic', 'bold', [0, 0, 0])
         logoY += 14
-        centerText('STA. ISABEL, CALAPAN CITY ORIENTAL MINDORO', logoY, 11, 'Helvetica', 'normal', [0, 0, 0])
+        centerText('STA. ISABEL, CALAPAN CITY ORIENTAL MINDORO', logoY, 11, 'CenturyGothic', 'normal', [0, 0, 0])
         currentY = logoY + 45 
       } catch (err) {
         console.error('Could not load logos for certificate', err)
@@ -309,11 +317,11 @@ export default {
       const sigPos1 = 'OIC - PROVINCIAL OFFICER'
       const sigPos2 = 'DICT ORIENTAL MINDORO'
 
-      centerText('CERTIFICATE OF COMPLETION', currentY, 38, 'Helvetica', 'bold', navyBlue)
+      centerText('CERTIFICATE OF COMPLETION', currentY, 38, 'CenturyGothic', 'bold', navyBlue)
       currentY += 35
-      centerText('This certificate is awarded to', currentY, 18, 'Helvetica', 'normal', [50, 50, 50])
+      centerText('This certificate is awarded to', currentY, 18, 'CenturyGothic', 'normal', [50, 50, 50])
       currentY += 60
-      centerText(internName, currentY, 42, 'Helvetica', 'bold', recipientBlue)
+      centerText(internName, currentY, 42, 'CenturyGothic', 'bold', recipientBlue)
       
       doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.setLineWidth(2)
       doc.line(80, currentY + 15, pageWidth - 80, currentY + 15)
@@ -325,17 +333,17 @@ export default {
       
       currentY += 30
       const dateText = `Given this ${day} day of ${monthName} ${year} at the Department of Information and Communications Technology – MIMAROPA Oriental Mindoro.`
-      centerText(dateText, currentY, 13, 'Helvetica', 'normal', [36, 79, 145])
+      centerText(dateText, currentY, 13, 'CenturyGothic', 'normal', [36, 79, 145])
 
       currentY = pageHeight - 100
       doc.setDrawColor(0, 0, 0); doc.setLineWidth(1.5)
       doc.line((pageWidth - 200) / 2, currentY, (pageWidth + 200) / 2, currentY)
       currentY += 20
-      centerText(sigName, currentY, 14, 'Helvetica', 'bold')
+      centerText(sigName, currentY, 14, 'CenturyGothic', 'bold')
       currentY += 16
-      centerText(sigPos1, currentY, 12, 'Helvetica', 'normal', [80, 80, 80])
+      centerText(sigPos1, currentY, 12, 'CenturyGothic', 'normal', [80, 80, 80])
       currentY += 14
-      centerText(sigPos2, currentY, 12, 'Helvetica', 'normal', [80, 80, 80])
+      centerText(sigPos2, currentY, 12, 'CenturyGothic', 'normal', [80, 80, 80])
 
       const safeName = internName.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '') || 'intern'
       doc.save(`${safeName}_completion_certificate.pdf`)
