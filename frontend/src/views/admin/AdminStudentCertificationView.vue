@@ -261,46 +261,50 @@ export default {
         doc.rect(0, 0, pageWidth, pageHeight, 'F')
       }
 
-      // --- NEW DIAMOND-ACCENTED BORDERS ---
+      // --- MODERN GEOMETRIC ABSTRACT BORDERS ---
       const drawBorder = () => {
-        // Outer Elegant Frame (Navy)
-        doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.setLineWidth(14)
-        doc.rect(15, 15, pageWidth - 30, pageHeight - 30, 'S')
+        // Sleek Triple-Color Bar at Top & Bottom
+        const barH = 4
+        const barW = pageWidth - 60
+        const barX = 30
+        
+        // Top Bars
+        doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.rect(barX, 15, barW, barH, 'F')
+        doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.rect(barX, 15 + barH, barW, barH - 1, 'F')
+        doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.rect(barX, 15 + barH*2 - 1, barW, barH - 2, 'F')
 
-        // Inner Gold Thin Line
-        doc.setDrawColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.setLineWidth(2)
-        doc.rect(28, 28, pageWidth - 56, pageHeight - 56, 'S')
+        // Bottom Bars
+        doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.rect(barX, pageHeight - 15 - barH, barW, barH, 'F')
+        doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.rect(barX, pageHeight - 15 - barH*2 + 1, barW, barH - 1, 'F')
+        doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.rect(barX, pageHeight - 15 - barH*3 + 2, barW, barH - 2, 'F')
 
-        const drawDiamond = (x, y, size, color) => {
-          doc.setFillColor(color[0], color[1], color[2])
-          // A diamond is just a polygon with 4 points
-          doc.lines([[size, size], [size, -size], [-size, -size], [-size, size]], x, y - size, [1, 1], 'F')
+        // MODERN ASYMMETRIC CORNER SHAPES
+        const drawCornerShape = (x, y, size, flipX = 1, flipY = 1) => {
+          doc.saveGraphicsState()
+          // Primary Navy Shape
+          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
+          doc.triangle(x, y, x + (size * flipX), y, x, y + (size * 1.5 * flipY), 'F')
+          
+          // Accent Red Shape (Offset)
+          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2])
+          doc.triangle(x + (15 * flipX), y, x + (size * 0.7 * flipX), y, x, y + (size * 1.1 * flipY), 'F')
+          
+          // Accent Gold Shape (Small)
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
+          doc.triangle(x, y, x + (30 * flipX), y, x, y + (30 * flipY), 'F')
+          doc.restoreGraphicsState()
         }
 
-        // Draw ornamental corner diamonds
-        const cornerOffset = 35
-        const dSize = 25
-        
-        // TL
-        drawDiamond(cornerOffset, cornerOffset, dSize, navyBlue)
-        drawDiamond(cornerOffset, cornerOffset, dSize - 10, goldYellow)
-        
-        // TR
-        drawDiamond(pageWidth - cornerOffset, cornerOffset, dSize, navyBlue)
-        drawDiamond(pageWidth - cornerOffset, cornerOffset, dSize - 10, goldYellow)
-        
-        // BR
-        drawDiamond(pageWidth - cornerOffset, pageHeight - cornerOffset, dSize, navyBlue)
-        drawDiamond(pageWidth - cornerOffset, pageHeight - cornerOffset, dSize - 10, goldYellow)
-        
-        // BL
-        drawDiamond(cornerOffset, pageHeight - cornerOffset, dSize, navyBlue)
-        drawDiamond(cornerOffset, pageHeight - cornerOffset, dSize - 10, goldYellow)
+        const cSize = 150
+        drawCornerShape(0, 0, cSize, 1, 1) // TL
+        drawCornerShape(pageWidth, 0, cSize, -1, 1) // TR
+        drawCornerShape(pageWidth, pageHeight, cSize, -1, -1) // BR
+        drawCornerShape(0, pageHeight, cSize, 1, -1) // BL
 
-        // Side Accents
-        doc.setFillColor(dictRed[0], dictRed[1], dictRed[2])
-        doc.rect(pageWidth / 2 - 40, 15, 80, 5, 'F') // Top center
-        doc.rect(pageWidth / 2 - 40, pageHeight - 20, 80, 5, 'F') // Bottom center
+        // Subtle side frames
+        doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.setLineWidth(1)
+        doc.line(15, 60, 15, pageHeight - 60)
+        doc.line(pageWidth - 15, 60, pageWidth - 15, pageHeight - 60)
       }
       drawBorder()
 
