@@ -261,50 +261,28 @@ export default {
         doc.rect(0, 0, pageWidth, pageHeight, 'F')
       }
 
-      // --- MODERN GEOMETRIC ABSTRACT BORDERS ---
+      // --- MINIMALIST ELEGANT BORDERS ---
       const drawBorder = () => {
-        // Sleek Triple-Color Bar at Top & Bottom
-        const barH = 4
-        const barW = pageWidth - 60
-        const barX = 30
-        
-        // Top Bars
-        doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.rect(barX, 15, barW, barH, 'F')
-        doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.rect(barX, 15 + barH, barW, barH - 1, 'F')
-        doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.rect(barX, 15 + barH*2 - 1, barW, barH - 2, 'F')
+        // Main Outer Thin Border (Navy)
+        doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.setLineWidth(1.5)
+        doc.rect(20, 20, pageWidth - 40, pageHeight - 40, 'S')
 
-        // Bottom Bars
-        doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.rect(barX, pageHeight - 15 - barH, barW, barH, 'F')
-        doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.rect(barX, pageHeight - 15 - barH*2 + 1, barW, barH - 1, 'F')
-        doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.rect(barX, pageHeight - 15 - barH*3 + 2, barW, barH - 2, 'F')
+        // Inner Even Thinner Border (Gold)
+        doc.setDrawColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.setLineWidth(0.8)
+        doc.rect(24, 24, pageWidth - 48, pageHeight - 48, 'S')
 
-        // MODERN ASYMMETRIC CORNER SHAPES
-        const drawCornerShape = (x, y, size, flipX = 1, flipY = 1) => {
-          doc.saveGraphicsState()
-          // Primary Navy Shape
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
-          doc.triangle(x, y, x + (size * flipX), y, x, y + (size * 1.5 * flipY), 'F')
-          
-          // Accent Red Shape (Offset)
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2])
-          doc.triangle(x + (15 * flipX), y, x + (size * 0.7 * flipX), y, x, y + (size * 1.1 * flipY), 'F')
-          
-          // Accent Gold Shape (Small)
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.triangle(x, y, x + (30 * flipX), y, x, y + (30 * flipY), 'F')
-          doc.restoreGraphicsState()
+        // Subtle Corner Accents (Small 3-color blocks)
+        const drawMiniAccent = (x, y, moveX, moveY) => {
+          const s = 6
+          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.rect(x, y, s, s, 'F')
+          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.rect(x + (s * moveX), y, s, s, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.rect(x, y + (s * moveY), s, s, 'F')
         }
 
-        const cSize = 150
-        drawCornerShape(0, 0, cSize, 1, 1) // TL
-        drawCornerShape(pageWidth, 0, cSize, -1, 1) // TR
-        drawCornerShape(pageWidth, pageHeight, cSize, -1, -1) // BR
-        drawCornerShape(0, pageHeight, cSize, 1, -1) // BL
-
-        // Subtle side frames
-        doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.setLineWidth(1)
-        doc.line(15, 60, 15, pageHeight - 60)
-        doc.line(pageWidth - 15, 60, pageWidth - 15, pageHeight - 60)
+        drawMiniAccent(20, 20, 1, 1) // TL
+        drawMiniAccent(pageWidth - 26, 20, -1, 1) // TR
+        drawMiniAccent(pageWidth - 26, pageHeight - 26, -1, -1) // BR
+        drawMiniAccent(20, pageHeight - 26, 1, -1) // BL
       }
       drawBorder()
 
