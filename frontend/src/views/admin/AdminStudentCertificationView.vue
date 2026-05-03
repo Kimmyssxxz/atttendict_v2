@@ -301,21 +301,32 @@ export default {
         const centerX = pageWidth / 2
         let logoY = 45
         
-        // Row 1: DICT & Bagong Pilipinas (More compact and larger)
-        const row1Size = 75
-        const row1Gap = 20
-        doc.addImage(logoDict, 'PNG', centerX - (row1Size + row1Gap/2), logoY, row1Size, row1Size)
-        doc.addImage(logoBP, 'PNG', centerX + row1Gap/2, logoY, row1Size, row1Size)
+        // Helper for proportional width
+        const getWidth = (img, targetHeight) => {
+          const ratio = img.width / img.height
+          return targetHeight * ratio
+        }
+
+        // Row 1: DICT & Bagong Pilipinas
+        const row1Height = 75
+        const w1 = getWidth(logoDict, row1Height)
+        const w2 = getWidth(logoBP, row1Height)
+        const row1Gap = 30
         
-        // Row 2: ILCDB & DTC/Tech4ED (Wider, grouped closer to row 1)
-        logoY += row1Size + 5
-        const row2Gap = 30
-        // ILCDB: ~3:1 ratio
-        doc.addImage(logoILCDB, 'PNG', centerX - 120, logoY, 100, 35)
-        // DTC: ~4:1 ratio
-        doc.addImage(logoDTC, 'PNG', centerX + 20, logoY, 120, 35)
+        doc.addImage(logoDict, 'PNG', centerX - (w1 + row1Gap/2), logoY, w1, row1Height)
+        doc.addImage(logoBP, 'PNG', centerX + row1Gap/2, logoY, w2, row1Height)
         
-        currentY = logoY + 75 // Start text after logos
+        // Row 2: ILCDB & DTC/Tech4ED
+        logoY += row1Height + 10
+        const row2Height = 40
+        const w3 = getWidth(logoILCDB, row2Height)
+        const w4 = getWidth(logoDTC, row2Height)
+        const row2Gap = 40
+        
+        doc.addImage(logoILCDB, 'PNG', centerX - (w3 + row2Gap/2), logoY, w3, row2Height)
+        doc.addImage(logoDTC, 'PNG', centerX + row2Gap/2, logoY, w4, row2Height)
+        
+        currentY = logoY + row2Height + 60 // Start text after logos
       } catch (err) {
         console.error('Could not load logos for certificate', err)
         currentY = 180
