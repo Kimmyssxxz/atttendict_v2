@@ -216,7 +216,7 @@ export default {
       })
     },
     async generateCertificate(intern) {
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'letter' })
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' })
       const pageWidth = doc.internal.pageSize.getWidth()
       const pageHeight = doc.internal.pageSize.getHeight()
 
@@ -225,19 +225,18 @@ export default {
       const goldYellow = [255, 204, 0]
       const dictRed = [185, 46, 43]
       const recipientBlue = [36, 79, 145]
-      let currentY = 180 // Initialize currentY to avoid undefined error
+      let currentY = 180
 
       // --- MODERN CUSTOM BORDER & DECORATIONS ---
-      // 1. Solid White Background
       doc.setFillColor(255, 255, 255)
       doc.rect(0, 0, pageWidth, pageHeight, 'F')
 
-      // 2. Main Outer Border (Blue)
+      // Main Outer Border (Blue)
       doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2])
       doc.setLineWidth(10)
       doc.rect(15, 15, pageWidth - 30, pageHeight - 30, 'S')
 
-      // 3. Inner Accents (Red & Yellow)
+      // Inner Accents (Red & Yellow)
       doc.setDrawColor(dictRed[0], dictRed[1], dictRed[2])
       doc.setLineWidth(2)
       doc.rect(25, 25, pageWidth - 50, pageHeight - 50, 'S')
@@ -246,50 +245,40 @@ export default {
       doc.setLineWidth(1.5)
       doc.rect(30, 30, pageWidth - 60, pageHeight - 60, 'S')
 
-      // 4. Corner Geometric Decorations
+      // Helper for centered text
+      const centerText = (text, y, size, font = 'Helvetica', style = 'normal', color = [0, 0, 0]) => {
+        doc.setFont(font, style)
+        doc.setFontSize(size)
+        doc.setTextColor(color[0], color[1], color[2])
+        const textWidth = doc.getTextWidth(text)
+        const x = (pageWidth - textWidth) / 2
+        doc.text(text, x, y)
+      }
+
+      // Corner Geometric Decorations
       const drawModernCorner = (type) => {
         doc.saveGraphicsState()
-        if (type === 'TL') { // Top Left
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
-          doc.triangle(0, 0, 100, 0, 0, 100, 'F')
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2])
-          doc.triangle(0, 0, 60, 0, 0, 60, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.triangle(0, 0, 30, 0, 0, 30, 'F')
-        } else if (type === 'TR') { // Top Right
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
-          doc.triangle(pageWidth, 0, pageWidth - 100, 0, pageWidth, 100, 'F')
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2])
-          doc.triangle(pageWidth, 0, pageWidth - 60, 0, pageWidth, 60, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.triangle(pageWidth, 0, pageWidth - 30, 0, pageWidth, 30, 'F')
-        } else if (type === 'BL') { // Bottom Left
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
-          doc.triangle(0, pageHeight, 100, pageHeight, 0, pageHeight - 100, 'F')
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2])
-          doc.triangle(0, pageHeight, 60, pageHeight, 0, pageHeight - 60, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.triangle(0, pageHeight, 30, pageHeight, 0, pageHeight - 30, 'F')
-        } else if (type === 'BR') { // Bottom Right
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
-          doc.triangle(pageWidth, pageHeight, pageWidth - 100, pageHeight, pageWidth, pageHeight - 100, 'F')
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2])
-          doc.triangle(pageWidth, pageHeight, pageWidth - 60, pageHeight, pageWidth, pageHeight - 60, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
-          doc.triangle(pageWidth, pageHeight, pageWidth - 30, pageHeight, pageWidth, pageHeight - 30, 'F')
+        if (type === 'TL') {
+          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(0, 0, 100, 0, 0, 100, 'F')
+          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(0, 0, 60, 0, 0, 60, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.triangle(0, 0, 30, 0, 0, 30, 'F')
+        } else if (type === 'TR') {
+          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(pageWidth, 0, pageWidth - 100, 0, pageWidth, 100, 'F')
+          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(pageWidth, 0, pageWidth - 60, 0, pageWidth, 60, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.triangle(pageWidth, 0, pageWidth - 30, 0, pageWidth, 30, 'F')
+        } else if (type === 'BL') {
+          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(0, pageHeight, 100, pageHeight, 0, pageHeight - 100, 'F')
+          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(0, pageHeight, 60, pageHeight, 0, pageHeight - 60, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.triangle(0, pageHeight, 30, pageHeight, 0, pageHeight - 30, 'F')
+        } else if (type === 'BR') {
+          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(pageWidth, pageHeight, pageWidth - 100, pageHeight, pageWidth, pageHeight - 100, 'F')
+          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(pageWidth, pageHeight, pageWidth - 60, pageHeight, pageWidth, pageHeight - 60, 'F')
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.triangle(pageWidth, pageHeight, pageWidth - 30, pageHeight, pageWidth, pageHeight - 30, 'F')
         }
         doc.restoreGraphicsState()
       }
 
-      drawModernCorner('TL')
-      drawModernCorner('TR')
-      drawModernCorner('BL')
-      drawModernCorner('BR')
-
-      // 5. Subtle Side Accents
-      doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2], 0.1)
-      doc.rect(0, pageHeight / 2 - 50, 5, 100, 'F')
-      doc.rect(pageWidth - 5, pageHeight / 2 - 50, 5, 100, 'F')
+      drawModernCorner('TL'); drawModernCorner('TR'); drawModernCorner('BL'); drawModernCorner('BR')
 
       // --- LOGOS (Top Single Row) ---
       try {
@@ -298,18 +287,14 @@ export default {
         const logoILCDB = await this.loadImage('/ilcdb-removebg-preview.png')
         const logoDTC = await this.loadImage('/OIP-removebg-preview.png')
         
-        const centerX = pageWidth / 2
-        let logoY = 40
+        let logoY = 55
         const logoHeight = 55
-        
         const getWidth = (img, h) => (img.width / img.height) * h
         
-        const w1 = getWidth(logoDict, logoHeight)
-        const w2 = getWidth(logoBP, logoHeight)
-        const w3 = getWidth(logoILCDB, logoHeight)
-        const w4 = getWidth(logoDTC, logoHeight)
+        const w1 = getWidth(logoDict, logoHeight); const w2 = getWidth(logoBP, logoHeight)
+        const w3 = getWidth(logoILCDB, logoHeight); const w4 = getWidth(logoDTC, logoHeight)
         
-        const gap = 20
+        const gap = 30
         const totalLogosWidth = w1 + w2 + w3 + w4 + (gap * 3)
         let currentX = (pageWidth - totalLogosWidth) / 2
         
@@ -318,22 +303,19 @@ export default {
         doc.addImage(logoILCDB, 'PNG', currentX, logoY, w3, logoHeight); currentX += w3 + gap
         doc.addImage(logoDTC, 'PNG', currentX, logoY, w4, logoHeight)
         
-        logoY += logoHeight + 15
+        logoY += logoHeight + 25
         
         // --- HEADER TEXT ---
-        doc.setFont('Helvetica', 'normal')
-        doc.setFontSize(11)
-        doc.setTextColor(0, 0, 0)
-        centerText('Republic of the Philippines', logoY, 11)
+        centerText('Republic of the Philippines', logoY, 11, 'Helvetica', 'normal', [0, 0, 0])
         logoY += 15
-        centerText('DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY', logoY, 12, 'Helvetica', 'bold')
+        centerText('DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY', logoY, 12, 'Helvetica', 'bold', [0, 0, 0])
         logoY += 14
-        centerText('STA. ISABEL, CALAPAN CITY ORIENTAL MINDORO', logoY, 11, 'Helvetica', 'normal')
+        centerText('STA. ISABEL, CALAPAN CITY ORIENTAL MINDORO', logoY, 11, 'Helvetica', 'normal', [0, 0, 0])
         
         currentY = logoY + 45 
       } catch (err) {
         console.error('Could not load logos for certificate', err)
-        currentY = 180
+        currentY = 220
       }
 
       const internName = (this.formatName(intern) || intern.username || 'Intern').toUpperCase()
