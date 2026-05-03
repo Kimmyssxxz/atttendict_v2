@@ -270,18 +270,27 @@ export default {
         doc.setDrawColor(dictRed[0], dictRed[1], dictRed[2]); doc.setLineWidth(1)
         doc.rect(30, 30, pageWidth - 60, pageHeight - 60, 'S')
 
-        const drawOrnament = (x, y, r1, r2) => {
-          doc.saveGraphicsState()
-          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2]); doc.triangle(x, y, x + r1, y, x, y + r1, 'F')
-          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2]); doc.triangle(x, y, x + r2, y, x, y + r2, 'F')
-          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.circle(x + r2/2, y + r2/2, 5, 'F')
-          doc.restoreGraphicsState()
+        const drawTri = (x1, y1, x2, y2, x3, y3, color) => {
+          doc.setFillColor(color[0], color[1], color[2])
+          doc.triangle(x1, y1, x2, y2, x3, y3, 'F')
         }
 
-        drawOrnament(0, 0, 120, 70) // TL
-        doc.saveGraphicsState(); doc.translate(pageWidth, 0); doc.rotate(90); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState() // TR
-        doc.saveGraphicsState(); doc.translate(pageWidth, pageHeight); doc.rotate(180); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState() // BR
-        doc.saveGraphicsState(); doc.translate(0, pageHeight); doc.rotate(270); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState() // BL
+        const r1 = 120; const r2 = 70
+        // Top Left
+        drawTri(0, 0, r1, 0, 0, r1, navyBlue); drawTri(0, 0, r2, 0, 0, r2, dictRed)
+        doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.circle(r2/2.5, r2/2.5, 5, 'F')
+
+        // Top Right
+        drawTri(pageWidth, 0, pageWidth - r1, 0, pageWidth, r1, navyBlue); drawTri(pageWidth, 0, pageWidth - r2, 0, pageWidth, r2, dictRed)
+        doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.circle(pageWidth - r2/2.5, r2/2.5, 5, 'F')
+
+        // Bottom Right
+        drawTri(pageWidth, pageHeight, pageWidth - r1, pageHeight, pageWidth, pageHeight - r1, navyBlue); drawTri(pageWidth, pageHeight, pageWidth - r2, pageHeight, pageWidth, pageHeight - r2, dictRed)
+        doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.circle(pageWidth - r2/2.5, pageHeight - r2/2.5, 5, 'F')
+
+        // Bottom Left
+        drawTri(0, pageHeight, r1, pageHeight, 0, pageHeight - r1, navyBlue); drawTri(0, pageHeight, r2, pageHeight, 0, pageHeight - r2, dictRed)
+        doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2]); doc.circle(r2/2.5, pageHeight - r2/2.5, 5, 'F')
       }
       drawBorder()
 
