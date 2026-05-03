@@ -256,7 +256,7 @@ export default {
         const bgImg = await this.loadImage('/cert bg 1.jpg')
         doc.addImage(bgImg, 'JPEG', 0, 0, pageWidth, pageHeight)
         
-        const borderImg = await this.loadImage('/cert border 4.png')
+        const borderImg = await this.loadImage('/cert border 5.png')
         doc.addImage(borderImg, 'PNG', 0, 0, pageWidth, pageHeight)
       } catch (err) {
         console.error('Could not load images', err)
