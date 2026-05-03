@@ -237,20 +237,51 @@ export default {
         doc.rect(0, 0, pageWidth, pageHeight, 'F')
       }
 
-      // --- BORDERS (On top of background) ---
-      // Main Outer Border (Blue)
-      doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2])
-      doc.setLineWidth(10)
-      doc.rect(15, 15, pageWidth - 30, pageHeight - 30, 'S')
+      // --- ENHANCED ORNAMENTAL BORDERS ---
+      const drawBorder = () => {
+        // Outer Elegant Frame (Navy)
+        doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2])
+        doc.setLineWidth(12)
+        doc.rect(15, 15, pageWidth - 30, pageHeight - 30, 'S')
 
-      // Inner Accents (Red & Yellow)
-      doc.setDrawColor(dictRed[0], dictRed[1], dictRed[2])
-      doc.setLineWidth(2)
-      doc.rect(25, 25, pageWidth - 50, pageHeight - 50, 'S')
-      
-      doc.setDrawColor(goldYellow[0], goldYellow[1], goldYellow[2])
-      doc.setLineWidth(1.5)
-      doc.rect(30, 30, pageWidth - 60, pageHeight - 60, 'S')
+        // Inner Gold Thin Line
+        doc.setDrawColor(goldYellow[0], goldYellow[1], goldYellow[2])
+        doc.setLineWidth(2)
+        doc.rect(26, 26, pageWidth - 52, pageHeight - 52, 'S')
+
+        // Inner Red Accent Line
+        doc.setDrawColor(dictRed[0], dictRed[1], dictRed[2])
+        doc.setLineWidth(1)
+        doc.rect(30, 30, pageWidth - 60, pageHeight - 60, 'S')
+
+        // ORNAMENTAL CORNER ACCENTS
+        const drawOrnament = (x, y, r1, r2) => {
+          doc.saveGraphicsState()
+          doc.setFillColor(navyBlue[0], navyBlue[1], navyBlue[2])
+          doc.triangle(x, y, x + r1, y, x, y + r1, 'F') // Base Navy
+          
+          doc.setFillColor(dictRed[0], dictRed[1], dictRed[2])
+          doc.triangle(x, y, x + r2, y, x, y + r2, 'F') // Accent Red
+          
+          doc.setFillColor(goldYellow[0], goldYellow[1], goldYellow[2])
+          doc.circle(x + r2/2, y + r2/2, 5, 'F') // Decorative dot
+          doc.restoreGraphicsState()
+        }
+
+        // Top Left
+        drawOrnament(0, 0, 120, 70)
+        // Top Right
+        doc.saveGraphicsState()
+        doc.translate(pageWidth, 0); doc.rotate(Math.PI / 2); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState()
+        // Bottom Right
+        doc.saveGraphicsState()
+        doc.translate(pageWidth, pageHeight); doc.rotate(Math.PI); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState()
+        // Bottom Left
+        doc.saveGraphicsState()
+        doc.translate(0, pageHeight); doc.rotate(-Math.PI / 2); drawOrnament(0, 0, 120, 70); doc.restoreGraphicsState()
+      }
+
+      drawBorder()
 
       // Helper for centered text
       const centerText = (text, y, size, font = 'Helvetica', style = 'normal', color = [0, 0, 0]) => {
