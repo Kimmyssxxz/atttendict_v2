@@ -319,7 +319,8 @@ export default {
       doc.line(80, currentY + 15, pageWidth - 80, currentY + 15)
 
       currentY += 45
-      const description = `For his invaluable contribution as one of our On-the-Job trainee from Mindoro State University- Bongabong Campus that significantly help the institution in delivering extension services to our clients.`
+      const university = intern.schoolOrUniversity || 'Mindoro State University- Bongabong Campus'
+      const description = `For his invaluable contribution as one of our On-the-Job trainee from ${university} that significantly help the institution in delivering extension services to our clients.`
       currentY = centerParagraph(description, currentY, 13, 18, [36, 79, 145])
       
       currentY += 30
