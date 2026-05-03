@@ -291,7 +291,7 @@ export default {
       doc.rect(0, pageHeight / 2 - 50, 5, 100, 'F')
       doc.rect(pageWidth - 5, pageHeight / 2 - 50, 5, 100, 'F')
 
-      // --- LOGOS (Top Center Group) ---
+      // --- LOGOS (Top Single Row) ---
       try {
         const logoDict = await this.loadImage('/dictlogo2.png')
         const logoBP = await this.loadImage('/Bagongpilipinas.png')
@@ -299,37 +299,41 @@ export default {
         const logoDTC = await this.loadImage('/OIP-removebg-preview.png')
         
         const centerX = pageWidth / 2
-        let logoY = 45
+        let logoY = 40
+        const logoHeight = 55
         
-        // Helper for proportional width
-        const getWidth = (img, targetHeight) => {
-          const ratio = img.width / img.height
-          return targetHeight * ratio
-        }
-
-        // Row 1: DICT & Bagong Pilipinas (Extremely Large)
-        const row1Height = 130
-        const w1 = getWidth(logoDict, row1Height)
-        const w2 = getWidth(logoBP, row1Height)
-        const row1Gap = 40
+        const getWidth = (img, h) => (img.width / img.height) * h
         
-        doc.addImage(logoDict, 'PNG', centerX - (w1 + row1Gap/2), logoY, w1, row1Height)
-        doc.addImage(logoBP, 'PNG', centerX + row1Gap/2, logoY, w2, row1Height)
+        const w1 = getWidth(logoDict, logoHeight)
+        const w2 = getWidth(logoBP, logoHeight)
+        const w3 = getWidth(logoILCDB, logoHeight)
+        const w4 = getWidth(logoDTC, logoHeight)
         
-        // Row 2: ILCDB & DTC/Tech4ED (Extremely Large)
-        logoY += row1Height + 20
-        const row2Height = 70
-        const w3 = getWidth(logoILCDB, row2Height)
-        const w4 = getWidth(logoDTC, row2Height)
-        const row2Gap = 50
+        const gap = 20
+        const totalLogosWidth = w1 + w2 + w3 + w4 + (gap * 3)
+        let currentX = (pageWidth - totalLogosWidth) / 2
         
-        doc.addImage(logoILCDB, 'PNG', centerX - (w3 + row2Gap/2), logoY, w3, row2Height)
-        doc.addImage(logoDTC, 'PNG', centerX + row2Gap/2, logoY, w4, row2Height)
+        doc.addImage(logoDict, 'PNG', currentX, logoY, w1, logoHeight); currentX += w1 + gap
+        doc.addImage(logoBP, 'PNG', currentX, logoY, w2, logoHeight); currentX += w2 + gap
+        doc.addImage(logoILCDB, 'PNG', currentX, logoY, w3, logoHeight); currentX += w3 + gap
+        doc.addImage(logoDTC, 'PNG', currentX, logoY, w4, logoHeight)
         
-        currentY = logoY + row2Height + 80 // Start text after extremely large logos
+        logoY += logoHeight + 15
+        
+        // --- HEADER TEXT ---
+        doc.setFont('Helvetica', 'normal')
+        doc.setFontSize(11)
+        doc.setTextColor(0, 0, 0)
+        centerText('Republic of the Philippines', logoY, 11)
+        logoY += 15
+        centerText('DEPARTMENT OF INFORMATION AND COMMUNICATIONS TECHNOLOGY', logoY, 12, 'Helvetica', 'bold')
+        logoY += 14
+        centerText('STA. ISABEL, CALAPAN CITY ORIENTAL MINDORO', logoY, 11, 'Helvetica', 'normal')
+        
+        currentY = logoY + 45 
       } catch (err) {
         console.error('Could not load logos for certificate', err)
-        currentY = 280
+        currentY = 180
       }
 
       const internName = (this.formatName(intern) || intern.username || 'Intern').toUpperCase()
