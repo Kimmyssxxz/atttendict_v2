@@ -237,6 +237,21 @@ export default {
         doc.rect(0, 0, pageWidth, pageHeight, 'F')
       }
 
+      // --- BORDERS (On top of background) ---
+      // Main Outer Border (Blue)
+      doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2])
+      doc.setLineWidth(10)
+      doc.rect(15, 15, pageWidth - 30, pageHeight - 30, 'S')
+
+      // Inner Accents (Red & Yellow)
+      doc.setDrawColor(dictRed[0], dictRed[1], dictRed[2])
+      doc.setLineWidth(2)
+      doc.rect(25, 25, pageWidth - 50, pageHeight - 50, 'S')
+      
+      doc.setDrawColor(goldYellow[0], goldYellow[1], goldYellow[2])
+      doc.setLineWidth(1.5)
+      doc.rect(30, 30, pageWidth - 60, pageHeight - 60, 'S')
+
       // Helper for centered text
       const centerText = (text, y, size, font = 'Helvetica', style = 'normal', color = [0, 0, 0]) => {
         doc.setFont(font, style)
