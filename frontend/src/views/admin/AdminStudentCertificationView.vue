@@ -307,29 +307,29 @@ export default {
           return targetHeight * ratio
         }
 
-        // Row 1: DICT & Bagong Pilipinas (Even Larger)
-        const row1Height = 100
+        // Row 1: DICT & Bagong Pilipinas (Extremely Large)
+        const row1Height = 130
         const w1 = getWidth(logoDict, row1Height)
         const w2 = getWidth(logoBP, row1Height)
-        const row1Gap = 35
+        const row1Gap = 40
         
         doc.addImage(logoDict, 'PNG', centerX - (w1 + row1Gap/2), logoY, w1, row1Height)
         doc.addImage(logoBP, 'PNG', centerX + row1Gap/2, logoY, w2, row1Height)
         
-        // Row 2: ILCDB & DTC/Tech4ED (Even Larger)
-        logoY += row1Height + 15
-        const row2Height = 55
+        // Row 2: ILCDB & DTC/Tech4ED (Extremely Large)
+        logoY += row1Height + 20
+        const row2Height = 70
         const w3 = getWidth(logoILCDB, row2Height)
         const w4 = getWidth(logoDTC, row2Height)
-        const row2Gap = 45
+        const row2Gap = 50
         
         doc.addImage(logoILCDB, 'PNG', centerX - (w3 + row2Gap/2), logoY, w3, row2Height)
         doc.addImage(logoDTC, 'PNG', centerX + row2Gap/2, logoY, w4, row2Height)
         
-        currentY = logoY + row2Height + 70 // Start text after larger logos
+        currentY = logoY + row2Height + 80 // Start text after extremely large logos
       } catch (err) {
         console.error('Could not load logos for certificate', err)
-        currentY = 220
+        currentY = 280
       }
 
       const internName = (this.formatName(intern) || intern.username || 'Intern').toUpperCase()
