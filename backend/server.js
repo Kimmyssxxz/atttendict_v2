@@ -2157,6 +2157,7 @@ app.get('/admin/ojt-summary', async (req, res) => {
         ojtTotalMinutes: totalCountedMinutes,
         ojtTotalHours: totalHoursDecimal.toFixed(2),
         ojtTotalHoursLabel: totalHoursLabel,
+        schoolOrUniversity: user.schoolOrUniversity || ''
       });
     }
 
