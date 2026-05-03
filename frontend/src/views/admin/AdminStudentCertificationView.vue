@@ -329,16 +329,6 @@ export default {
       const sigPos1 = 'OIC - PROVINCIAL OFFICER'
       const sigPos2 = 'DICT ORIENTAL MINDORO'
 
-      // Helper for centered text
-      const centerText = (text, y, size, font = 'Helvetica', style = 'normal', color = [0, 0, 0]) => {
-        doc.setFont(font, style)
-        doc.setFontSize(size)
-        doc.setTextColor(color[0], color[1], color[2])
-        const textWidth = doc.getTextWidth(text)
-        const x = (pageWidth - textWidth) / 2
-        doc.text(text, x, y)
-      }
-
       // Helper for centered paragraph
       const centerParagraph = (text, startY, size, lineHeight = 18, color = [0,0,0]) => {
         doc.setFont('Helvetica', 'normal')
