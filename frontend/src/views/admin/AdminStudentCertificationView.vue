@@ -225,6 +225,7 @@ export default {
       const goldYellow = [255, 204, 0]
       const dictRed = [185, 46, 43]
       const recipientBlue = [36, 79, 145]
+      let currentY = 180 // Initialize currentY to avoid undefined error
 
       // --- MODERN CUSTOM BORDER & DECORATIONS ---
       // 1. Solid White Background
