@@ -47,8 +47,9 @@
         <input
           v-model="form.middleName"
           type="text"
+          required
           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-blue-500 focus:outline-none transition-colors"
-          placeholder="Middle Name (Optional)"
+          placeholder="Middle Name"
         />
 
         <!-- Role Dropdown -->
@@ -306,8 +307,9 @@
                   id="middleName"
                   v-model="form.middleName"
                   type="text"
+                  required
                   class="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
-                  placeholder="Middle Name (Optional)"
+                  placeholder="Middle Name"
                 />
               </div>
 
@@ -402,6 +404,9 @@
                   class="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-colors"
                   placeholder="School / University"
                 />
+                <p class="mt-1 text-[11px] text-red-500 italic">
+                  Note: Wag i-abbreviate ang school dahil mag-appear ito sa certificate.
+                </p>
               </div>
 
               <div v-if="form.role === 'student'" class="relative sm:col-span-2">
